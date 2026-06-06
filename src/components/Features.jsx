@@ -1,5 +1,6 @@
 import React from 'react';
 import coffeeMachine from '../coffee-machine.jpg';
+import { useTranslation } from 'react-i18next'
 
 const productItems = [
   { emoji: '☕', label: 'Espresso maşını' },
@@ -27,15 +28,15 @@ const CARD_BG = {
 };
 
 export default function Features() {
+  const { t } = useTranslation()
   return (
     <section id="features" style={{ background: '#F5F0E8', padding: '80px 60px' }}>
 
       <p style={{ fontSize: 12, letterSpacing: '0.15em', color: '#8B6F5E', marginBottom: 12 }}>
-        NİYƏ HORECAHUB?
+        {t('home.whyTitle')}
       </p>
       <h2 style={{ fontSize: 42, color: '#2C2820', marginBottom: 48, fontWeight: 700 }}>
-        Sektora xüsusi,{' '}
-        <span style={{ color: '#6B8C5A', fontStyle: 'italic' }}>sıfır kompromis</span>
+        {t('home.whySubtitle')}
       </h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24 }}>

@@ -1,38 +1,41 @@
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail } from 'lucide-react'
 import Logo from './Logo'
-
-const COLS = [
-  {
-    title: 'Platforma',
-    links: [
-      { label: 'Avadanlıq',    href: '/listings?category=kitchen' },
-      { label: 'Kadrlar',      href: '/listings?category=staff' },
-      { label: 'Təchizatçılar',href: '/listings?category=suppliers' },
-      { label: 'Bütün kateqoriyalar', href: '/listings' },
-    ],
-  },
-  {
-    title: 'Şirkət',
-    links: [
-      { label: 'Haqqımızda',   href: '/' },
-      { label: 'Blog',         href: '/' },
-      { label: 'Karyera',      href: '/' },
-      { label: 'Tərəfdaşlar',  href: '/' },
-    ],
-  },
-  {
-    title: 'Dəstək',
-    links: [
-      { label: 'Suallar (FAQ)', href: '/' },
-      { label: 'Əlaqə',         href: '/' },
-      { label: 'İstifadə şərtləri', href: '/' },
-      { label: 'Məxfilik siyasəti', href: '/' },
-    ],
-  },
-]
+import { useTranslation } from 'react-i18next'
 
 export default function Footer() {
+  const { t } = useTranslation()
+
+  const COLS = [
+    {
+      title: t('footer.platform'),
+      links: [
+        { label: t('footer.equipment'),    href: '/listings?category=kitchen' },
+        { label: t('footer.staff'),        href: '/listings?category=staff' },
+        { label: t('footer.suppliers'),    href: '/listings?category=suppliers' },
+        { label: t('footer.allCategories'),href: '/listings' },
+      ],
+    },
+    {
+      title: t('footer.company'),
+      links: [
+        { label: t('footer.about'),    href: '/' },
+        { label: t('footer.blog'),     href: '/' },
+        { label: t('footer.careers'),  href: '/' },
+        { label: t('footer.partners'), href: '/' },
+      ],
+    },
+    {
+      title: t('footer.support'),
+      links: [
+        { label: t('footer.faq'),     href: '/' },
+        { label: t('footer.contact'), href: '/' },
+        { label: t('footer.terms'),   href: '/terms' },
+        { label: t('footer.privacy'), href: '/privacy' },
+      ],
+    },
+  ]
+
   return (
     <footer id="footer" className="bg-navy text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -42,7 +45,7 @@ export default function Footer() {
               <Logo light height={30} />
             </div>
             <p className="text-sm text-white/50 leading-relaxed mb-6">
-              Azərbaycanın HoReCa sektorunu bir platformada birləşdiririk.
+              {t('footer.desc')}
             </p>
             <div className="space-y-2">
               {[
@@ -81,11 +84,11 @@ export default function Footer() {
 
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/30">
-            © 2025 HorecaHub.az. Bütün hüquqlar qorunur.
+            {t('footer.copyright')}
           </p>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-white/30 tracking-widest uppercase">Sistem aktiv</span>
+            <span className="text-xs text-white/30 tracking-widest uppercase">{t('footer.systemActive')}</span>
           </div>
         </div>
       </div>

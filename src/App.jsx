@@ -10,6 +10,13 @@ import AddListing from './pages/AddListing'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import Messages from './pages/Messages'
+import EditProfile from './pages/EditProfile'
+import EditListing from './pages/EditListing'
+import TermsOfService from './pages/TermsOfService'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import HowItWorks from './pages/HowItWorks'
+import NotFound from './pages/NotFound'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -35,6 +42,13 @@ function Layout() {
           <Route path="/login"        element={<Login />} />
           <Route path="/register"     element={<Register />} />
           <Route path="/profile/:id"  element={<Profile />} />
+          <Route path="/messages"     element={<Messages />} />
+          <Route path="/edit-profile"       element={<EditProfile />} />
+          <Route path="/listings/:id/edit" element={<EditListing />} />
+          <Route path="/terms"         element={<TermsOfService />} />
+          <Route path="/privacy"       element={<PrivacyPolicy />} />
+          <Route path="/how-it-works"  element={<HowItWorks />} />
+          <Route path="*"              element={<NotFound />} />
         </Routes>
       </main>
       {!isAuth && <Footer />}

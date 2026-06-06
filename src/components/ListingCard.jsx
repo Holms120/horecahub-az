@@ -1,14 +1,77 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Heart, MapPin, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Heart, MapPin, Clock, Pencil, Trash2 } from 'lucide-react'
+import { supabase } from '../supabaseClient'
+import { useAuth } from '../context/AuthContext'
+import { useTranslation } from 'react-i18next'
+
+const PAYMENT_BADGE  = {
+  cash:   'bg-blue-50 text-blue-700',
+  credit: 'bg-amber-50 text-amber-700',
+  order:  'bg-purple-50 text-purple-700',
+}
 
 export default function ListingCard({ listing }) {
-  const [liked, setLiked] = useState(false)
-  const { id, title, price, condition, city, date, image, priceLabel } = listing
+  const { t } = useTranslation()
+  const [isFavorited, setIsFavorited] = useState(false)
+  const [favLoading, setFavLoading]   = useState(false)
+  const [deleting, setDeleting]       = useState(false)
+  const { user }  = useAuth()
+  const navigate  = useNavigate()
+  const { id, title, price, condition, city, date, image, paymentType, userId,
+          category, listingType, skills } = listing
 
-  const displayPrice = price > 0
-    ? `${price.toLocaleString('az-AZ')} ₼`
-    : (priceLabel || 'Razılaşma ilə')
+  const PAYMENT_LABELS = { cash: t('listingCard.cash'), credit: t('listingCard.credit'), order: t('listingCard.order') }
+
+  const isOwner  = !!(user && userId && user.id === userId)
+  const isStaff  = category === 'staff'
+  const ptKey    = paymentType || 'cash'
+
+  const displayPrice = isStaff
+    ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
+    : `₼${price.toLocaleString('az-AZ')}`
+
+  const conditionBadge = isStaff
+    ? (listingType === 'vacancy'
+        ? { label: t('listingCard.vacancy'), cls: 'bg-purple-100 text-purple-700' }
+        : { label: t('listingCard.cv'),      cls: 'bg-blue-100 text-blue-700' })
+    : (condition === 'Yeni'
+        ? { label: t('listingCard.new'),  cls: 'bg-green-100 text-green-700' }
+        : { label: t('listingCard.used'), cls: 'bg-gray-100 text-gray-600' })
+
+  // Fetch favorite status
+  useEffect(() => {
+    if (!user || !id) return
+    supabase.from('favorites').select('id')
+      .eq('user_id', user.id).eq('listing_id', id).maybeSingle()
+      .then(({ data }) => setIsFavorited(!!data))
+  }, [user, id])
+
+  async function toggleFavorite(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!user) { navigate('/login'); return }
+    setFavLoading(true)
+    if (isFavorited) {
+      await supabase.from('favorites').delete()
+        .eq('user_id', user.id).eq('listing_id', id)
+      setIsFavorited(false)
+    } else {
+      await supabase.from('favorites').insert({ user_id: user.id, listing_id: id })
+      setIsFavorited(true)
+    }
+    setFavLoading(false)
+  }
+
+  async function handleDelete(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!window.confirm(t('listingCard.deleteConfirm'))) return
+    setDeleting(true)
+    await supabase.from('listings').update({ status: 'deleted' })
+      .eq('id', id).eq('user_id', user.id)
+    window.location.reload()
+  }
 
   return (
     <Link
@@ -22,22 +85,16 @@ export default function ListingCard({ listing }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
-        <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold ${
-          condition === 'Yeni'
-            ? 'bg-green-100 text-green-700'
-            : 'bg-gray-100 text-gray-600'
-        }`}>
-          {condition}
+        <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold ${conditionBadge.cls}`}>
+          {conditionBadge.label}
         </span>
         <button
-          onClick={e => { e.preventDefault(); setLiked(v => !v) }}
-          className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow hover:scale-110 transition-transform"
-          aria-label="Seçilmişlərə əlavə et"
+          onClick={toggleFavorite}
+          disabled={favLoading}
+          className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow hover:scale-110 transition-transform disabled:opacity-50"
+          aria-label={t('listingCard.addToFavorites')}
         >
-          <Heart
-            size={15}
-            className={liked ? 'fill-red-500 text-red-500' : 'text-gray-400'}
-          />
+          <Heart size={15} className={isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
         </button>
       </div>
 
@@ -45,17 +102,48 @@ export default function ListingCard({ listing }) {
         <p className="text-sm font-medium text-navy line-clamp-2 leading-snug mb-2 min-h-[2.5rem]">
           {title}
         </p>
-        <p className="text-base font-bold text-blue-600 mb-2">{displayPrice}</p>
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <span className="flex items-center gap-1">
-            <MapPin size={11} />
-            {city}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock size={11} />
-            {date}
-          </span>
+
+        {isStaff && listingType === 'cv' && skills?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {skills.slice(0, 3).map(s => (
+              <span key={s} className="bg-blue-50 text-blue-700 text-[10px] font-medium px-2 py-0.5 rounded-full">{s}</span>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-base font-bold text-blue-600">{displayPrice}</p>
+          {!isStaff && (
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PAYMENT_BADGE[ptKey] || PAYMENT_BADGE.cash}`}>
+              {PAYMENT_LABELS[ptKey] || t('listingCard.cash')}
+            </span>
+          )}
         </div>
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span className="flex items-center gap-1"><MapPin size={11} />{city}</span>
+          <span className="flex items-center gap-1"><Clock size={11} />{date}</span>
+        </div>
+
+        {/* Owner actions */}
+        {isOwner && (
+          <div className="flex gap-2 pt-2 mt-2 border-t border-gray-100 overflow-hidden">
+            <button
+              onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(`/listings/${id}/edit`) }}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors min-w-0 flex-1"
+            >
+              <Pencil size={11} className="flex-shrink-0" />
+              <span className="truncate">{t('listingCard.edit')}</span>
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50 min-w-0 flex-1"
+            >
+              <Trash2 size={11} className="flex-shrink-0" />
+              <span className="truncate">{deleting ? '...' : t('listingCard.delete')}</span>
+            </button>
+          </div>
+        )}
       </div>
     </Link>
   )

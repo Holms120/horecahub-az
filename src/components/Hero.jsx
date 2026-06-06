@@ -1,6 +1,9 @@
+import { useTranslation } from 'react-i18next'
+
 const heroImage = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1920&q=80'
 
 export default function Hero() {
+  const { t } = useTranslation()
   return (
     <section id="hero" style={{position:'relative', height:'100vh', overflow:'hidden'}}>
 
@@ -25,20 +28,19 @@ export default function Hero() {
         maxWidth:'520px'
       }}>
         <p style={{fontSize:'12px', letterSpacing:'0.15em', color:'#8B6F5E', marginBottom:'16px'}}>
-          Azərbaycanda ilk Horeca Marketplace
+          {t('hero.badge')}
         </p>
         <h1 style={{fontSize:'52px', lineHeight:1.1, color:'#2C2820', marginBottom:'24px'}}>
-          HoReCa üçün<br/>
-          <em>Marketplace.</em>
+          {t('hero.title')}
         </h1>
         <p style={{fontSize:'16px', color:'#7A7368', marginBottom:'36px'}}>
-          Avadanlıq, kadr, təchizatçı — hamısı bir yerdə. Vasitəçisiz, birbaşa.
+          {t('hero.subtitle')}
         </p>
         <div style={{display:'flex', gap:'16px', alignItems:'center'}}>
           <button style={{background:'#6B8C5A', color:'white', padding:'14px 28px', borderRadius:'8px', border:'none', fontSize:'15px', cursor:'pointer'}}>
-            Pulsuz listinq yerləşdir
+            {t('hero.cta')}
           </button>
-          <a href="#how" style={{color:'#2C2820', fontSize:'15px'}}>Necə işləyir →</a>
+          <a href="#how" style={{color:'#2C2820', fontSize:'15px'}}>{t('hero.howItWorks')}</a>
         </div>
       </div>
 

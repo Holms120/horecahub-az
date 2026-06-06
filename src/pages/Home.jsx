@@ -1,12 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import {
   Search, ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, ShieldCheck, MessageCircle,
   Target, ArrowRight, Plus
 } from 'lucide-react'
-import { CATEGORIES, LISTINGS } from '../data/mockData'
+import { CATEGORIES } from '../data/mockData'
+import { supabase } from '../supabaseClient'
+import { normalizeListing } from '../lib/normalize'
 import ListingCard from '../components/ListingCard'
+import { useTranslation } from 'react-i18next'
 
 const ICON_MAP = {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
@@ -25,9 +29,47 @@ const CAT_COLORS = [
 ]
 
 export default function Home() {
-  const [query, setQuery] = useState('')
+  const { t, i18n } = useTranslation()
+  const [query, setQuery]       = useState('')
   const [category, setCategory] = useState('')
+  const [listings, setListings] = useState([])
+  const [loadingListings, setLoadingListings] = useState(true)
+  const [stats, setStats] = useState({ listings: 0, sellers: 0 })
   const navigate = useNavigate()
+
+  const trustItems = [
+    { Icon: ShieldCheck, color: 'bg-green-50 text-green-600', title: t('home.verified'), desc: t('home.verifiedDesc') },
+    { Icon: MessageCircle, color: 'bg-blue-50 text-blue-600', title: t('home.direct'), desc: t('home.directDesc') },
+    { Icon: Target, color: 'bg-purple-50 text-purple-600', title: t('home.niche'), desc: t('home.nicheDesc') },
+  ]
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoadingListings(true)
+      const [latestRes, countRes, sellersRes] = await Promise.all([
+        supabase
+          .from('listings')
+          .select('*, profiles!left(id, full_name, company_name, account_type, logo_url, phone)')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(6),
+        supabase
+          .from('listings')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'active'),
+        supabase
+          .from('listings')
+          .select('user_id')
+          .eq('status', 'active'),
+      ])
+      setListings((latestRes.data || []).map(normalizeListing))
+      const totalListings = countRes.count ?? 0
+      const uniqueSellers = new Set((sellersRes.data || []).map(r => r.user_id)).size
+      setStats({ listings: totalListings, sellers: uniqueSellers })
+      setLoadingListings(false)
+    }
+    fetchData()
+  }, [i18n.language])
 
   function handleSearch(e) {
     e.preventDefault()
@@ -37,22 +79,27 @@ export default function Home() {
     navigate(`/listings?${params.toString()}`)
   }
 
-  const featured = LISTINGS.filter(l => l.isFeatured).slice(0, 8)
-  const recent = LISTINGS.slice(0, 8)
-
   return (
     <div>
+      <Helmet>
+        <title>{`HorecaHub — ${t('hero.title')}`}</title>
+        <meta name="description" content="Azərbaycanda HoReCa sektoru üçün ilk marketplace. Avadanlıq, kadr və təchizatçı elanları. Vasitəçisiz, birbaşa. Pulsuz qeydiyyat." />
+        <meta property="og:title" content="HorecaHub — HoReCa Marketplace" />
+        <meta property="og:description" content="Avadanlıq, kadr və təchizatçı elanları. Vasitəçisiz, birbaşa." />
+        <meta property="og:image" content="https://horecahub.az/logo.png" />
+        <meta property="og:url" content="https://horecahub.az" />
+      </Helmet>
       {/* ── HERO ── */}
       <section className="bg-gradient-to-br from-navy to-blue-700 text-white py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-blue-200 text-xs font-semibold tracking-widest uppercase mb-3">
-            Azərbaycanda ilk
+            {t('hero.badge')}
           </p>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4">
-            HoReCa üçün <span className="text-blue-300">Marketplace</span>
+            {t('hero.title')}
           </h1>
           <p className="text-blue-100 text-base md:text-lg mb-10 max-w-xl mx-auto">
-            Avadanlıq, kadr, təchizatçı — hamısı bir yerdə. Vasitəçisiz, birbaşa.
+            {t('hero.subtitle')}
           </p>
 
           {/* Search bar */}
@@ -62,8 +109,8 @@ export default function Home() {
               onChange={e => setCategory(e.target.value)}
               className="sm:w-44 flex-shrink-0 px-3 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
             >
-              <option value="">Bütün kateqoriyalar</option>
-              {CATEGORIES.map(c => (
+              <option value="">{t('hero.allCategories')}</option>
+              {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map(c => (
                 <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
@@ -72,7 +119,7 @@ export default function Home() {
                 <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Nə axtarırsınız?"
+                  placeholder={t('hero.searchPlaceholder')}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 text-sm text-gray-800 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 bg-gray-50"
@@ -83,18 +130,18 @@ export default function Home() {
                 className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Search size={16} />
-                <span className="hidden sm:inline">Axtar</span>
+                <span className="hidden sm:inline">{t('hero.searchBtn')}</span>
               </button>
             </div>
           </form>
 
           {/* Stats */}
           <div className="flex items-center justify-center gap-8 mt-8 text-sm text-blue-200">
-            <span><strong className="text-white text-lg">479</strong> Listinq</span>
+            <span><strong className="text-white text-lg">{stats.listings}</strong> {t('hero.listings')}</span>
             <span className="w-px h-4 bg-blue-500" />
-            <span><strong className="text-white text-lg">200+</strong> Satıcı</span>
+            <span><strong className="text-white text-lg">{stats.sellers}</strong> {t('hero.sellers')}</span>
             <span className="w-px h-4 bg-blue-500" />
-            <span><strong className="text-white text-lg">8</strong> Kateqoriya</span>
+            <span><strong className="text-white text-lg">8</strong> {t('hero.categories')}</span>
           </div>
         </div>
       </section>
@@ -103,16 +150,16 @@ export default function Home() {
       <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-navy">Kateqoriyalar</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-navy">{t('home.categoriesTitle')}</h2>
             <button
               onClick={() => navigate('/listings')}
               className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
             >
-              Hamısına bax <ArrowRight size={15} />
+              {t('home.viewAll')} <ArrowRight size={15} />
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-            {CATEGORIES.map((cat, i) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
               return (
                 <button
@@ -122,9 +169,8 @@ export default function Home() {
                 >
                   {Icon && <Icon size={24} />}
                   <span className="text-xs font-semibold text-center leading-tight text-navy">
-                    {cat.label}
+                    {t(cat.key) || cat.label}
                   </span>
-                  <span className="text-xs text-gray-400">{cat.count}</span>
                 </button>
               )
             })}
@@ -132,74 +178,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FEATURED LISTINGS ── */}
+      {/* ── LATEST LISTINGS ── */}
       <section className="py-14 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-navy">Seçilmiş elanlar</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-navy">{t('home.latestListings')}</h2>
             <button
               onClick={() => navigate('/listings')}
               className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
             >
-              Hamısına bax <ArrowRight size={15} />
+              {t('home.viewAll')} <ArrowRight size={15} />
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {featured.map(listing => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── RECENT LISTINGS ── */}
-      <section className="py-14 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-navy">Son əlavə edilənlər</h2>
-            <button
-              onClick={() => navigate('/listings')}
-              className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
-            >
-              Hamısına bax <ArrowRight size={15} />
-            </button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {recent.map(listing => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
+          {loadingListings ? (
+            <div className="flex justify-center py-16">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : listings.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+              <div className="text-5xl mb-4">📦</div>
+              <p className="text-gray-600 font-medium mb-2">{t('home.noListings')}</p>
+              <p className="text-gray-400 text-sm mb-6">{t('home.beFirst')}</p>
+              <button
+                onClick={() => navigate('/sell')}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                <Plus size={16} />
+                {t('home.postListing')}
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {listings.map(listing => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── TRUST SECTION ── */}
-      <section id="how" className="py-16 bg-gray-50">
+      <section id="how" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">Niyə HorecaHub?</p>
-            <h2 className="text-2xl md:text-3xl font-bold text-navy">Sektora xüsusi, sıfır kompromis</h2>
+            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">{t('home.whyTitle')}</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-navy">{t('home.whySubtitle')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                Icon: ShieldCheck,
-                color: 'bg-green-50 text-green-600',
-                title: 'Doğrulanmış satıcılar',
-                desc: 'Hər satıcı əl ilə yoxlanılır. Doğrulama nişanı olan profillər 100% etibarlıdır.',
-              },
-              {
-                Icon: MessageCircle,
-                color: 'bg-blue-50 text-blue-600',
-                title: 'Birbaşa əlaqə',
-                desc: 'Heç bir vasitəçi yoxdur. Alıcı ilə satıcı birbaşa danışır, razılaşır.',
-              },
-              {
-                Icon: Target,
-                color: 'bg-purple-50 text-purple-600',
-                title: 'HoReCa-ya xüsusi',
-                desc: 'Yalnız hotel, restoran və kafe sektoru üçün. Ümumi bazarların əksinə.',
-              },
-            ].map(({ Icon, color, title, desc }) => (
+            {trustItems.map(({ Icon, color, title, desc }) => (
               <div key={title} className="bg-white rounded-2xl border border-gray-200 p-8 text-center hover:shadow-md transition-shadow">
                 <div className={`inline-flex p-4 rounded-2xl mb-5 ${color}`}>
                   <Icon size={28} />
@@ -216,17 +243,17 @@ export default function Home() {
       <section className="py-16 bg-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Avadanlığınızı satmaq istəyirsiniz?
+            {t('home.ctaBanner')}
           </h2>
           <p className="text-blue-100 mb-8">
-            Pulsuz listinq yerləşdirin. 5 dəqiqəyə hazır.
+            {t('home.ctaBannerSub')}
           </p>
           <button
-            onClick={() => window.location.href = '/sell'}
+            onClick={() => navigate('/sell')}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-lg"
           >
             <Plus size={18} />
-            Pulsuz listinq yerləşdir
+            {t('home.ctaBannerBtn')}
           </button>
         </div>
       </section>
