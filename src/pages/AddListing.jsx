@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { Check, ChevronRight, Upload, AlertCircle, X, ImageOff } from 'lucide-react'
 import {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
-  LayoutGrid, Wine, Users, Truck
+  LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
 import { useTranslation } from 'react-i18next'
 
-const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck }
+const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap }
 const EMPTY     = {
   category: '', subcategory: '', otherDescription: '',
   title: '', description: '', condition: 'Yeni', city: '', price: '', paymentType: 'cash',
@@ -148,7 +148,7 @@ export default function AddListing() {
     if (step === 1) {
       if (strip(form.title).length < 5) e.title = t('addListing.errTitle')
       if (!form.city) e.city = t('addListing.errCity')
-      if (form.category !== 'staff' && !form.condition) e.condition = t('addListing.errCondition')
+      if (!['staff', 'consulting', 'software', 'training'].includes(form.category) && !form.condition) e.condition = t('addListing.errCondition')
       if (form.category === 'staff') {
         if (!form.experienceYears) e.experienceYears = t('addListing.errExp')
         if (form.listingType === 'cv' && strip(form.bio).length < 20)
@@ -331,7 +331,7 @@ export default function AddListing() {
                         ...f,
                         subcategory:     sub.id,
                         otherDescription: '',
-                        ...(f.category === 'staff'
+                        ...(['staff', 'consulting', 'software', 'training'].includes(f.category)
                           ? { title: SUBCATEGORIES[f.category]?.find(s => s.id === sub.id)?.label || '' }
                           : {}),
                       }))}
@@ -398,8 +398,8 @@ export default function AddListing() {
               </div>
             )}
 
-            {/* Title input — hidden for staff (auto-set from subcategory) */}
-            {form.category !== 'staff' && (
+            {/* Title input — hidden for staff and service categories (auto-set from subcategory) */}
+            {!['staff', 'consulting', 'software', 'training'].includes(form.category) && (
               <div>
                 <label className="block text-sm font-medium text-navy mb-1.5">{t('addListing.titleLabel')}</label>
                 <input type="text" value={form.title}
@@ -422,7 +422,7 @@ export default function AddListing() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none" />
               </div>
             )}
-            {form.category !== 'staff' && (
+            {!['staff', 'consulting', 'software', 'training'].includes(form.category) && (
               <div>
                 <label className="block text-sm font-medium text-navy mb-2">{t('addListing.condition')}</label>
                 <div className="flex gap-3">
@@ -649,7 +649,7 @@ export default function AddListing() {
               </div>
               {stepErrors.price && <p className="text-red-500 text-xs mt-1">{stepErrors.price}</p>}
             </div>
-            {form.category !== 'staff' && (
+            {!['staff', 'consulting', 'software', 'training'].includes(form.category) && (
               <div>
                 <label className="block text-sm font-medium text-navy mb-3">{t('addListing.paymentType')}</label>
                 <div className="flex flex-col gap-2">

@@ -5,8 +5,11 @@ export const CATEGORIES = [
   { id: 'service',   key: 'cat.service',   label: 'Servis avadanlığı',    icon: 'UtensilsCrossed' },
   { id: 'furniture', key: 'cat.furniture', label: 'Mebel & dekor',        icon: 'LayoutGrid'      },
   { id: 'tableware', key: 'cat.tableware', label: 'Qab-qacaq & aksesuar', icon: 'Wine'            },
-  { id: 'staff',     key: 'cat.staff',     label: 'Kadrlar',              icon: 'Users'           },
-  { id: 'suppliers', key: 'cat.suppliers', label: 'Təchizatçılar',        icon: 'Truck'           },
+  { id: 'staff',       key: 'cat.staff',       label: 'Kadrlar',              icon: 'Users'          },
+  { id: 'suppliers',   key: 'cat.suppliers',   label: 'Təchizatçılar',        icon: 'Truck'          },
+  { id: 'consulting',  key: 'cat.consulting',  label: 'Konsaltinq',           icon: 'Briefcase'      },
+  { id: 'software',    key: 'cat.software',    label: 'Proqram təminatı',     icon: 'Monitor'        },
+  { id: 'training',    key: 'cat.training',    label: 'Təlim & Kurslar',      icon: 'GraduationCap'  },
 ]
 
 export const CITIES = [
@@ -61,6 +64,11 @@ export const SUBCATEGORIES = {
     { id: 'dispenser',          key: 'subcat.dispenser',          label: 'Porsion aparatları' },
     { id: 'tea_service',        key: 'subcat.tea_service',        label: 'Çay/qəhvə servis avadanlığı' },
     { id: 'trolley',            key: 'subcat.trolley',            label: 'Yemək arabacıqları' },
+    { id: 'pos_terminal',       key: 'subcat.pos_terminal',       label: 'Kassa aparatları' },
+    { id: 'safe',               key: 'subcat.safe',               label: 'Seyfler' },
+    { id: 'cash_counter',       key: 'subcat.cash_counter',       label: 'Para sayma maşınları' },
+    { id: 'barcode_reader',     key: 'subcat.barcode_reader',     label: 'Barkod oxuyucular' },
+    { id: 'receipt_printer',    key: 'subcat.receipt_printer',    label: 'Çek printerləri' },
     { id: 'service_other',      key: 'subcat.service_other',      label: 'Digər servis avadanlığı' },
   ],
   furniture: [
@@ -103,6 +111,27 @@ export const SUBCATEGORIES = {
     { id: 'technician',     key: 'subcat.technician',     label: 'Avadanlıq ustası' },
     { id: 'cleaner',        key: 'subcat.cleaner',        label: 'Təmizlikçi' },
     { id: 'security',       key: 'subcat.security',       label: 'Qarovulçu' },
+  ],
+  consulting: [
+    { id: 'restaurant_opening',   key: 'subcat.restaurant_opening',   label: 'Restoran/kafe açmaq' },
+    { id: 'menu_engineering',     key: 'subcat.menu_engineering',     label: 'Menyu mühəndisliyi' },
+    { id: 'equipment_consulting', key: 'subcat.equipment_consulting', label: 'Avadanlıq seçimi' },
+    { id: 'financial_planning',   key: 'subcat.financial_planning',   label: 'Maliyyə planlaşdırma' },
+    { id: 'haccp',                key: 'subcat.haccp',                label: 'HACCP/Sanitariya' },
+    { id: 'marketing_consulting', key: 'subcat.marketing_consulting', label: 'Marketing məsləhəti' },
+    { id: 'consulting_other',     key: 'subcat.consulting_other',     label: 'Digər' },
+  ],
+  software: [
+    { id: 'pos_systems',     key: 'subcat.pos_systems',     label: 'Kassa sistemləri (POS)' },
+    { id: 'software_other',  key: 'subcat.software_other',  label: 'Digər' },
+  ],
+  training: [
+    { id: 'barista_training',    key: 'subcat.barista_training',    label: 'Barista təlimi' },
+    { id: 'chef_training',       key: 'subcat.chef_training',       label: 'Aşpaz kursları' },
+    { id: 'management_training', key: 'subcat.management_training', label: 'Restoran idarəetməsi' },
+    { id: 'haccp_cert',          key: 'subcat.haccp_cert',          label: 'HACCP sertifikasiyası' },
+    { id: 'service_training',    key: 'subcat.service_training',    label: 'Servis təlimi' },
+    { id: 'training_other',      key: 'subcat.training_other',      label: 'Digər' },
   ],
   suppliers: [
     { id: 'meat',            key: 'subcat.meat',            label: 'Ət və quş əti' },

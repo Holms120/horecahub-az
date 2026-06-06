@@ -258,7 +258,14 @@ export default function EditListing() {
                   <button
                     key={sub.id}
                     type="button"
-                    onClick={() => setForm(f => ({ ...f, subcategory: sub.id, otherDescription: '' }))}
+                    onClick={() => setForm(f => ({
+                      ...f,
+                      subcategory: sub.id,
+                      otherDescription: '',
+                      ...(['staff', 'consulting', 'software', 'training'].includes(f.category)
+                        ? { title: SUBCATEGORIES[f.category]?.find(s => s.id === sub.id)?.label || '' }
+                        : {}),
+                    }))}
                     className={`text-left px-3 py-2.5 rounded-xl border-2 text-sm transition-all ${
                       form.subcategory === sub.id
                         ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
@@ -291,19 +298,21 @@ export default function EditListing() {
         <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
           <h2 className="text-sm font-semibold text-navy">{t('addListing.listingDetails')}</h2>
 
-          <div>
-            <label className="block text-sm font-medium text-navy mb-1.5">{t('addListing.titleLabel')}</label>
-            <input
-              type="text" value={form.title} maxLength={80}
-              onChange={e => { set('title', e.target.value); setFieldErrors(fe => ({ ...fe, title: '' })) }}
-              placeholder={t('addListing.titlePlaceholderDefault')}
-              className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.title ? 'border-red-400' : 'border-gray-200'}`}
-            />
-            <div className="flex justify-between mt-1">
-              {fieldErrors.title ? <p className="text-red-500 text-xs">{fieldErrors.title}</p> : <span />}
-              <p className="text-xs text-gray-400">{form.title.length}/80</p>
+          {!['staff', 'consulting', 'software', 'training'].includes(form.category) && (
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">{t('addListing.titleLabel')}</label>
+              <input
+                type="text" value={form.title} maxLength={80}
+                onChange={e => { set('title', e.target.value); setFieldErrors(fe => ({ ...fe, title: '' })) }}
+                placeholder={t('addListing.titlePlaceholderDefault')}
+                className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.title ? 'border-red-400' : 'border-gray-200'}`}
+              />
+              <div className="flex justify-between mt-1">
+                {fieldErrors.title ? <p className="text-red-500 text-xs">{fieldErrors.title}</p> : <span />}
+                <p className="text-xs text-gray-400">{form.title.length}/80</p>
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-navy mb-1.5">{t('addListing.description')}</label>
@@ -462,33 +471,35 @@ export default function EditListing() {
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-navy mb-3">{t('addListing.paymentType')}</label>
-            <div className="flex flex-col gap-2">
-              {PAYMENT_OPTS.map(({ value, label }) => (
-                <label
-                  key={value}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
-                    form.paymentType === value
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-blue-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentType"
-                    value={value}
-                    checked={form.paymentType === value}
-                    onChange={() => set('paymentType', value)}
-                    className="accent-blue-600"
-                  />
-                  <span className={`text-sm font-medium ${form.paymentType === value ? 'text-blue-700' : 'text-gray-700'}`}>
-                    {label}
-                  </span>
-                </label>
-              ))}
+          {!['staff', 'consulting', 'software', 'training'].includes(form.category) && (
+            <div>
+              <label className="block text-sm font-medium text-navy mb-3">{t('addListing.paymentType')}</label>
+              <div className="flex flex-col gap-2">
+                {PAYMENT_OPTS.map(({ value, label }) => (
+                  <label
+                    key={value}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
+                      form.paymentType === value
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      value={value}
+                      checked={form.paymentType === value}
+                      onChange={() => set('paymentType', value)}
+                      className="accent-blue-600"
+                    />
+                    <span className={`text-sm font-medium ${form.paymentType === value ? 'text-blue-700' : 'text-gray-700'}`}>
+                      {label}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* ── Actions ── */}

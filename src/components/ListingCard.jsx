@@ -100,7 +100,9 @@ export default function ListingCard({ listing }) {
 
       <div className="p-3">
         <p className="text-sm font-medium text-navy line-clamp-2 leading-snug mb-2 min-h-[2.5rem]">
-          {title}
+          {['staff', 'consulting', 'software', 'training'].includes(category) && listing.subcategory
+            ? (t('subcat.' + listing.subcategory) || title)
+            : title}
         </p>
 
         {isStaff && listingType === 'cv' && skills?.length > 0 && (

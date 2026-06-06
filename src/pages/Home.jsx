@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import {
   Search, ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, ShieldCheck, MessageCircle,
-  Target, ArrowRight, Plus
+  Target, ArrowRight, Plus, Briefcase, Monitor, GraduationCap
 } from 'lucide-react'
 import { CATEGORIES } from '../data/mockData'
 import { supabase } from '../supabaseClient'
@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 
 const ICON_MAP = {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
-  LayoutGrid, Wine, Users, Truck,
+  LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap,
 }
 
 const CAT_COLORS = [
@@ -159,7 +159,7 @@ export default function Home() {
             </button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map((cat, i) => {
+            {CATEGORIES.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
               return (
                 <button

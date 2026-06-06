@@ -259,7 +259,11 @@ export default function ListingDetail() {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-navy mb-3 leading-snug">{title}</h1>
+          <h1 className="text-2xl font-bold text-navy mb-3 leading-snug">
+            {['staff', 'consulting', 'software', 'training'].includes(listing.category) && listing.subcategory
+              ? (t('subcat.' + listing.subcategory) || title)
+              : title}
+          </h1>
           <div className="flex items-center gap-3 mb-4">
             <p className="text-3xl font-bold text-blue-600">{displayPrice}</p>
             {listing.category !== 'staff' && (

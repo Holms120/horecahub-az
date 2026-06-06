@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
-import { Menu, X, Plus, Search, LogOut, User, MessageSquare, Pencil, Heart } from 'lucide-react'
+import { Menu, X, Plus, Search, LogOut, User, MessageSquare, Pencil, Heart, ChevronDown } from 'lucide-react'
 import Logo from './Logo'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
@@ -11,14 +11,18 @@ export default function Navbar() {
   const { t } = useTranslation()
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen]       = useState(false)
-  const [dropOpen, setDropOpen]       = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
+  const [menuOpen, setMenuOpen]         = useState(false)
+  const [dropOpen, setDropOpen]         = useState(false)
+  const [servicesOpen, setServicesOpen]   = useState(false)
+  const servicesTimer = useRef(null)
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
+  const [unreadCount, setUnreadCount]   = useState(0)
 
-  const NAV_LINKS = [
-    { label: t('nav.staff'),       href: '/listings?category=staff' },
-    { label: t('nav.suppliers'),   href: '/listings?category=suppliers' },
-    { label: t('nav.howItWorks'),  href: '/how-it-works' },
+  const SERVICES_ITEMS = [
+    { label: t('nav.suppliers'),  href: '/listings?category=suppliers' },
+    { label: t('cat.consulting'), href: '/listings?category=consulting' },
+    { label: t('cat.software'),   href: '/listings?category=software' },
+    { label: t('cat.training'),   href: '/listings?category=training' },
   ]
 
   useEffect(() => {
@@ -56,13 +60,45 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-7">
-            {NAV_LINKS.map(link => (
-              <Link key={link.label} to={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
-                {link.label}
-              </Link>
-            ))}
+          <nav className="hidden md:flex items-center gap-6">
+            {/* Avadanlıq */}
+            <Link to="/listings"
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              {t('nav.equipment')}
+            </Link>
+
+            {/* Kadrlar */}
+            <Link to="/listings?category=staff"
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              {t('nav.staff')}
+            </Link>
+
+            {/* Xidmətlər dropdown */}
+            <div className="relative"
+              onMouseEnter={() => { clearTimeout(servicesTimer.current); setServicesOpen(true) }}
+              onMouseLeave={() => { servicesTimer.current = setTimeout(() => setServicesOpen(false), 150) }}
+            >
+              <button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+                {t('nav.services')} <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {servicesOpen && (
+                <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+                  {SERVICES_ITEMS.map(item => (
+                    <Link key={item.href} to={item.href}
+                      onClick={() => setServicesOpen(false)}
+                      className="block px-4 py-2.5 text-sm text-navy hover:bg-gray-50 transition-colors">
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Necə işləyir */}
+            <Link to="/how-it-works"
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              {t('nav.howItWorks')}
+            </Link>
           </nav>
 
           {/* Desktop right */}
@@ -170,25 +206,58 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
-          <div className="pt-2 border-t border-gray-100 space-y-2">
-            <div className="flex items-center gap-1 text-xs font-semibold pb-2">
-              {['az', 'ru', 'en'].map(lang => (
-                <button
-                  key={lang}
-                  onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
-                  className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
-                >
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-            </div>
+          {/* Language switcher */}
+          <div className="flex items-center gap-1 text-xs font-semibold pb-2">
+            {['az', 'ru', 'en'].map(lang => (
+              <button
+                key={lang}
+                onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
+                className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
+              >
+                {lang.toUpperCase()}
+              </button>
+            ))}
           </div>
-          {NAV_LINKS.map(link => (
-            <Link key={link.label} to={link.href} onClick={() => setMenuOpen(false)}
-              className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-              {link.label}
-            </Link>
-          ))}
+
+          {/* Avadanlıq */}
+          <Link to="/listings" onClick={() => setMenuOpen(false)}
+            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            {t('nav.equipment')}
+          </Link>
+
+          {/* Kadrlar */}
+          <Link to="/listings?category=staff" onClick={() => setMenuOpen(false)}
+            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            {t('nav.staff')}
+          </Link>
+
+          {/* Xidmətlər expandable */}
+          <div>
+            <button
+              onClick={() => setMobileServicesOpen(v => !v)}
+              className="flex items-center justify-between w-full py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+            >
+              {t('nav.services')}
+              <ChevronDown size={14} className={`transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {mobileServicesOpen && (
+              <div className="pl-4 space-y-0.5">
+                {SERVICES_ITEMS.map(item => (
+                  <Link key={item.href} to={item.href} onClick={() => { setMenuOpen(false); setMobileServicesOpen(false) }}
+                    className="block py-2 px-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Necə işləyir */}
+          <Link to="/how-it-works" onClick={() => setMenuOpen(false)}
+            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            {t('nav.howItWorks')}
+          </Link>
+
           <div className="pt-2 border-t border-gray-100 space-y-2">
             {user ? (
               <>
