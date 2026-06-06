@@ -274,7 +274,7 @@ export default function ListingDetail() {
             <span className="flex items-center gap-1.5"><Clock size={14} />{date}</span>
             <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{(categoryKey && t(categoryKey)) || categoryLabel}</span>
             {subcategoryLabel && (
-              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{subcategoryLabel}</span>
+              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{(listing.subcategory && t('subcat.' + listing.subcategory)) || subcategoryLabel}</span>
             )}
             {subcategoryLabel && otherDescription && (
               <span className="text-gray-400 text-xs">— {otherDescription}</span>

@@ -19,16 +19,16 @@ export default function Footer() {
     {
       title: t('footer.company'),
       links: [
-        { label: t('footer.about'),    href: '/' },
-        { label: t('footer.blog'),     href: '/' },
-        { label: t('footer.careers'),  href: '/' },
-        { label: t('footer.partners'), href: '/' },
+        { label: t('footer.about'),    href: '/about' },
+        { label: t('footer.blog'),     href: '/blog' },
+        { label: t('footer.careers'),  href: '/careers' },
+        { label: t('footer.partners'), href: '/partners' },
       ],
     },
     {
       title: t('footer.support'),
       links: [
-        { label: t('footer.faq'),     href: '/' },
+        { label: t('footer.faq'),     href: '/faq' },
         { label: t('footer.contact'), href: '/' },
         { label: t('footer.terms'),   href: '/terms' },
         { label: t('footer.privacy'), href: '/privacy' },

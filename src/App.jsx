@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
@@ -16,6 +16,8 @@ import EditListing from './pages/EditListing'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import HowItWorks from './pages/HowItWorks'
+import About from './pages/About'
+import ComingSoon from './pages/ComingSoon'
 import NotFound from './pages/NotFound'
 
 function ScrollToTop() {
@@ -48,6 +50,11 @@ function Layout() {
           <Route path="/terms"         element={<TermsOfService />} />
           <Route path="/privacy"       element={<PrivacyPolicy />} />
           <Route path="/how-it-works"  element={<HowItWorks />} />
+          <Route path="/about"         element={<About />} />
+          <Route path="/blog"          element={<ComingSoon />} />
+          <Route path="/careers"       element={<ComingSoon />} />
+          <Route path="/partners"      element={<ComingSoon />} />
+          <Route path="/faq"           element={<Navigate to="/how-it-works" replace />} />
           <Route path="*"              element={<NotFound />} />
         </Routes>
       </main>

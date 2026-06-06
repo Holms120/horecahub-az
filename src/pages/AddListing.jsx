@@ -341,7 +341,7 @@ export default function AddListing() {
                           : 'border-gray-200 hover:border-blue-300 text-gray-600'
                       }`}
                     >
-                      {sub.label}
+                      {t('subcat.' + sub.id) || sub.label}
                     </button>
                   ))}
                 </div>

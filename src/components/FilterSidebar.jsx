@@ -83,39 +83,41 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
         )}
       </div>
 
-      <Section title={t('filter.category')}>
-        <div className="space-y-1.5">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="category"
-              value=""
-              checked={filters.category === ''}
-              onChange={() => onChange({ ...filters, category: '', subcategories: [] })}
-              className="accent-blue-600"
-            />
-            <span className="text-sm text-gray-700">{t('filter.all')}</span>
-          </label>
-          {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map(cat => (
-            <label key={cat.id} className="flex items-center justify-between cursor-pointer group">
-              <div className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="category"
-                  value={cat.id}
-                  checked={filters.category === cat.id}
-                  onChange={() => onChange({ ...filters, category: cat.id, subcategories: [] })}
-                  className="accent-blue-600"
-                />
-                <span className="text-sm text-gray-700 group-hover:text-navy">{t(cat.key) || cat.label}</span>
-              </div>
-              {categoryCounts[cat.id] > 0 && (
-                <span className="text-xs text-gray-400">{categoryCounts[cat.id]}</span>
-              )}
+      {filters.category !== 'staff' && (
+        <Section title={t('filter.category')}>
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="category"
+                value=""
+                checked={filters.category === ''}
+                onChange={() => onChange({ ...filters, category: '', subcategories: [] })}
+                className="accent-blue-600"
+              />
+              <span className="text-sm text-gray-700">{t('filter.all')}</span>
             </label>
-          ))}
-        </div>
-      </Section>
+            {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map(cat => (
+              <label key={cat.id} className="flex items-center justify-between cursor-pointer group">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="category"
+                    value={cat.id}
+                    checked={filters.category === cat.id}
+                    onChange={() => onChange({ ...filters, category: cat.id, subcategories: [] })}
+                    className="accent-blue-600"
+                  />
+                  <span className="text-sm text-gray-700 group-hover:text-navy">{t(cat.key) || cat.label}</span>
+                </div>
+                {categoryCounts[cat.id] > 0 && (
+                  <span className="text-xs text-gray-400">{categoryCounts[cat.id]}</span>
+                )}
+              </label>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* Subcategory filter — shown when a category with subcategories is selected */}
       {filters.category && SUBCATEGORIES[filters.category]?.length > 0 && (
@@ -129,64 +131,68 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
                   onChange={() => toggleSubcategory(sub.id)}
                   className="accent-blue-600 rounded"
                 />
-                <span className="text-sm text-gray-700">{sub.label}</span>
+                <span className="text-sm text-gray-700">{t('subcat.' + sub.id) || sub.label}</span>
               </label>
             ))}
           </div>
         </Section>
       )}
 
-      <Section title={t('filter.priceRange')}>
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            placeholder={t('filter.min')}
-            value={filters.priceMin}
-            onChange={e => onChange({ ...filters, priceMin: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-          <span className="text-gray-400 text-sm">—</span>
-          <input
-            type="number"
-            placeholder={t('filter.max')}
-            value={filters.priceMax}
-            onChange={e => onChange({ ...filters, priceMax: e.target.value })}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-      </Section>
-
-      <Section title={t('filter.condition')}>
-        <div className="space-y-2">
-          {['Yeni', 'İşlənmiş'].map(cond => (
-            <label key={cond} className="flex items-center gap-2 cursor-pointer">
+      {filters.category !== 'staff' && (
+        <>
+          <Section title={t('filter.priceRange')}>
+            <div className="flex items-center gap-2">
               <input
-                type="checkbox"
-                checked={filters.conditions.includes(cond)}
-                onChange={() => toggleCondition(cond)}
-                className="accent-blue-600 rounded"
+                type="number"
+                placeholder={t('filter.min')}
+                value={filters.priceMin}
+                onChange={e => onChange({ ...filters, priceMin: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">{cond === 'Yeni' ? t('filter.new') : t('filter.used')}</span>
-            </label>
-          ))}
-        </div>
-      </Section>
-
-      <Section title={t('filter.paymentType')}>
-        <div className="space-y-2">
-          {PAYMENT_OPTS.map(({ value, label }) => (
-            <label key={value} className="flex items-center gap-2 cursor-pointer">
+              <span className="text-gray-400 text-sm">—</span>
               <input
-                type="checkbox"
-                checked={(filters.paymentTypes || []).includes(value)}
-                onChange={() => togglePaymentType(value)}
-                className="accent-blue-600 rounded"
+                type="number"
+                placeholder={t('filter.max')}
+                value={filters.priceMax}
+                onChange={e => onChange({ ...filters, priceMax: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">{label}</span>
-            </label>
-          ))}
-        </div>
-      </Section>
+            </div>
+          </Section>
+
+          <Section title={t('filter.condition')}>
+            <div className="space-y-2">
+              {['Yeni', 'İşlənmiş'].map(cond => (
+                <label key={cond} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={filters.conditions.includes(cond)}
+                    onChange={() => toggleCondition(cond)}
+                    className="accent-blue-600 rounded"
+                  />
+                  <span className="text-sm text-gray-700">{cond === 'Yeni' ? t('filter.new') : t('filter.used')}</span>
+                </label>
+              ))}
+            </div>
+          </Section>
+
+          <Section title={t('filter.paymentType')}>
+            <div className="space-y-2">
+              {PAYMENT_OPTS.map(({ value, label }) => (
+                <label key={value} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={(filters.paymentTypes || []).includes(value)}
+                    onChange={() => togglePaymentType(value)}
+                    className="accent-blue-600 rounded"
+                  />
+                  <span className="text-sm text-gray-700">{label}</span>
+                </label>
+              ))}
+            </div>
+          </Section>
+        </>
+      )}
 
       <Section title={t('filter.city')}>
         <select
