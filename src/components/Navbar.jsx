@@ -7,6 +7,18 @@ import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index.js'
 
+function resolveNavbarDisplayName(user, profile) {
+  const fullName = (profile?.full_name || user?.user_metadata?.full_name || '').trim()
+  if (fullName) return fullName.split(/\s+/)[0]
+
+  const username = (profile?.username || user?.user_metadata?.username || '').trim()
+  if (username) return username
+
+  const email = user?.email || profile?.email || ''
+  if (email.includes('@')) return email.split('@')[0]
+  return email
+}
+
 export default function Navbar() {
   const { t } = useTranslation()
   const { user, signOut } = useAuth()
@@ -21,18 +33,19 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!user) { setDisplayName(''); return }
+
+    setDisplayName(resolveNavbarDisplayName(user, null))
+
+    let cancelled = false
     supabase
       .from('profiles')
-      .select('full_name')
+      .select('full_name, email')
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
-        if (data?.full_name) {
-          setDisplayName(data.full_name.split(' ')[0])
-        } else {
-          setDisplayName(user.email.split('@')[0])
-        }
+        if (!cancelled) setDisplayName(resolveNavbarDisplayName(user, data))
       })
+    return () => { cancelled = true }
   }, [user])
 
   const SERVICES_ITEMS = [
@@ -65,7 +78,7 @@ export default function Navbar() {
     navigate('/')
   }
 
-  const userInitial = (displayName || user?.email || '?').charAt(0).toUpperCase()
+  const userInitial = (displayName || '?').charAt(0).toUpperCase()
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -228,6 +241,15 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
+          {user && (
+            <div className="flex items-center gap-2.5 pb-3 mb-1 border-b border-gray-100">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                {userInitial}
+              </div>
+              <span className="text-sm font-semibold text-navy truncate">{displayName}</span>
+            </div>
+          )}
+
           {/* Language switcher */}
           <div className="flex items-center gap-1 text-xs font-semibold pb-2">
             {['az', 'ru', 'en'].map(lang => (

@@ -4,7 +4,8 @@ import { Heart, MapPin, Clock, Pencil, Trash2 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
-import { timeAgo } from '../lib/normalize'
+import { useRelativeTime } from '../hooks/useRelativeTime'
+import { isNewListing } from '../lib/time'
 
 const PAYMENT_BADGE  = {
   cash:   'bg-blue-50 text-blue-700',
@@ -22,8 +23,8 @@ export default function ListingCard({ listing }) {
   const { id, title, price, condition, city, image, paymentType, userId,
           category, listingType, skills, createdAt } = listing
 
-  const timeDisplay = timeAgo(createdAt)
-  const isNew = createdAt && Date.now() - new Date(createdAt).getTime() < 48 * 60 * 60 * 1000
+  const timeDisplay = useRelativeTime(createdAt)
+  const isNew = isNewListing(createdAt)
 
   const PAYMENT_LABELS = { cash: t('listingCard.cash'), credit: t('listingCard.credit'), order: t('listingCard.order') }
 

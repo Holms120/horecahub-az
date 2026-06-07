@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Send, ChevronLeft, MessageSquare, Inbox } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import { timeAgo } from '../lib/normalize'
+import RelativeTime from '../components/RelativeTime'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index.js'
 
@@ -191,7 +191,7 @@ export default function Messages() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="text-sm font-semibold text-navy truncate">{name}</span>
-                        <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{timeAgo(last.created_at)}</span>
+                        <RelativeTime dateStr={last.created_at} className="text-xs text-gray-400 flex-shrink-0 ml-2" />
                       </div>
                       <p className="text-xs text-blue-600 font-medium truncate mb-0.5">{conv.listingTitle}</p>
                       <p className="text-xs text-gray-500 truncate">
@@ -249,7 +249,7 @@ export default function Messages() {
                       }`}>
                         <p className="leading-relaxed break-words">{msg.content}</p>
                         <p className={`text-xs mt-1 ${mine ? 'text-blue-200' : 'text-gray-400'}`}>
-                          {timeAgo(msg.created_at)}
+                          <RelativeTime dateStr={msg.created_at} />
                         </p>
                       </div>
                     </div>

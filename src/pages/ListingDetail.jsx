@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext'
 import { normalizeListing } from '../lib/normalize'
 import ListingCard from '../components/ListingCard'
 import { useTranslation } from 'react-i18next'
+import { useRelativeTime } from '../hooks/useRelativeTime'
 
 export default function ListingDetail() {
   const { t }        = useTranslation()
@@ -37,6 +38,8 @@ export default function ListingDetail() {
   const [msgText, setMsgText]     = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
   const [msgSent, setMsgSent]     = useState(false)
+
+  const timeDisplay = useRelativeTime(listing?.createdAt)
 
   useEffect(() => {
     async function load() {
@@ -156,7 +159,7 @@ export default function ListingDetail() {
     )
   }
 
-  const { title, price, condition, city, date, images, description, seller, categoryKey, categoryLabel, subcategoryLabel, otherDescription, paymentType, userId } = listing
+  const { title, price, condition, city, images, description, seller, categoryKey, categoryLabel, subcategoryLabel, otherDescription, paymentType, userId } = listing
   const displayPrice = listing.category === 'staff'
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
     : `₼${price.toLocaleString('az-AZ')}`
@@ -275,7 +278,7 @@ export default function ListingDetail() {
 
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100 flex-wrap">
             <span className="flex items-center gap-1.5"><MapPin size={14} />{city}</span>
-            <span className="flex items-center gap-1.5"><Clock size={14} />{date}</span>
+            <span className="flex items-center gap-1.5"><Clock size={14} />{timeDisplay}</span>
             <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{(categoryKey && t(categoryKey)) || categoryLabel}</span>
             {subcategoryLabel && (
               <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{(listing.subcategory && t('subcat.' + listing.subcategory)) || subcategoryLabel}</span>

@@ -1,5 +1,4 @@
 import { CATEGORIES, SUBCATEGORIES } from '../data/mockData'
-import i18n from '../i18n/index.js'
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80'
 
@@ -17,26 +16,8 @@ const STAFF_PLACEHOLDERS = {
 const VACANCY_PLACEHOLDER = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=400&q=80'
 const STAFF_DEFAULT       = 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=80'
 
-export function timeAgo(dateStr) {
-  if (!dateStr) return ''
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1)  return i18n.t('time.now')
-  if (mins < 60) return i18n.t('time.minsAgo', { count: mins })
-  const hrs = Math.floor(mins / 60)
-  if (hrs < 24)  return i18n.t('time.hoursAgo', { count: hrs })
-  const days = Math.floor(hrs / 24)
-  if (days < 7)  return i18n.t('time.daysAgo', { count: days })
-  const locale = i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'en' ? 'en-US' : 'az-AZ'
-  return new Date(dateStr).toLocaleDateString(locale)
-}
-
 export function normalizeListing(row) {
   if (!row) return null
-  // Debug: verify listing_type for staff (remove after fix confirmed)
-  if (row.category === 'staff') {
-    console.log('[normalize] staff id:', row.id, '| listing_type raw:', row.listing_type, '| resolved:', row.listing_type ?? 'item')
-  }
   const profile = row.profiles || {}
   const hasImages = Array.isArray(row.images) && row.images.length > 0
   let fallback = PLACEHOLDER
@@ -58,7 +39,6 @@ export function normalizeListing(row) {
     price: row.price != null ? Number(row.price) : 0,
     condition: row.condition === 'new' ? 'Yeni' : 'İşlənmiş',
     city: row.city || '',
-    date: timeAgo(row.created_at),
     createdAt: row.created_at || '',
     category: row.category || '',
     categoryKey:   CATEGORIES.find(c => c.id === row.category)?.key   || '',

@@ -430,8 +430,11 @@
   },
   "time": {
     "now": "Только что",
+    "minAgo": "1 минуту назад",
     "minsAgo": "{{count}} мин. назад",
+    "hourAgo": "1 час назад",
     "hoursAgo": "{{count}} ч. назад",
+    "dayAgo": "1 день назад",
     "daysAgo": "{{count}} дн. назад"
   },
   "about": {

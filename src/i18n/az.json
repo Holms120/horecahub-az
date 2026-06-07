@@ -430,8 +430,11 @@
   },
   "time": {
     "now": "İndi",
-    "minsAgo": "{{count}} dəq. əvvəl",
+    "minAgo": "1 dəqiqə əvvəl",
+    "minsAgo": "{{count}} dəqiqə əvvəl",
+    "hourAgo": "1 saat əvvəl",
     "hoursAgo": "{{count}} saat əvvəl",
+    "dayAgo": "1 gün əvvəl",
     "daysAgo": "{{count}} gün əvvəl"
   },
   "about": {

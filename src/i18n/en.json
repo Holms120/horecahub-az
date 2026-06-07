@@ -430,8 +430,11 @@
   },
   "time": {
     "now": "Just now",
-    "minsAgo": "{{count}} min ago",
-    "hoursAgo": "{{count}} hr ago",
+    "minAgo": "1 minute ago",
+    "minsAgo": "{{count}} minutes ago",
+    "hourAgo": "1 hour ago",
+    "hoursAgo": "{{count}} hours ago",
+    "dayAgo": "1 day ago",
     "daysAgo": "{{count}} days ago"
   },
   "about": {
