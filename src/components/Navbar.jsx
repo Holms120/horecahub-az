@@ -70,14 +70,14 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center h-16 gap-4 lg:gap-8">
 
           <Link to="/" className="flex-shrink-0">
             <Logo height={32} />
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0">
             {/* Avadanlıq */}
             <Link to="/listings"
               className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
@@ -118,8 +118,8 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          {/* Desktop right */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop right: Search | Lang | User | Post */}
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0 ml-auto">
             <Link to="/listings" className="p-2 text-gray-500 hover:text-navy hover:bg-gray-50 rounded-lg transition-colors">
               <Search size={20} />
             </Link>
@@ -136,85 +136,90 @@ export default function Navbar() {
               ))}
             </div>
 
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setDropOpen(v => !v)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {userInitial}
-                  </div>
-                  <span className="text-sm font-medium text-navy max-w-[120px] truncate">
-                    {displayName || user.email?.split('@')[0]}
-                  </span>
-                </button>
+            <div className="flex items-center gap-3">
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setDropOpen(v => !v)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      {userInitial}
+                    </div>
+                    <span className="text-sm font-medium text-navy max-w-[120px] truncate">
+                      {displayName}
+                    </span>
+                  </button>
 
-                {dropOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden z-50">
-                    <Link to={`/profile/${user.id}`} onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
-                      <User size={16} className="text-gray-400" /> {t('nav.myProfile')}
-                    </Link>
-                    <Link to={`/profile/${user.id}?tab=favorites`} onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
-                      <Heart size={16} className="text-red-400" /> {t('nav.favorites')}
-                    </Link>
-                    <Link to="/edit-profile" onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
-                      <Pencil size={16} className="text-gray-400" /> {t('nav.editProfile')}
-                    </Link>
-                    <Link to="/messages" onClick={() => { setDropOpen(false); setUnreadCount(0) }}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
-                      <span className="relative">
-                        <MessageSquare size={16} className="text-gray-400" />
+                  {dropOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden z-50">
+                      <Link to={`/profile/${user.id}`} onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
+                        <User size={16} className="text-gray-400" /> {t('nav.myProfile')}
+                      </Link>
+                      <Link to={`/profile/${user.id}?tab=favorites`} onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
+                        <Heart size={16} className="text-red-400" /> {t('nav.favorites')}
+                      </Link>
+                      <Link to="/edit-profile" onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
+                        <Pencil size={16} className="text-gray-400" /> {t('nav.editProfile')}
+                      </Link>
+                      <Link to="/messages" onClick={() => { setDropOpen(false); setUnreadCount(0) }}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
+                        <span className="relative">
+                          <MessageSquare size={16} className="text-gray-400" />
+                          {unreadCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                              {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                          )}
+                        </span>
+                        {t('nav.messages')}
                         {unreadCount > 0 && (
-                          <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                          <span className="ml-auto bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
                             {unreadCount > 9 ? '9+' : unreadCount}
                           </span>
                         )}
-                      </span>
-                      {t('nav.messages')}
-                      {unreadCount > 0 && (
-                        <span className="ml-auto bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
-                          {unreadCount > 9 ? '9+' : unreadCount}
-                        </span>
-                      )}
-                    </Link>
-                    <Link to="/sell" onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
-                      <Plus size={16} className="text-gray-400" /> {t('nav.postListing')}
-                    </Link>
-                    <div className="border-t border-gray-100">
-                      <button onClick={handleSignOut}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                        <LogOut size={16} /> {t('nav.logout')}
-                      </button>
+                      </Link>
+                      <Link to="/sell" onClick={() => setDropOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-navy hover:bg-gray-50">
+                        <Plus size={16} className="text-gray-400" /> {t('nav.postListing')}
+                      </Link>
+                      <div className="border-t border-gray-100">
+                        <button onClick={handleSignOut}
+                          className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                          <LogOut size={16} /> {t('nav.logout')}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-navy hover:text-blue-600 transition-colors">
-                  {t('nav.login')}
-                </Link>
-                <Link to="/register"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                  {t('nav.register')}
-                </Link>
-              </div>
-            )}
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link to="/login"
+                    className="px-4 py-2 text-sm font-semibold text-navy hover:text-blue-600 transition-colors">
+                    {t('nav.login')}
+                  </Link>
+                  <Link to="/register"
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                    {t('nav.register')}
+                  </Link>
+                </div>
+              )}
 
-            <Link to="/sell"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors">
-              <Plus size={16} /> {t('nav.postListing')}
-            </Link>
+              <Link to="/sell"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors">
+                <Plus size={16} /> {t('nav.postListing')}
+              </Link>
+            </div>
           </div>
 
-          <button className="md:hidden p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors"
-            onClick={() => setMenuOpen(v => !v)} aria-label={t('nav.menu')}>
+          <button
+            className="md:hidden p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors ml-auto"
+            onClick={() => setMenuOpen(v => !v)}
+            aria-label={t('nav.menu')}
+          >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
