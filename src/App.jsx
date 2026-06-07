@@ -17,6 +17,7 @@ import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import HowItWorks from './pages/HowItWorks'
 import About from './pages/About'
+import Contact from './pages/Contact'
 import ComingSoon from './pages/ComingSoon'
 import NotFound from './pages/NotFound'
 
@@ -51,6 +52,7 @@ function Layout() {
           <Route path="/privacy"       element={<PrivacyPolicy />} />
           <Route path="/how-it-works"  element={<HowItWorks />} />
           <Route path="/about"         element={<About />} />
+          <Route path="/contact"       element={<Contact />} />
           <Route path="/blog"          element={<ComingSoon />} />
           <Route path="/careers"       element={<ComingSoon />} />
           <Route path="/partners"      element={<ComingSoon />} />

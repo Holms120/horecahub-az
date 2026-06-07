@@ -556,5 +556,16 @@
     "consulting": "Консалтинг",
     "software": "Программное обеспечение",
     "training": "Обучение & Курсы"
+  },
+  "contact": {
+    "title": "Связаться с нами",
+    "phone": "Телефон",
+    "email": "E-mail",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "address": "Адрес",
+    "addressValue": "Сумгайыт, Азербайджан",
+    "callUs": "Позвоните нам",
+    "followUs": "Следите за нами"
   }
 }

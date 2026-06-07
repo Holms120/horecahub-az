@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Phone, Mail } from 'lucide-react'
+import { MapPin, Phone, Mail, Instagram, Facebook } from 'lucide-react'
 import Logo from './Logo'
 import { useTranslation } from 'react-i18next'
 
@@ -29,7 +29,7 @@ export default function Footer() {
       title: t('footer.support'),
       links: [
         { label: t('footer.faq'),     href: '/faq' },
-        { label: t('footer.contact'), href: '/' },
+        { label: t('footer.contact'), href: '/contact' },
         { label: t('footer.terms'),   href: '/terms' },
         { label: t('footer.privacy'), href: '/privacy' },
       ],
@@ -48,16 +48,32 @@ export default function Footer() {
               {t('footer.desc')}
             </p>
             <div className="space-y-2">
-              {[
-                { Icon: MapPin, text: 'Bakı, Azərbaycan' },
-                { Icon: Phone, text: '+994 12 XXX XX XX' },
-                { Icon: Mail,  text: 'info@horecahub.az' },
-              ].map(({ Icon, text }) => (
-                <div key={text} className="flex items-center gap-2 text-white/40 text-xs">
-                  <Icon size={12} />
-                  <span>{text}</span>
-                </div>
-              ))}
+              <div className="flex items-center gap-2 text-white/40 text-xs">
+                <MapPin size={12} />
+                <span>Sumqayıt, Azərbaycan</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/40 text-xs">
+                <Phone size={12} />
+                <a href="tel:+9940556222912" className="hover:text-white transition-colors">
+                  +994 055 622 29 12
+                </a>
+              </div>
+              <div className="flex items-center gap-2 text-white/40 text-xs">
+                <Mail size={12} />
+                <a href="mailto:info@horecahub.az" className="hover:text-white transition-colors">
+                  info@horecahub.az
+                </a>
+              </div>
+              <div className="flex items-center gap-3 pt-1">
+                <a href="https://www.instagram.com/horecahub.az" target="_blank" rel="noreferrer"
+                  className="text-white/40 hover:text-white transition-colors">
+                  <Instagram size={16} />
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61589830914631" target="_blank" rel="noreferrer"
+                  className="text-white/40 hover:text-white transition-colors">
+                  <Facebook size={16} />
+                </a>
+              </div>
             </div>
           </div>
 

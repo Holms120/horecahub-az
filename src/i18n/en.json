@@ -556,5 +556,16 @@
     "consulting": "Consulting",
     "software": "Software",
     "training": "Training & Courses"
+  },
+  "contact": {
+    "title": "Contact us",
+    "phone": "Phone",
+    "email": "Email",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "address": "Address",
+    "addressValue": "Sumgayit, Azerbaijan",
+    "callUs": "Call us",
+    "followUs": "Follow us"
   }
 }

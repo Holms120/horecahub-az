@@ -556,5 +556,16 @@
     "consulting": "Konsaltinq",
     "software": "Proqram təminatı",
     "training": "Təlim & Kurslar"
+  },
+  "contact": {
+    "title": "Bizimlə əlaqə",
+    "phone": "Telefon",
+    "email": "E-poçt",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "address": "Ünvan",
+    "addressValue": "Sumqayıt, Azərbaycan",
+    "callUs": "Zəng edin",
+    "followUs": "Bizi izləyin"
   }
 }
