@@ -21,10 +21,17 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!user) { setDisplayName(''); return }
-    supabase.from('profiles').select('full_name').eq('id', user.id).single()
+    supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single()
       .then(({ data }) => {
-        const name = data?.full_name?.trim()
-        setDisplayName(name ? name.split(' ')[0] : (user.email?.split('@')[0] || ''))
+        if (data?.full_name) {
+          setDisplayName(data.full_name.split(' ')[0])
+        } else {
+          setDisplayName(user.email.split('@')[0])
+        }
       })
   }, [user])
 
@@ -117,6 +124,18 @@ export default function Navbar() {
               <Search size={20} />
             </Link>
 
+            <div className="flex items-center gap-1 text-xs font-semibold">
+              {['az', 'ru', 'en'].map(lang => (
+                <button
+                  key={lang}
+                  onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
+                  className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
+                >
+                  {lang.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
             {user ? (
               <div className="relative">
                 <button
@@ -187,18 +206,6 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
-
-            <div className="flex items-center gap-1 text-xs font-semibold">
-              {['az', 'ru', 'en'].map(lang => (
-                <button
-                  key={lang}
-                  onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
-                  className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
-                >
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-            </div>
 
             <Link to="/sell"
               className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors">
