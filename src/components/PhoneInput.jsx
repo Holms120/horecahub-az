@@ -15,7 +15,7 @@ export default function PhoneInput({ value = '', onChange, required = false, pla
 
   function update(newOp, rawNum) {
     const digits = rawNum.replace(/\D/g, '').slice(0, 7)
-    onChange(digits ? `+994${newOp}${digits}` : '')
+    onChange(`+994${newOp}${digits}`)
   }
 
   return (
