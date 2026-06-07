@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { Menu, X, Plus, Search, LogOut, User, MessageSquare, Pencil, Heart, ChevronDown } from 'lucide-react'
@@ -7,16 +7,33 @@ import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index.js'
 
-function resolveNavbarDisplayName(user, profile) {
-  const fullName = (profile?.full_name || user?.user_metadata?.full_name || '').trim()
-  if (fullName) return fullName.split(/\s+/)[0]
+const EMAIL_LIKE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-  const username = (profile?.username || user?.user_metadata?.username || '').trim()
-  if (username) return username
+function emailLocalPart(value) {
+  const s = (value || '').trim()
+  if (!s) return ''
+  const at = s.indexOf('@')
+  return at > 0 ? s.slice(0, at) : s
+}
 
-  const email = user?.email || profile?.email || ''
-  if (email.includes('@')) return email.split('@')[0]
-  return email
+/** full_name → username → email local-part. Never returns a full email. */
+export function getNavbarDisplayName(user, profile = null) {
+  if (!user) return ''
+
+  const nameCandidates = [
+    profile?.full_name,
+    user.user_metadata?.full_name,
+    profile?.username,
+    user.user_metadata?.username,
+  ]
+
+  for (const raw of nameCandidates) {
+    const value = (raw || '').trim()
+    if (!value || EMAIL_LIKE.test(value) || value.includes('@')) continue
+    return value.split(/\s+/)[0]
+  }
+
+  return emailLocalPart(user.email || profile?.email)
 }
 
 export default function Navbar() {
@@ -29,13 +46,12 @@ export default function Navbar() {
   const servicesTimer = useRef(null)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
   const [unreadCount, setUnreadCount]   = useState(0)
-  const [displayName, setDisplayName]   = useState('')
+  const [profile, setProfile]         = useState(null)
 
   useEffect(() => {
-    if (!user) { setDisplayName(''); return }
+    if (!user) { setProfile(null); return }
 
-    setDisplayName(resolveNavbarDisplayName(user, null))
-
+    setProfile(null)
     let cancelled = false
     supabase
       .from('profiles')
@@ -43,10 +59,15 @@ export default function Navbar() {
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
-        if (!cancelled) setDisplayName(resolveNavbarDisplayName(user, data))
+        if (!cancelled) setProfile(data ?? null)
       })
     return () => { cancelled = true }
-  }, [user])
+  }, [user?.id])
+
+  const displayName = useMemo(
+    () => getNavbarDisplayName(user, profile),
+    [user, profile],
+  )
 
   const SERVICES_ITEMS = [
     { label: t('nav.suppliers'),  href: '/listings?category=suppliers' },
@@ -132,34 +153,34 @@ export default function Navbar() {
           </nav>
 
           {/* Desktop right: Search | Lang | User | Post */}
-          <div className="hidden md:flex items-center gap-3 flex-shrink-0 ml-auto">
+          <div className="hidden md:flex items-center flex-shrink-0 ml-auto">
             <Link to="/listings" className="p-2 text-gray-500 hover:text-navy hover:bg-gray-50 rounded-lg transition-colors">
               <Search size={20} />
             </Link>
 
-            <div className="flex items-center gap-1 text-xs font-semibold">
-              {['az', 'ru', 'en'].map(lang => (
-                <button
-                  key={lang}
-                  onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
-                  className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
-                >
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-            </div>
+            <div className="flex items-center gap-4 border-l border-gray-200 pl-4 ml-3">
+              <div className="flex items-center gap-1 text-xs font-semibold">
+                {['az', 'ru', 'en'].map(lang => (
+                  <button
+                    key={lang}
+                    onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
+                    className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
+                  >
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
+              </div>
 
-            <div className="flex items-center gap-3">
               {user ? (
                 <div className="relative">
                   <button
                     onClick={() => setDropOpen(v => !v)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors max-w-[160px]"
                   >
-                    <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                       {userInitial}
                     </div>
-                    <span className="text-sm font-medium text-navy max-w-[120px] truncate">
+                    <span className="text-sm font-medium text-navy truncate min-w-0">
                       {displayName}
                     </span>
                   </button>
@@ -222,7 +243,7 @@ export default function Navbar() {
               )}
 
               <Link to="/sell"
-                className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors">
+                className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
                 <Plus size={16} /> {t('nav.postListing')}
               </Link>
             </div>
