@@ -17,6 +17,16 @@ export default function Navbar() {
   const servicesTimer = useRef(null)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
   const [unreadCount, setUnreadCount]   = useState(0)
+  const [displayName, setDisplayName]   = useState('')
+
+  useEffect(() => {
+    if (!user) { setDisplayName(''); return }
+    supabase.from('profiles').select('full_name').eq('id', user.id).single()
+      .then(({ data }) => {
+        const name = data?.full_name?.trim()
+        setDisplayName(name ? name.split(' ')[0] : (user.email?.split('@')[0] || ''))
+      })
+  }, [user])
 
   const SERVICES_ITEMS = [
     { label: t('nav.suppliers'),  href: '/listings?category=suppliers' },
@@ -48,7 +58,7 @@ export default function Navbar() {
     navigate('/')
   }
 
-  const userInitial = user?.email?.charAt(0).toUpperCase() ?? '?'
+  const userInitial = (displayName || user?.email || '?').charAt(0).toUpperCase()
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -117,7 +127,7 @@ export default function Navbar() {
                     {userInitial}
                   </div>
                   <span className="text-sm font-medium text-navy max-w-[120px] truncate">
-                    {user.email}
+                    {displayName || user.email?.split('@')[0]}
                   </span>
                 </button>
 

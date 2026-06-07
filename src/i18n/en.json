@@ -100,7 +100,8 @@
     "edit": "Edit",
     "delete": "Delete",
     "deleteConfirm": "Are you sure you want to delete this listing?",
-    "addToFavorites": "Add to favorites"
+    "addToFavorites": "Add to favorites",
+    "newListing": "New"
   },
   "listingDetail": {
     "back": "Back",
@@ -291,7 +292,15 @@
     "registering": "Creating account...",
     "registerBtn": "Register",
     "hasAccount": "Already have an account?",
-    "loginLink": "Sign in"
+    "loginLink": "Sign in",
+    "confirmEmail": "Confirm your email",
+    "confirmEmailDesc": "A confirmation link was sent to {{email}}. Please check your email and click the link.",
+    "checkSpam": "Also check your spam folder",
+    "backToLogin": "Back to login",
+    "termsAccept": "I have read and accept the",
+    "termsLink": "Terms of service",
+    "privacyLink": "Privacy policy",
+    "errTerms": "You must accept the terms to continue"
   },
   "profile": {
     "verified": "Verified Supplier",

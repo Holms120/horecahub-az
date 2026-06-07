@@ -100,7 +100,8 @@
     "edit": "Redaktə et",
     "delete": "Sil",
     "deleteConfirm": "Bu elanı silmək istədiyinizə əminsiniz?",
-    "addToFavorites": "Bəyəndiklərinə əlavə et"
+    "addToFavorites": "Bəyəndiklərinə əlavə et",
+    "newListing": "Yeni"
   },
   "listingDetail": {
     "back": "Geri",
@@ -291,7 +292,15 @@
     "registering": "Hesab yaradılır...",
     "registerBtn": "Qeydiyyatdan keç",
     "hasAccount": "Artıq hesabınız var?",
-    "loginLink": "Daxil olun"
+    "loginLink": "Daxil olun",
+    "confirmEmail": "Emailinizi təsdiqləyin",
+    "confirmEmailDesc": "{{email}} ünvanına təsdiq linki göndərildi. Zəhmət olmasa emailinizi yoxlayın və linki klikləyin.",
+    "checkSpam": "Spam qovluğunu da yoxlayın",
+    "backToLogin": "Giriş səhifəsinə qayıt",
+    "termsAccept": "oxudum və qəbul edirəm",
+    "termsLink": "İstifadə şərtlərini",
+    "privacyLink": "Məxfilik siyasətini",
+    "errTerms": "Davam etmək üçün şərtləri qəbul etməlisiniz"
   },
   "profile": {
     "verified": "Doğrulanmış Təchizatçı",

@@ -59,6 +59,7 @@ export function normalizeListing(row) {
     condition: row.condition === 'new' ? 'Yeni' : 'İşlənmiş',
     city: row.city || '',
     date: timeAgo(row.created_at),
+    createdAt: row.created_at || '',
     category: row.category || '',
     categoryKey:   CATEGORIES.find(c => c.id === row.category)?.key   || '',
     categoryLabel: CATEGORIES.find(c => c.id === row.category)?.label || row.category || '',

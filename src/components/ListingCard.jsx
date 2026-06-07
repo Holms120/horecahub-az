@@ -4,6 +4,7 @@ import { Heart, MapPin, Clock, Pencil, Trash2 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { timeAgo } from '../lib/normalize'
 
 const PAYMENT_BADGE  = {
   cash:   'bg-blue-50 text-blue-700',
@@ -18,8 +19,11 @@ export default function ListingCard({ listing }) {
   const [deleting, setDeleting]       = useState(false)
   const { user }  = useAuth()
   const navigate  = useNavigate()
-  const { id, title, price, condition, city, date, image, paymentType, userId,
-          category, listingType, skills } = listing
+  const { id, title, price, condition, city, image, paymentType, userId,
+          category, listingType, skills, createdAt } = listing
+
+  const timeDisplay = timeAgo(createdAt)
+  const isNew = createdAt && Date.now() - new Date(createdAt).getTime() < 48 * 60 * 60 * 1000
 
   const PAYMENT_LABELS = { cash: t('listingCard.cash'), credit: t('listingCard.credit'), order: t('listingCard.order') }
 
@@ -88,6 +92,11 @@ export default function ListingCard({ listing }) {
         <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold ${conditionBadge.cls}`}>
           {conditionBadge.label}
         </span>
+        {isNew && (
+          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-500 text-white">
+            {t('listingCard.newListing')}
+          </span>
+        )}
         <button
           onClick={toggleFavorite}
           disabled={favLoading}
@@ -123,7 +132,7 @@ export default function ListingCard({ listing }) {
         </div>
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1"><MapPin size={11} />{city}</span>
-          <span className="flex items-center gap-1"><Clock size={11} />{date}</span>
+          <span className="flex items-center gap-1"><Clock size={11} />{timeDisplay}</span>
         </div>
 
         {/* Owner actions */}

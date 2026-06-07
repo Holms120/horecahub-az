@@ -35,6 +35,8 @@ export default function Register() {
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
+  const [confirmed, setConfirmed]       = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const navigate = useNavigate()
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
@@ -71,6 +73,8 @@ export default function Register() {
       fe.companyName = t('auth.errCompany')
     if (form.accountType === 'supplier' && form.supplierCategories.length === 0)
       fe.supplierCategories = t('auth.errCategories')
+    if (!termsAccepted)
+      fe.terms = t('auth.errTerms')
     setFieldErrors(fe)
     if (Object.keys(fe).length > 0) return
 
@@ -78,7 +82,7 @@ export default function Register() {
     setError('')
     setFieldErrors({})
 
-    const { error: authErr } = await supabase.auth.signUp({
+    const { data: signUpData, error: authErr } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
@@ -96,12 +100,36 @@ export default function Register() {
     if (authErr) {
       setError(translateAuthError(authErr.message))
       setLoading(false)
+    } else if (!signUpData.session) {
+      setConfirmed(true)
     } else {
       navigate('/', { replace: true })
     }
   }
 
   const isSupplier = form.accountType === 'supplier'
+
+  if (confirmed) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4">
+        <Helmet><title>{t('auth.confirmEmail')} — HorecaHub</title></Helmet>
+        <div className="w-full max-w-md text-center">
+          <div className="text-6xl mb-6">✉️</div>
+          <h1 className="text-2xl font-bold text-navy mb-3">{t('auth.confirmEmail')}</h1>
+          <p className="text-gray-600 mb-3 leading-relaxed">
+            {t('auth.confirmEmailDesc', { email: form.email })}
+          </p>
+          <p className="text-sm text-gray-400 mb-8">{t('auth.checkSpam')}</p>
+          <Link
+            to="/login"
+            className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            {t('auth.backToLogin')}
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4">
@@ -247,6 +275,28 @@ export default function Register() {
                   className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.confirmPassword ? 'border-red-400' : 'border-gray-200'}`} />
                 {fieldErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword}</p>}
               </div>
+            </div>
+
+            <div>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={e => setTermsAccepted(e.target.checked)}
+                  className="mt-0.5 accent-blue-600 w-4 h-4 flex-shrink-0"
+                />
+                <span className="text-sm text-gray-600 leading-snug">
+                  <a href="/terms" target="_blank" rel="noreferrer"
+                    className="text-blue-600 hover:underline font-medium">{t('auth.termsLink')}</a>
+                  {' '}və{' '}
+                  <a href="/privacy" target="_blank" rel="noreferrer"
+                    className="text-blue-600 hover:underline font-medium">{t('auth.privacyLink')}</a>
+                  {' '}{t('auth.termsAccept')}
+                </span>
+              </label>
+              {fieldErrors.terms && (
+                <p className="text-red-500 text-xs mt-1.5">{fieldErrors.terms}</p>
+              )}
             </div>
 
             <button type="submit" disabled={loading}
