@@ -488,7 +488,7 @@ const TABS = [
 ]
 
 export default function Admin() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
   const [tab, setTab] = useState('dashboard')
   const [supportBadge, setSupportBadge] = useState(0)
 
@@ -503,8 +503,7 @@ export default function Admin() {
       .then(({ count }) => setSupportBadge(count || 0))
   }, [user])
 
-  // Loading: wait for profile to resolve
-  if (!user || profile === null) return (
+  if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
