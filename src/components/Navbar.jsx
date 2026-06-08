@@ -152,13 +152,18 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          {/* Desktop right: Search | Lang | User | Post */}
+          {/* Desktop right: Search | Post | Lang | User */}
           <div className="hidden md:flex items-center flex-shrink-0 ml-auto">
             <Link to="/listings" className="p-2 text-gray-500 hover:text-navy hover:bg-gray-50 rounded-lg transition-colors">
               <Search size={20} />
             </Link>
 
             <div className="flex items-center gap-4 border-l border-gray-200 pl-4 ml-3">
+              <Link to="/sell"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
+                <Plus size={16} /> {t('nav.postListing')}
+              </Link>
+
               <div className="flex items-center gap-1 text-xs font-semibold">
                 {['az', 'ru', 'en'].map(lang => (
                   <button
@@ -242,12 +247,6 @@ export default function Navbar() {
                 </div>
               )}
 
-              {!user && (
-                <Link to="/sell"
-                  className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
-                  <Plus size={16} /> {t('nav.postListing')}
-                </Link>
-              )}
             </div>
           </div>
 
@@ -366,12 +365,10 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
-            {!user && (
-              <Link to="/sell" onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
-                <Plus size={16} /> {t('nav.postListing')}
-              </Link>
-            )}
+            <Link to="/sell" onClick={() => setMenuOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
+              <Plus size={16} /> {t('nav.postListing')}
+            </Link>
           </div>
         </div>
       )}
