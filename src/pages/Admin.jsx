@@ -488,16 +488,9 @@ const TABS = [
 ]
 
 export default function Admin() {
-  const { user, signOut } = useAuth()
-  const [isAdmin, setIsAdmin] = useState(null)
+  const { user, profile, signOut } = useAuth()
   const [tab, setTab] = useState('dashboard')
   const [supportBadge, setSupportBadge] = useState(0)
-
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return }
-    supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-      .then(({ data }) => setIsAdmin(!!data?.is_admin))
-  }, [user])
 
   // Unread support count
   useEffect(() => {
@@ -510,17 +503,18 @@ export default function Admin() {
       .then(({ count }) => setSupportBadge(count || 0))
   }, [user])
 
-  if (isAdmin === null) return (
+  // Loading: wait for profile to resolve
+  if (!user || profile === null) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   )
-  if (!isAdmin) return <Navigate to="/" replace />
+  if (!profile?.is_admin) return <Navigate to="/" replace />
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-56 flex-shrink-0 bg-navy text-white flex flex-col">
+      <aside className="w-56 flex-shrink-0 bg-[#0A2342] text-white flex flex-col">
         <div className="px-5 py-5 border-b border-white/10">
           <Link to="/" className="text-white font-bold text-lg tracking-tight">HorecaHub</Link>
           <p className="text-white/40 text-xs mt-0.5">Admin panel</p>
