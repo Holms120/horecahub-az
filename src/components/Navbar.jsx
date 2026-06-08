@@ -242,10 +242,12 @@ export default function Navbar() {
                 </div>
               )}
 
-              <Link to="/sell"
-                className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
-                <Plus size={16} /> {t('nav.postListing')}
-              </Link>
+              {!user && (
+                <Link to="/sell"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
+                  <Plus size={16} /> {t('nav.postListing')}
+                </Link>
+              )}
             </div>
           </div>
 
@@ -364,10 +366,12 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
-            <Link to="/sell" onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
-              <Plus size={16} /> {t('nav.postListing')}
-            </Link>
+            {!user && (
+              <Link to="/sell" onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
+                <Plus size={16} /> {t('nav.postListing')}
+              </Link>
+            )}
           </div>
         </div>
       )}

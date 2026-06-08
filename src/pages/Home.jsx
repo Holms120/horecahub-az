@@ -141,7 +141,7 @@ export default function Home() {
             <span className="w-px h-4 bg-blue-500" />
             <span><strong className="text-white text-lg">{stats.sellers}</strong> {t('hero.sellers')}</span>
             <span className="w-px h-4 bg-blue-500" />
-            <span><strong className="text-white text-lg">8</strong> {t('hero.categories')}</span>
+            <span><strong className="text-white text-lg">{CATEGORIES.length}</strong> {t('hero.categories')}</span>
           </div>
         </div>
       </section>
