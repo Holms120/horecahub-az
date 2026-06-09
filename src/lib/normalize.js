@@ -37,7 +37,7 @@ export function normalizeListing(row) {
     id: row.id,
     title: row.title || '',
     price: row.price != null ? Number(row.price) : 0,
-    condition: row.condition === 'new' ? 'Yeni' : 'İşlənmiş',
+    condition: row.condition === 'new' ? 'Sıfır' : 'İşlənmiş',
     city: row.city || '',
     createdAt: row.created_at ? String(row.created_at).trim() : '',
     category: row.category || '',

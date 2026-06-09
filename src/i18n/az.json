@@ -93,6 +93,7 @@
     "vacancy": "💼 Vakansiya",
     "cv": "👤 CV",
     "new": "Yeni",
+    "unused": "Sıfır",
     "used": "İşlənmiş",
     "cash": "Nağd",
     "credit": "Kreditlə",
@@ -101,7 +102,7 @@
     "delete": "Sil",
     "deleteConfirm": "Bu elanı silmək istədiyinizə əminsiniz?",
     "addToFavorites": "Bəyəndiklərinə əlavə et",
-    "newListing": "Yeni"
+    "newListing": "Yeni elan"
   },
   "listingDetail": {
     "back": "Geri",

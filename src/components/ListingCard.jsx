@@ -50,9 +50,9 @@ export default function ListingCard({ listing }) {
     ? (listingType === 'vacancy'
         ? { label: t('listingCard.vacancy'), cls: 'bg-purple-100 text-purple-700' }
         : { label: t('listingCard.cv'),      cls: 'bg-blue-100 text-blue-700' })
-    : (condition === 'Yeni'
-        ? { label: t('listingCard.new'),  cls: 'bg-green-100 text-green-700' }
-        : { label: t('listingCard.used'), cls: 'bg-gray-100 text-gray-600' })
+    : (condition === 'Sıfır'
+        ? { label: t('listingCard.unused'), cls: 'bg-green-100 text-green-700' }
+        : { label: t('listingCard.used'),   cls: 'bg-gray-100 text-gray-600' })
 
   // Fetch favorite status
   useEffect(() => {
