@@ -46,10 +46,13 @@ export default function ListingCard({ listing }) {
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
     : `₼${price.toLocaleString('az-AZ')}`
 
+  const SERVICE_CATS = ['consulting', 'software', 'training']
   const conditionBadge = isStaff
     ? (listingType === 'vacancy'
         ? { label: t('listingCard.vacancy'), cls: 'bg-purple-100 text-purple-700' }
         : { label: t('listingCard.cv'),      cls: 'bg-blue-100 text-blue-700' })
+    : SERVICE_CATS.includes(category)
+    ? null
     : (condition === 'Sıfır'
         ? { label: t('listingCard.unused'), cls: 'bg-green-100 text-green-700' }
         : { label: t('listingCard.used'),   cls: 'bg-gray-100 text-gray-600' })
@@ -104,11 +107,11 @@ export default function ListingCard({ listing }) {
           <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-500 text-white">
             {t('listingCard.newListing')}
           </span>
-        ) : (
+        ) : conditionBadge ? (
           <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold ${conditionBadge.cls}`}>
             {conditionBadge.label}
           </span>
-        )}
+        ) : null}
         {isOwner && status === 'pending' && (
           <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-amber-500 text-white">
             Gözləmədə

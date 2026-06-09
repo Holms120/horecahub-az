@@ -108,6 +108,13 @@ export default function AddListing() {
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
+  function getDescPlaceholder() {
+    if (form.category === 'training')   return t('addListing.descPlaceholderTraining')
+    if (form.category === 'consulting') return t('addListing.descPlaceholderConsulting')
+    if (form.category === 'software')   return t('addListing.descPlaceholderSoftware')
+    return t('addListing.descPlaceholder')
+  }
+
   function handleFileChange(e) {
     const incoming = Array.from(e.target.files)
     const slots    = MAX_FILES - selectedFiles.length
@@ -424,7 +431,7 @@ export default function AddListing() {
               <div>
                 <label className="block text-sm font-medium text-navy mb-1.5">{t('addListing.description')}</label>
                 <textarea value={form.description} onChange={e => set('description', e.target.value)}
-                  placeholder={t('addListing.descPlaceholder')}
+                  placeholder={getDescPlaceholder()}
                   rows={5}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none" />
               </div>
