@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { translateAuthError } from '../lib/authErrors'
 import Logo from '../components/Logo'
@@ -8,10 +9,11 @@ import { useTranslation } from 'react-i18next'
 
 export default function Login() {
   const { t } = useTranslation()
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState('')
+  const [email, setEmail]             = useState('')
+  const [password, setPassword]       = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading]         = useState(false)
+  const [error, setError]             = useState('')
   const navigate  = useNavigate()
   const location  = useLocation()
   const from      = location.state?.from || '/'
@@ -60,12 +62,22 @@ export default function Login() {
             </div>
             <div>
               <label className="block text-sm font-medium text-navy mb-1.5">{t('auth.password')}</label>
-              <input
-                type="password" required autoComplete="current-password"
-                value={password} onChange={e => setPassword(e.target.value)}
-                placeholder={t('auth.passwordPlaceholder')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'} required autoComplete="current-password"
+                  value={password} onChange={e => setPassword(e.target.value)}
+                  placeholder={t('auth.passwordPlaceholder')}
+                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
             </div>
             <button
               type="submit" disabled={loading}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { CITIES } from '../data/mockData'
 import { translateAuthError } from '../lib/authErrors'
@@ -37,6 +38,8 @@ export default function Register() {
   const [fieldErrors, setFieldErrors] = useState({})
   const [confirmed, setConfirmed]       = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [showPassword, setShowPassword]   = useState(false)
+  const [showConfirm, setShowConfirm]     = useState(false)
   const navigate = useNavigate()
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
@@ -278,18 +281,30 @@ export default function Register() {
             <div className="flex gap-3">
               <div className="flex-1">
                 <label className="block text-sm font-medium text-navy mb-1.5">{t('auth.password')} *</label>
-                <input type="password" autoComplete="new-password" value={form.password}
-                  onChange={e => { set('password', e.target.value); setFieldErrors(fe => ({ ...fe, password: '', confirmPassword: '' })) }}
-                  placeholder={t('auth.passwordPlaceholder')}
-                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.password ? 'border-red-400' : 'border-gray-200'}`} />
+                <div className="relative">
+                  <input type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={form.password}
+                    onChange={e => { set('password', e.target.value); setFieldErrors(fe => ({ ...fe, password: '', confirmPassword: '' })) }}
+                    placeholder={t('auth.passwordPlaceholder')}
+                    className={`w-full px-4 py-3 pr-11 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.password ? 'border-red-400' : 'border-gray-200'}`} />
+                  <button type="button" onClick={() => setShowPassword(v => !v)} tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
                 {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
               </div>
               <div className="flex-1">
                 <label className="block text-sm font-medium text-navy mb-1.5">{t('auth.confirmPassword')}</label>
-                <input type="password" autoComplete="new-password" value={form.confirmPassword}
-                  onChange={e => { set('confirmPassword', e.target.value); setFieldErrors(fe => ({ ...fe, confirmPassword: '' })) }}
-                  placeholder={t('auth.confirmPlaceholder')}
-                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.confirmPassword ? 'border-red-400' : 'border-gray-200'}`} />
+                <div className="relative">
+                  <input type={showConfirm ? 'text' : 'password'} autoComplete="new-password" value={form.confirmPassword}
+                    onChange={e => { set('confirmPassword', e.target.value); setFieldErrors(fe => ({ ...fe, confirmPassword: '' })) }}
+                    placeholder={t('auth.confirmPlaceholder')}
+                    className={`w-full px-4 py-3 pr-11 border rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${fieldErrors.confirmPassword ? 'border-red-400' : 'border-gray-200'}`} />
+                  <button type="button" onClick={() => setShowConfirm(v => !v)} tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                    {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
                 {fieldErrors.confirmPassword && <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmPassword}</p>}
               </div>
             </div>
