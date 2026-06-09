@@ -508,7 +508,7 @@ export default function Admin() {
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   )
-  if (!profile?.is_admin) return <Navigate to="/" replace />
+  if (profile !== null && !profile?.is_admin) return <Navigate to="/" replace />
 
   return (
     <div className="flex min-h-screen bg-gray-50">
