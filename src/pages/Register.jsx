@@ -101,7 +101,7 @@ export default function Register() {
     })
 
     if (authErr) {
-      setError(translateAuthError(authErr.message))
+      setError(t(translateAuthError(authErr.message)))
       setLoading(false)
       return
     }
@@ -320,7 +320,7 @@ export default function Register() {
                 <span className="text-sm text-gray-600 leading-snug">
                   <a href="/terms" target="_blank" rel="noreferrer"
                     className="text-blue-600 hover:underline font-medium">{t('auth.termsLink')}</a>
-                  {' '}və{' '}
+                  {' '}{t('auth.and')}{' '}
                   <a href="/privacy" target="_blank" rel="noreferrer"
                     className="text-blue-600 hover:underline font-medium">{t('auth.privacyLink')}</a>
                   {' '}{t('auth.termsAccept')}

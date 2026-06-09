@@ -307,7 +307,13 @@
     "termsAccept": "oxudum və qəbul edirəm",
     "termsLink": "İstifadə şərtlərini",
     "privacyLink": "Məxfilik siyasətini",
-    "errTerms": "Davam etmək üçün şərtləri qəbul etməlisiniz"
+    "errTerms": "Davam etmək üçün şərtləri qəbul etməlisiniz",
+    "errGeneral": "Xəta baş verdi. Yenidən cəhd edin",
+    "errAlreadyRegistered": "Bu email artıq qeydiyyatdan keçib",
+    "errInvalidCredentials": "Email və ya şifrə yanlışdır",
+    "errEmailNotConfirmed": "Email təsdiqlənməyib. Emailinizi yoxlayın",
+    "errInvalidEmailFormat": "Email formatı yanlışdır",
+    "and": "və"
   },
   "profile": {
     "verified": "Doğrulanmış Təchizatçı",

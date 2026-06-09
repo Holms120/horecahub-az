@@ -307,7 +307,13 @@
     "termsAccept": "I have read and accept the",
     "termsLink": "Terms of service",
     "privacyLink": "Privacy policy",
-    "errTerms": "You must accept the terms to continue"
+    "errTerms": "You must accept the terms to continue",
+    "errGeneral": "An error occurred. Please try again",
+    "errAlreadyRegistered": "This email is already registered",
+    "errInvalidCredentials": "Invalid email or password",
+    "errEmailNotConfirmed": "Email not confirmed. Please check your inbox",
+    "errInvalidEmailFormat": "Invalid email format",
+    "and": "and"
   },
   "profile": {
     "verified": "Verified Supplier",

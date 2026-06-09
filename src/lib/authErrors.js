@@ -1,15 +1,15 @@
 export function translateAuthError(msg) {
-  if (!msg) return 'Xəta baş verdi. Yenidən cəhd edin'
+  if (!msg) return 'auth.errGeneral'
   const m = msg.toLowerCase()
   if (m.includes('user already registered') || m.includes('already registered'))
-    return 'Bu email artıq qeydiyyatdan keçib'
+    return 'auth.errAlreadyRegistered'
   if (m.includes('invalid login credentials'))
-    return 'Email və ya şifrə yanlışdır'
+    return 'auth.errInvalidCredentials'
   if (m.includes('email not confirmed'))
-    return 'Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın'
+    return 'auth.errEmailNotConfirmed'
   if (m.includes('password should be at least') || m.includes('password must be'))
-    return 'Şifrə ən az 6 simvol olmalıdır'
+    return 'auth.errPassword'
   if (m.includes('unable to validate email') || m.includes('invalid format'))
-    return 'Email formatı yanlışdır'
-  return 'Xəta baş verdi. Yenidən cəhd edin'
+    return 'auth.errInvalidEmailFormat'
+  return 'auth.errGeneral'
 }

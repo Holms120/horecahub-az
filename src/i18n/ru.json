@@ -307,7 +307,13 @@
     "termsAccept": "прочитал(а) и принимаю",
     "termsLink": "Условия использования",
     "privacyLink": "Политику конфиденциальности",
-    "errTerms": "Для продолжения необходимо принять условия"
+    "errTerms": "Для продолжения необходимо принять условия",
+    "errGeneral": "Произошла ошибка. Попробуйте снова",
+    "errAlreadyRegistered": "Этот email уже зарегистрирован",
+    "errInvalidCredentials": "Неверный email или пароль",
+    "errEmailNotConfirmed": "Email не подтверждён. Проверьте почту",
+    "errInvalidEmailFormat": "Неверный формат email",
+    "and": "и"
   },
   "profile": {
     "verified": "Проверенный поставщик",

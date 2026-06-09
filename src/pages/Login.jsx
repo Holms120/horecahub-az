@@ -26,7 +26,7 @@ export default function Login() {
     const { error: err } = await supabase.auth.signInWithPassword({ email, password })
 
     if (err) {
-      setError(translateAuthError(err.message))
+      setError(t(translateAuthError(err.message)))
       setLoading(false)
     } else {
       navigate(from, { replace: true })
