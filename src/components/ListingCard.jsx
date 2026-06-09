@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Heart, MapPin, Clock, Pencil, Trash2 } from 'lucide-react'
+import { Heart, MapPin, Clock, Pencil, Trash2, Eye } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
@@ -18,13 +18,23 @@ export default function ListingCard({ listing }) {
   const [isFavorited, setIsFavorited] = useState(false)
   const [favLoading, setFavLoading]   = useState(false)
   const [deleting, setDeleting]       = useState(false)
+  const [viewCount, setViewCount]     = useState(0)
   const { user }  = useAuth()
   const navigate  = useNavigate()
   const { id, title, price, condition, city, image, paymentType, userId,
-          category, listingType, skills, createdAt, created_at } = listing
+          category, listingType, skills, createdAt, created_at, status } = listing
 
   const timeDisplay = useRelativeTime(createdAt || created_at)
   const isNew = isNewListing(createdAt || created_at)
+
+  useEffect(() => {
+    if (!id) return
+    supabase
+      .from('listing_views')
+      .select('*', { count: 'exact', head: true })
+      .eq('listing_id', id)
+      .then(({ count }) => setViewCount(count || 0))
+  }, [id])
 
   const PAYMENT_LABELS = { cash: t('listingCard.cash'), credit: t('listingCard.credit'), order: t('listingCard.order') }
 
@@ -99,6 +109,11 @@ export default function ListingCard({ listing }) {
             {conditionBadge.label}
           </span>
         )}
+        {isOwner && status === 'pending' && (
+          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-amber-500 text-white">
+            Gözləmədə
+          </span>
+        )}
         <button
           onClick={toggleFavorite}
           disabled={favLoading}
@@ -134,7 +149,10 @@ export default function ListingCard({ listing }) {
         </div>
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1"><MapPin size={11} />{city}</span>
-          <span className="flex items-center gap-1"><Clock size={11} />{timeDisplay}</span>
+          <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1"><Eye size={11} />{viewCount}</span>
+            <span className="flex items-center gap-1"><Clock size={11} />{timeDisplay}</span>
+          </div>
         </div>
 
         {/* Owner actions */}
