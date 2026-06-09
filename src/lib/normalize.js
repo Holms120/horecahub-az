@@ -59,6 +59,7 @@ export function normalizeListing(row) {
     isFeatured: false,
     paymentType: row.payment_type || 'cash',
     userId: row.user_id || '',
+    status: row.status || 'active',
     seller: {
       id: profile.id || row.user_id || '',
       name: sellerName,
