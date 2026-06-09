@@ -83,7 +83,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
         )}
       </div>
 
-      {!['staff', 'consulting', 'software', 'training'].includes(filters.category) && (
+      {!['staff', 'consulting', 'software', 'training', 'business_sale'].includes(filters.category) && (
         <Section title={t('filter.category')}>
           <div className="space-y-1.5">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -138,7 +138,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
         </Section>
       )}
 
-      {!['staff', 'consulting', 'software', 'training'].includes(filters.category) && (
+      {!['staff', 'consulting', 'software', 'training', 'business_sale'].includes(filters.category) && (
         <>
           <Section title={t('filter.priceRange')}>
             <div className="flex items-center gap-2">

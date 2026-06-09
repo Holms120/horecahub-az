@@ -182,6 +182,7 @@
     "descPlaceholderTraining": "Training content, duration, who it's suitable for...",
     "descPlaceholderConsulting": "Scope of consulting services, experience, approach...",
     "descPlaceholderSoftware": "Software features, technical requirements...",
+    "descPlaceholderBusiness": "Business type, location, capacity, reason for selling, price basis...",
     "condition": "Condition *",
     "new": "New",
     "used": "Used",
@@ -560,7 +561,19 @@
     "management_training": "Restaurant management",
     "haccp_cert": "HACCP certification",
     "service_training": "Service training",
-    "training_other": "Other"
+    "training_other": "Other",
+    "cups": "Cups & lids",
+    "boxes": "Boxes & containers",
+    "bags": "Bags & pouches",
+    "napkins": "Napkins & paper products",
+    "labels": "Labels & printing",
+    "other_packaging": "Other packaging",
+    "restaurant_sale": "Restaurant for sale",
+    "cafe_sale": "Café for sale",
+    "takeaway_sale": "Takeaway for sale",
+    "franchise": "Franchise",
+    "equipment_complex": "Equipment complex",
+    "other_business": "Other business"
   },
   "cat": {
     "kitchen": "Kitchen equipment",
@@ -573,7 +586,9 @@
     "suppliers": "Suppliers",
     "consulting": "Consulting",
     "software": "Software",
-    "training": "Training & Courses"
+    "training": "Training & Courses",
+    "packaging": "Packaging",
+    "business_sale": "Business for Sale"
   },
   "contact": {
     "title": "Contact us",

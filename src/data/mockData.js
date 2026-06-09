@@ -7,9 +7,11 @@ export const CATEGORIES = [
   { id: 'tableware', key: 'cat.tableware', label: 'Qab-qacaq & aksesuar', icon: 'Wine'            },
   { id: 'staff',       key: 'cat.staff',       label: 'Kadrlar',              icon: 'Users'          },
   { id: 'suppliers',   key: 'cat.suppliers',   label: 'Təchizatçılar',        icon: 'Truck'          },
-  { id: 'consulting',  key: 'cat.consulting',  label: 'Konsaltinq',           icon: 'Briefcase'      },
-  { id: 'software',    key: 'cat.software',    label: 'Proqram təminatı',     icon: 'Monitor'        },
-  { id: 'training',    key: 'cat.training',    label: 'Təlim & Kurslar',      icon: 'GraduationCap'  },
+  { id: 'consulting',    key: 'cat.consulting',    label: 'Konsaltinq',        icon: 'Briefcase'     },
+  { id: 'software',      key: 'cat.software',      label: 'Proqram təminatı',  icon: 'Monitor'       },
+  { id: 'training',      key: 'cat.training',      label: 'Təlim & Kurslar',   icon: 'GraduationCap' },
+  { id: 'packaging',     key: 'cat.packaging',     label: 'Qablaşdırma',       icon: 'Package'       },
+  { id: 'business_sale', key: 'cat.business_sale', label: 'Biznes satışı',     icon: 'Store'         },
 ]
 
 export const CITIES = [
@@ -132,6 +134,22 @@ export const SUBCATEGORIES = {
     { id: 'haccp_cert',          key: 'subcat.haccp_cert',          label: 'HACCP sertifikasiyası' },
     { id: 'service_training',    key: 'subcat.service_training',    label: 'Servis təlimi' },
     { id: 'training_other',      key: 'subcat.training_other',      label: 'Digər' },
+  ],
+  packaging: [
+    { id: 'cups',             key: 'subcat.cups',             label: 'Stəkanlar' },
+    { id: 'boxes',            key: 'subcat.boxes',            label: 'Qutular və konteyner' },
+    { id: 'bags',             key: 'subcat.bags',             label: 'Paketlər və torbalar' },
+    { id: 'napkins',          key: 'subcat.napkins',          label: 'Salfet və kağız məmulatları' },
+    { id: 'labels',           key: 'subcat.labels',           label: 'Etiket və çap' },
+    { id: 'other_packaging',  key: 'subcat.other_packaging',  label: 'Digər qablaşdırma' },
+  ],
+  business_sale: [
+    { id: 'restaurant_sale',    key: 'subcat.restaurant_sale',    label: 'Restoran satışı' },
+    { id: 'cafe_sale',          key: 'subcat.cafe_sale',          label: 'Kafe satışı' },
+    { id: 'takeaway_sale',      key: 'subcat.takeaway_sale',      label: 'Takeaway satışı' },
+    { id: 'franchise',          key: 'subcat.franchise',          label: 'Franşiza' },
+    { id: 'equipment_complex',  key: 'subcat.equipment_complex',  label: 'Kompleks avadanlıq' },
+    { id: 'other_business',     key: 'subcat.other_business',     label: 'Digər biznes' },
   ],
   suppliers: [
     { id: 'meat',            key: 'subcat.meat',            label: 'Ət və quş əti' },

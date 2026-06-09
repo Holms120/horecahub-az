@@ -4,7 +4,8 @@ import { Helmet } from 'react-helmet-async'
 import {
   Search, ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, ShieldCheck, MessageCircle,
-  Target, ArrowRight, Plus, Briefcase, Monitor, GraduationCap
+  Target, ArrowRight, Plus, Briefcase, Monitor, GraduationCap,
+  Package, Store
 } from 'lucide-react'
 import { CATEGORIES } from '../data/mockData'
 import { supabase } from '../supabaseClient'
@@ -15,6 +16,7 @@ import { useTranslation } from 'react-i18next'
 const ICON_MAP = {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap,
+  Package, Store,
 }
 
 const CAT_COLORS = [

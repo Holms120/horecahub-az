@@ -46,7 +46,7 @@ export default function ListingCard({ listing }) {
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
     : `₼${price.toLocaleString('az-AZ')}`
 
-  const SERVICE_CATS = ['consulting', 'software', 'training']
+  const SERVICE_CATS = ['consulting', 'software', 'training', 'business_sale']
   const conditionBadge = isStaff
     ? (listingType === 'vacancy'
         ? { label: t('listingCard.vacancy'), cls: 'bg-purple-100 text-purple-700' }
