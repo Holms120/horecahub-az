@@ -249,6 +249,8 @@
     "publish": "Elanı yerləşdir",
     "successTitle": "Elan yerləşdirildi!",
     "successDesc": "Elanınız aktiv oldu.",
+    "pendingTitle": "Elanınız göndərildi!",
+    "pendingDesc": "Elanınız moderasiyaya göndərildi. Admin tərəfindən yoxlandıqdan sonra yayımlanacaq.",
     "viewListings": "Elanlara bax",
     "postAnother": "Yeni elan yerləşdir"
   },

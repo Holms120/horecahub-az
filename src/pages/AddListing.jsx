@@ -62,9 +62,16 @@ export default function AddListing() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState(null)
+
+  // Redirect unauthenticated users
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login', { state: { from: '/sell' } })
+    }
+  }, [user, authLoading, navigate])
 
   const STEPS = [
     t('addListing.step1'), t('addListing.step2'), t('addListing.step3'),
@@ -223,7 +230,7 @@ export default function AddListing() {
       condition:    form.condition === 'Yeni' ? 'new' : 'used',
       city:         form.city,
       images:       imageUrls,
-      status:       'active',
+      status:       'pending',
     })
 
     if (error) {
@@ -237,11 +244,11 @@ export default function AddListing() {
   if (submitted) {
     return (
       <div className="max-w-md mx-auto px-4 py-24 text-center">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check size={36} className="text-green-600" />
+        <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <span className="text-3xl">🕐</span>
         </div>
-        <h2 className="text-2xl font-bold text-navy mb-3">{t('addListing.successTitle')}</h2>
-        <p className="text-gray-500 mb-8">{t('addListing.successDesc')}</p>
+        <h2 className="text-2xl font-bold text-navy mb-3">{t('addListing.pendingTitle')}</h2>
+        <p className="text-gray-500 mb-8">{t('addListing.pendingDesc')}</p>
         <div className="flex flex-col gap-3">
           <button onClick={() => navigate('/listings')}
             className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700">

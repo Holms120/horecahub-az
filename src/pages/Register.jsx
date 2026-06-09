@@ -100,7 +100,24 @@ export default function Register() {
     if (authErr) {
       setError(translateAuthError(authErr.message))
       setLoading(false)
-    } else if (!signUpData.session) {
+      return
+    }
+
+    // Upsert profile so phone, city, account_type are stored immediately
+    if (signUpData.user) {
+      await supabase.from('profiles').upsert({
+        id:                  signUpData.user.id,
+        full_name:           strip(form.fullName),
+        phone:               form.phone,
+        city:                form.city,
+        account_type:        form.accountType,
+        company_name:        form.accountType === 'supplier' ? strip(form.companyName) : null,
+        phone2:              form.accountType === 'supplier' && form.phone2 ? form.phone2 : null,
+        supplier_categories: form.accountType === 'supplier' ? form.supplierCategories : [],
+      }, { onConflict: 'id' })
+    }
+
+    if (!signUpData.session) {
       setConfirmed(true)
     } else {
       navigate('/', { replace: true })

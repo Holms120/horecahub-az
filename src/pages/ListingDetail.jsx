@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import {
   MapPin, Clock, Heart, Share2, ShieldCheck,
   Star, ChevronLeft, MessageSquare, Phone, ArrowRight, Send, CheckCircle2,
-  Pencil, Trash2
+  Pencil, Trash2, Eye
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
@@ -27,6 +27,9 @@ export default function ListingDetail() {
   const [activeImg, setActiveImg]     = useState(0)
   const [isFavorited, setIsFavorited] = useState(false)
   const [favLoading, setFavLoading]   = useState(false)
+
+  // View count
+  const [viewCount, setViewCount] = useState(0)
 
   // Phone reveal
   const [phoneRevealed, setPhoneRevealed] = useState(false)
@@ -68,6 +71,22 @@ export default function ListingDetail() {
       setLoading(false)
     }
     load()
+  }, [id])
+
+
+  // Track view
+  useEffect(() => {
+    if (!id) return
+    supabase.from("listing_views").insert({ listing_id: id }).then(({ error }) => { if (error) console.error("view error:", error) })
+  }, [id])
+  // Fetch view count
+  useEffect(() => {
+    if (!id) return
+    supabase
+      .from('listing_views')
+      .select('*', { count: 'exact', head: true })
+      .eq('listing_id', id)
+      .then(({ count }) => setViewCount(count || 0))
   }, [id])
 
   // Fetch favorite status
@@ -279,6 +298,7 @@ export default function ListingDetail() {
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100 flex-wrap">
             <span className="flex items-center gap-1.5"><MapPin size={14} />{city}</span>
             <span className="flex items-center gap-1.5"><Clock size={14} />{timeDisplay}</span>
+            <span className="flex items-center gap-1.5"><Eye size={14} />{viewCount}</span>
             <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{(categoryKey && t(categoryKey)) || categoryLabel}</span>
             {subcategoryLabel && (
               <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{(listing.subcategory && t('subcat.' + listing.subcategory)) || subcategoryLabel}</span>

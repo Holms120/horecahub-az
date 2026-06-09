@@ -21,10 +21,10 @@ export default function ListingCard({ listing }) {
   const { user }  = useAuth()
   const navigate  = useNavigate()
   const { id, title, price, condition, city, image, paymentType, userId,
-          category, listingType, skills, createdAt } = listing
+          category, listingType, skills, createdAt, created_at } = listing
 
-  const timeDisplay = useRelativeTime(createdAt)
-  const isNew = isNewListing(createdAt)
+  const timeDisplay = useRelativeTime(createdAt || created_at)
+  const isNew = isNewListing(createdAt || created_at)
 
   const PAYMENT_LABELS = { cash: t('listingCard.cash'), credit: t('listingCard.credit'), order: t('listingCard.order') }
 
@@ -90,12 +90,13 @@ export default function ListingCard({ listing }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
-        <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold ${conditionBadge.cls}`}>
-          {conditionBadge.label}
-        </span>
-        {isNew && (
-          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-500 text-white">
+        {isNew ? (
+          <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-green-500 text-white">
             {t('listingCard.newListing')}
+          </span>
+        ) : (
+          <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-semibold ${conditionBadge.cls}`}>
+            {conditionBadge.label}
           </span>
         )}
         <button

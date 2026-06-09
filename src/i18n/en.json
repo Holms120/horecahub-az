@@ -249,6 +249,8 @@
     "publish": "Post listing",
     "successTitle": "Listing posted!",
     "successDesc": "Your listing is now active.",
+    "pendingTitle": "Listing submitted!",
+    "pendingDesc": "Your listing has been sent for moderation. It will be published after admin review.",
     "viewListings": "View listings",
     "postAnother": "Post another listing"
   },

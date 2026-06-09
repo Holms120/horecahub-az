@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link, useSearchParams } from 'react-router-dom'
+import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { MapPin, Phone, ShieldCheck, Package, Calendar, Pencil, Heart, Tag } from 'lucide-react'
+import { MapPin, Phone, ShieldCheck, Package, Calendar, Pencil, Heart, Tag, Eye } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { normalizeListing } from '../lib/normalize'
@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next'
 export default function Profile() {
   const { t } = useTranslation()
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
   const SUPPLIER_CAT_LABELS = {
@@ -31,12 +32,13 @@ export default function Profile() {
     searchParams.get('tab') === 'favorites' ? 'favorites' : 'listings'
   )
 
-  const [profile, setProfile]   = useState(null)
-  const [listings, setListings] = useState([])
+  const [profile, setProfile]     = useState(null)
+  const [listings, setListings]   = useState([])
+  const [viewCounts, setViewCounts] = useState({})
   const [favorites, setFavorites] = useState([])
-  const [loading, setLoading]   = useState(true)
+  const [loading, setLoading]     = useState(true)
   const [favLoading, setFavLoading] = useState(false)
-  const [error, setError]       = useState('')
+  const [error, setError]         = useState('')
 
   useEffect(() => {
     async function load() {
@@ -47,18 +49,32 @@ export default function Profile() {
           .from('listings')
           .select('*, profiles!left(id, full_name, company_name, account_type, logo_url, phone)')
           .eq('user_id', id)
-          .eq('status', 'active')
+          .in('status', ['active', 'pending'])
           .order('created_at', { ascending: false }),
       ])
 
       if (pRes.error) setError('Profil tapılmadı.')
       else setProfile(pRes.data)
 
-      if (!lRes.error) setListings((lRes.data || []).map(normalizeListing))
+      const normalizedListings = (lRes.data || []).map(normalizeListing)
+      if (!lRes.error) setListings(normalizedListings)
+
+      // Load view counts for own profile
+      if (user?.id === id && normalizedListings.length > 0) {
+        const ids = normalizedListings.map(l => l.id)
+        const { data: vData } = await supabase
+          .from('listing_views')
+          .select('listing_id')
+          .in('listing_id', ids)
+        const vc = {}
+        ;(vData || []).forEach(v => { vc[v.listing_id] = (vc[v.listing_id] || 0) + 1 })
+        setViewCounts(vc)
+      }
+
       setLoading(false)
     }
     load()
-  }, [id])
+  }, [id, user?.id])
 
   // Fetch favorites when isOwn + favorites tab active
   useEffect(() => {
@@ -224,7 +240,25 @@ export default function Profile() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {listings.map(l => <ListingCard key={l.id} listing={l} />)}
+              {listings.map(l => (
+                <div key={l.id} className="flex flex-col">
+                  <div className="relative">
+                    <ListingCard listing={l} />
+                    {isOwn && l.status === 'pending' && (
+                      <div className="absolute top-2 right-8 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        Gözləmədə
+                      </div>
+                    )}
+                  </div>
+                  {isOwn && (
+                    <div className="flex items-center gap-3 mt-1 px-1 text-xs text-gray-400">
+                      <span className="flex items-center gap-1">
+                        <Eye size={11} /> {viewCounts[l.id] || 0} baxış
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </>
