@@ -39,7 +39,7 @@ export function normalizeListing(row) {
     price: row.price != null ? Number(row.price) : 0,
     condition: row.condition === 'new' ? 'Yeni' : 'İşlənmiş',
     city: row.city || '',
-    createdAt: row.created_at || '',
+    createdAt: row.created_at ? String(row.created_at).trim() : '',
     category: row.category || '',
     categoryKey:   CATEGORIES.find(c => c.id === row.category)?.key   || '',
     categoryLabel: CATEGORIES.find(c => c.id === row.category)?.label || row.category || '',
