@@ -13,7 +13,7 @@ function buildConfirmUrl(payload: EmailHookPayload): string {
   const { token_hash, redirect_to, site_url } = payload.email_data
   const base = site_url || SITE_URL
   const redirectTo = redirect_to || base
-  return `${base}/auth/v1/verify?token=${token_hash}&type=signup&redirect_to=${encodeURIComponent(redirectTo)}`
+  return `https://ehlgmylgsaegsazobexw.supabase.co/auth/v1/verify?token=${token_hash}&type=signup&redirect_to=${encodeURIComponent(redirectTo)}`
 }
 
 function buildHtml(name: string, confirmUrl: string): string {

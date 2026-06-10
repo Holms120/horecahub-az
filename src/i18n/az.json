@@ -371,7 +371,13 @@
     "deleteConfirm": "Bəli, sil",
     "deleteCancel": "Ləğv et",
     "deleting": "Silinir...",
-    "deleteError": "Hesab silinərkən xəta baş verdi. Yenidən cəhd edin."
+    "deleteError": "Hesab silinərkən xəta baş verdi. Yenidən cəhd edin.",
+    "changePassword": "Şifrə dəyiş",
+    "newPassword": "Yeni şifrə",
+    "confirmNewPassword": "Şifrəni təkrarla",
+    "updatePassword": "Şifrəni yenilə",
+    "updatingPassword": "Yenilənir...",
+    "passwordUpdated": "Şifrə uğurla yeniləndi."
   },
   "messages": {
     "title": "Mesajlar",

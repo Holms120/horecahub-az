@@ -38,31 +38,14 @@ export function getNavbarDisplayName(user, profile = null) {
 
 export default function Navbar() {
   const { t } = useTranslation()
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen]         = useState(false)
-  const [dropOpen, setDropOpen]         = useState(false)
+  const [menuOpen, setMenuOpen]           = useState(false)
+  const [dropOpen, setDropOpen]           = useState(false)
   const [servicesOpen, setServicesOpen]   = useState(false)
   const servicesTimer = useRef(null)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
-  const [unreadCount, setUnreadCount]   = useState(0)
-  const [profile, setProfile]         = useState(null)
-
-  useEffect(() => {
-    if (!user) { setProfile(null); return }
-
-    setProfile(null)
-    let cancelled = false
-    supabase
-      .from('profiles')
-      .select('full_name, email')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (!cancelled) setProfile(data ?? null)
-      })
-    return () => { cancelled = true }
-  }, [user?.id])
+  const [unreadCount, setUnreadCount]     = useState(0)
 
   const displayName = useMemo(
     () => getNavbarDisplayName(user, profile),
@@ -182,8 +165,11 @@ export default function Navbar() {
                     onClick={() => setDropOpen(v => !v)}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors max-w-[160px]"
                   >
-                    <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                      {userInitial}
+                    <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden bg-blue-600 flex items-center justify-center">
+                      {profile?.logo_url
+                        ? <img src={profile.logo_url} alt="" className="w-full h-full object-cover" />
+                        : <span className="text-white text-xs font-bold">{userInitial}</span>
+                      }
                     </div>
                     <span className="text-sm font-medium text-navy truncate min-w-0">
                       {displayName}

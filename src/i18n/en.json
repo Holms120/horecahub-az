@@ -371,7 +371,13 @@
     "deleteConfirm": "Yes, delete",
     "deleteCancel": "Cancel",
     "deleting": "Deleting...",
-    "deleteError": "Error deleting account. Please try again."
+    "deleteError": "Error deleting account. Please try again.",
+    "changePassword": "Change password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "updatePassword": "Update password",
+    "updatingPassword": "Updating...",
+    "passwordUpdated": "Password updated successfully."
   },
   "messages": {
     "title": "Messages",

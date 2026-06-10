@@ -371,7 +371,13 @@
     "deleteConfirm": "Да, удалить",
     "deleteCancel": "Отмена",
     "deleting": "Удаление...",
-    "deleteError": "Ошибка при удалении аккаунта. Попробуйте снова."
+    "deleteError": "Ошибка при удалении аккаунта. Попробуйте снова.",
+    "changePassword": "Изменить пароль",
+    "newPassword": "Новый пароль",
+    "confirmNewPassword": "Повторите пароль",
+    "updatePassword": "Обновить пароль",
+    "updatingPassword": "Обновление...",
+    "passwordUpdated": "Пароль успешно обновлён."
   },
   "messages": {
     "title": "Сообщения",
