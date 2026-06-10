@@ -313,6 +313,7 @@
     "errInvalidCredentials": "Неверный email или пароль",
     "errEmailNotConfirmed": "Email не подтверждён. Проверьте почту",
     "errInvalidEmailFormat": "Неверный формат email",
+    "errRateLimit": "Слишком много попыток. Подождите несколько минут.",
     "and": "и"
   },
   "profile": {

@@ -313,6 +313,7 @@
     "errInvalidCredentials": "Invalid email or password",
     "errEmailNotConfirmed": "Email not confirmed. Please check your inbox",
     "errInvalidEmailFormat": "Invalid email format",
+    "errRateLimit": "Too many attempts. Please wait a few minutes.",
     "and": "and"
   },
   "profile": {

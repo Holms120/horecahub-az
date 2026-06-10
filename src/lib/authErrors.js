@@ -11,5 +11,7 @@ export function translateAuthError(msg) {
     return 'auth.errPassword'
   if (m.includes('unable to validate email') || m.includes('invalid format'))
     return 'auth.errInvalidEmailFormat'
+  if (m.includes('rate limit') || m.includes('too many requests') || m.includes('email rate limit exceeded'))
+    return 'auth.errRateLimit'
   return 'auth.errGeneral'
 }

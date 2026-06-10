@@ -313,6 +313,7 @@
     "errInvalidCredentials": "Email və ya şifrə yanlışdır",
     "errEmailNotConfirmed": "Email təsdiqlənməyib. Emailinizi yoxlayın",
     "errInvalidEmailFormat": "Email formatı yanlışdır",
+    "errRateLimit": "Çox sayda cəhd edildi. Bir neçə dəqiqə gözləyin.",
     "and": "və"
   },
   "profile": {
