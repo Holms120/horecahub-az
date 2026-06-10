@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Camera, ChevronLeft, CheckCircle2, AlertCircle, Loader2, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Camera, ChevronLeft, ChevronDown, CheckCircle2, AlertCircle, Loader2, Trash2, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import { CITIES } from '../data/mockData'
 import { useTranslation } from 'react-i18next'
 
 export default function EditProfile() {
@@ -25,9 +24,11 @@ export default function EditProfile() {
 
   // Editable fields
   const [fullName, setFullName]       = useState('')
-  const [city, setCity]               = useState('')
   const [description, setDescription] = useState('')
   const [companyName, setCompanyName] = useState('')
+
+  // Password section visibility
+  const [showPasswordSection, setShowPasswordSection] = useState(false)
 
   // Avatar
   const [avatarFile, setAvatarFile]       = useState(null)
@@ -66,7 +67,6 @@ export default function EditProfile() {
 
       setProfile(data)
       setFullName(data.full_name || '')
-      setCity(data.city || '')
       setDescription(data.description || '')
       setCompanyName(data.company_name || '')
       setAvatarPreview(data.logo_url || '')
@@ -100,7 +100,6 @@ export default function EditProfile() {
     e.preventDefault()
     const fe = {}
     if (fullName.trim().length < 2) fe.fullName = t('editProfile.errName')
-    if (!city) fe.city = t('editProfile.errCity')
     setFieldErrors(fe)
     if (Object.keys(fe).length > 0) return
 
@@ -128,7 +127,6 @@ export default function EditProfile() {
 
     const updates = {
       full_name:   fullName.trim(),
-      city:        city || null,
       description: description.trim() || null,
       logo_url:    logoUrl,
     }
@@ -283,18 +281,6 @@ export default function EditProfile() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-navy mb-1.5">{t('editProfile.city')}</label>
-            <select
-              value={city} onChange={e => { setCity(e.target.value); setFieldErrors(fe => ({ ...fe, city: '' })) }}
-              className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:border-blue-500 bg-white ${fieldErrors.city ? 'border-red-400' : 'border-gray-200'}`}
-            >
-              <option value="">{t('editProfile.selectCity')}</option>
-              {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            {fieldErrors.city && <p className="text-red-500 text-xs mt-1">{fieldErrors.city}</p>}
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-navy mb-1.5">{t('editProfile.about')}</label>
             <textarea
               value={description}
@@ -316,6 +302,10 @@ export default function EditProfile() {
           <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
             <span className="text-sm text-gray-500">{t('editProfile.phone')}</span>
             <span className="text-sm font-medium text-navy">{profile.phone || '—'}</span>
+          </div>
+          <div className="flex justify-between items-center py-2.5 border-b border-gray-200">
+            <span className="text-sm text-gray-500">{t('editProfile.city')}</span>
+            <span className="text-sm font-medium text-navy">{profile.city || '—'}</span>
           </div>
           <div className="flex justify-between items-center py-2.5">
             <span className="text-sm text-gray-500">{t('editProfile.accountTypeLabel')}</span>
@@ -349,67 +339,78 @@ export default function EditProfile() {
       </form>
 
       {/* Password change */}
-      <div className="mt-6 bg-white border border-gray-200 rounded-2xl p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-navy">{t('editProfile.changePassword')}</h2>
+      <div className="mt-6 bg-white border border-gray-200 rounded-2xl p-6">
+        <button
+          type="button"
+          onClick={() => { setShowPasswordSection(v => !v); setPasswordError(''); setPasswordSuccess(false) }}
+          className="flex items-center justify-between w-full text-sm font-semibold text-navy"
+        >
+          {t('editProfile.changePassword')}
+          <ChevronDown size={16} className={`transition-transform ${showPasswordSection ? 'rotate-180' : ''}`} />
+        </button>
 
-        {passwordSuccess && (
-          <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
-            <CheckCircle2 size={15} className="flex-shrink-0" />
-            {t('editProfile.passwordUpdated')}
+        {showPasswordSection && (
+          <div className="space-y-4 mt-4 pt-4 border-t border-gray-100">
+            {passwordSuccess && (
+              <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+                <CheckCircle2 size={15} className="flex-shrink-0" />
+                {t('editProfile.passwordUpdated')}
+              </div>
+            )}
+            {passwordError && (
+              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                <AlertCircle size={15} className="flex-shrink-0" />
+                {passwordError}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">{t('editProfile.newPassword')}</label>
+              <div className="relative">
+                <input
+                  type={showNewPass ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={e => { setNewPassword(e.target.value); setPasswordError(''); setPasswordSuccess(false) }}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <button type="button" onClick={() => setShowNewPass(v => !v)} tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                  {showNewPass ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">{t('editProfile.confirmNewPassword')}</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPass ? 'text' : 'password'}
+                  value={confirmNewPassword}
+                  onChange={e => { setConfirmNewPassword(e.target.value); setPasswordError(''); setPasswordSuccess(false) }}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <button type="button" onClick={() => setShowConfirmPass(v => !v)} tabIndex={-1}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                  {showConfirmPass ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handlePasswordChange}
+                disabled={passwordSaving || !newPassword}
+                className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
+              >
+                {passwordSaving && <Loader2 size={14} className="animate-spin" />}
+                {passwordSaving ? t('editProfile.updatingPassword') : t('editProfile.updatePassword')}
+              </button>
+            </div>
           </div>
         )}
-        {passwordError && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
-            <AlertCircle size={15} className="flex-shrink-0" />
-            {passwordError}
-          </div>
-        )}
-
-        <div>
-          <label className="block text-sm font-medium text-navy mb-1.5">{t('editProfile.newPassword')}</label>
-          <div className="relative">
-            <input
-              type={showNewPass ? 'text' : 'password'}
-              value={newPassword}
-              onChange={e => { setNewPassword(e.target.value); setPasswordError(''); setPasswordSuccess(false) }}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <button type="button" onClick={() => setShowNewPass(v => !v)} tabIndex={-1}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-              {showNewPass ? <EyeOff size={17} /> : <Eye size={17} />}
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-navy mb-1.5">{t('editProfile.confirmNewPassword')}</label>
-          <div className="relative">
-            <input
-              type={showConfirmPass ? 'text' : 'password'}
-              value={confirmNewPassword}
-              onChange={e => { setConfirmNewPassword(e.target.value); setPasswordError(''); setPasswordSuccess(false) }}
-              placeholder="••••••••"
-              className="w-full px-4 py-3 pr-11 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <button type="button" onClick={() => setShowConfirmPass(v => !v)} tabIndex={-1}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
-              {showConfirmPass ? <EyeOff size={17} /> : <Eye size={17} />}
-            </button>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={handlePasswordChange}
-            disabled={passwordSaving || !newPassword}
-            className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm flex items-center gap-2"
-          >
-            {passwordSaving && <Loader2 size={14} className="animate-spin" />}
-            {passwordSaving ? t('editProfile.updatingPassword') : t('editProfile.updatePassword')}
-          </button>
-        </div>
       </div>
 
       {/* Danger zone */}
