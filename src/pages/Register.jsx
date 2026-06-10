@@ -92,6 +92,7 @@ export default function Register() {
         data: {
           full_name:            strip(form.fullName),
           phone:                form.phone,
+          city:                 form.city,
           account_type:         form.accountType,
           company_name:         form.accountType === 'supplier' ? strip(form.companyName) : null,
           phone2:               form.accountType === 'supplier' && form.phone2 ? form.phone2 : null,
