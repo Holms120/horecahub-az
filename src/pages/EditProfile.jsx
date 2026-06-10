@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Camera, ChevronLeft, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { Camera, ChevronLeft, CheckCircle2, AlertCircle, Loader2, Trash2 } from 'lucide-react'
 import PhoneInput from '../components/PhoneInput'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
@@ -17,10 +17,12 @@ export default function EditProfile() {
 
   const [profile, setProfile]         = useState(null)
   const [loading, setLoading]         = useState(true)
-  const [saving, setSaving]           = useState(false)
-  const [success, setSuccess]         = useState(false)
-  const [error, setError]             = useState('')
-  const [fieldErrors, setFieldErrors] = useState({})
+  const [saving, setSaving]             = useState(false)
+  const [success, setSuccess]           = useState(false)
+  const [error, setError]               = useState('')
+  const [fieldErrors, setFieldErrors]   = useState({})
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleting, setDeleting]         = useState(false)
 
   // Form fields
   const [fullName, setFullName]       = useState('')
@@ -73,6 +75,19 @@ export default function EditProfile() {
     if (avatarPreview && avatarPreview.startsWith('blob:')) URL.revokeObjectURL(avatarPreview)
     setAvatarFile(file)
     setAvatarPreview(URL.createObjectURL(file))
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true)
+    const { error: rpcErr } = await supabase.rpc('delete_user')
+    if (rpcErr) {
+      setError(t('editProfile.deleteError'))
+      setDeleting(false)
+      setShowDeleteModal(false)
+      return
+    }
+    await supabase.auth.signOut()
+    navigate('/', { replace: true })
   }
 
   async function handleSave(e) {
@@ -313,6 +328,55 @@ export default function EditProfile() {
           </button>
         </div>
       </form>
+
+      {/* Danger zone */}
+      <div className="mt-8 pt-6 border-t border-red-100">
+        <h3 className="text-sm font-semibold text-red-600 mb-3">{t('editProfile.dangerZone')}</h3>
+        <button
+          type="button"
+          onClick={() => setShowDeleteModal(true)}
+          className="flex items-center gap-2 px-5 py-2.5 border border-red-200 text-red-600 font-semibold rounded-xl hover:bg-red-50 transition-colors text-sm"
+        >
+          <Trash2 size={15} />
+          {t('editProfile.deleteAccount')}
+        </button>
+      </div>
+
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-600" />
+            </div>
+            <h2 className="text-lg font-bold text-navy text-center mb-2">
+              {t('editProfile.deleteTitle')}
+            </h2>
+            <p className="text-sm text-gray-500 text-center mb-6 leading-relaxed">
+              {t('editProfile.deleteDesc')}
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="flex-1 py-2.5 border border-gray-200 text-navy font-semibold rounded-xl hover:bg-gray-50 transition-colors text-sm disabled:opacity-50"
+              >
+                {t('editProfile.deleteCancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+                className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {deleting && <Loader2 size={14} className="animate-spin" />}
+                {deleting ? t('editProfile.deleting') : t('editProfile.deleteConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

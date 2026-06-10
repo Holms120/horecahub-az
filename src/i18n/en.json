@@ -363,7 +363,15 @@
     "cancel": "Cancel",
     "saving": "Saving...",
     "save": "Save",
-    "uploadTooltip": "Upload photo"
+    "uploadTooltip": "Upload photo",
+    "dangerZone": "Danger zone",
+    "deleteAccount": "Delete account",
+    "deleteTitle": "Delete your account?",
+    "deleteDesc": "This action cannot be undone. All your listings, messages and profile data will be permanently deleted.",
+    "deleteConfirm": "Yes, delete",
+    "deleteCancel": "Cancel",
+    "deleting": "Deleting...",
+    "deleteError": "Error deleting account. Please try again."
   },
   "messages": {
     "title": "Messages",

@@ -363,7 +363,15 @@
     "cancel": "Ləğv et",
     "saving": "Saxlanılır...",
     "save": "Yadda saxla",
-    "uploadTooltip": "Şəkil yüklə"
+    "uploadTooltip": "Şəkil yüklə",
+    "dangerZone": "Təhlükəli zona",
+    "deleteAccount": "Hesabı sil",
+    "deleteTitle": "Hesabı silmək istəyirsiniz?",
+    "deleteDesc": "Bu əməliyyat geri alına bilməz. Bütün elanlarınız, mesajlarınız və profil məlumatlarınız silinəcək.",
+    "deleteConfirm": "Bəli, sil",
+    "deleteCancel": "Ləğv et",
+    "deleting": "Silinir...",
+    "deleteError": "Hesab silinərkən xəta baş verdi. Yenidən cəhd edin."
   },
   "messages": {
     "title": "Mesajlar",
