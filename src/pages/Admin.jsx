@@ -136,7 +136,7 @@ function DashboardTab({ realtimeEvents }) {
     async function load() {
       try {
         const ws = weekStart()
-        const [allRes, activeRes, pendingRes, usersRes, newListRes, newUsrRes, catRes, phoneClicksRes] = await Promise.all([
+        const [allRes, activeRes, pendingRes, usersRes, newListRes, newUsrRes, catRes, phoneClicksRes, phoneClicksRes2] = await Promise.all([
           supabase.from('listings').select('*', { count: 'exact', head: true }),
           supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'active'),
           supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -144,16 +144,18 @@ function DashboardTab({ realtimeEvents }) {
           supabase.from('listings').select('*', { count: 'exact', head: true }).gte('created_at', ws),
           supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', ws),
           supabase.from('listings').select('category').eq('status', 'active'),
-          supabase.from('phone_clicks').select('*', { count: 'exact', head: true }).gte('created_at', ws),
+          supabase.from('phone_clicks').select('*', { count: 'exact', head: true }).gte('created_at', ws).not('user_id', 'is', null),
+          supabase.from('phone_clicks').select('*', { count: 'exact', head: true }).gte('created_at', ws).is('user_id', null),
         ])
         setStats({
-          allListings:     allRes.count          ?? 0,
-          listings:        activeRes.count       ?? 0,
-          pendingListings: pendingRes.count      ?? 0,
-          users:           usersRes.count        ?? 0,
-          newListings:     newListRes.count      ?? 0,
-          newUsers:        newUsrRes.count       ?? 0,
-          phoneClicks:     phoneClicksRes.count  ?? 0,
+          allListings:       allRes.count            ?? 0,
+          listings:          activeRes.count         ?? 0,
+          pendingListings:   pendingRes.count        ?? 0,
+          users:             usersRes.count          ?? 0,
+          newListings:       newListRes.count        ?? 0,
+          newUsers:          newUsrRes.count         ?? 0,
+          phoneClicksAuth:   phoneClicksRes.count    ?? 0,
+          phoneClicksAnon:   phoneClicksRes2.count   ?? 0,
         })
         const cc = {}
         ;(catRes.data || []).forEach(r => { cc[r.category] = (cc[r.category] || 0) + 1 })
@@ -198,7 +200,7 @@ function DashboardTab({ realtimeEvents }) {
       <h2 className="text-xl font-bold text-[#0A2342]">Ümumi statistika</h2>
       {error && <ErrorBanner msg={error} />}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         {stats && [
           { label: 'Cəmi elanlar',           value: stats.allListings,     color: 'text-gray-700',    bg: 'bg-gray-100'    },
           { label: 'Aktiv elanlar',           value: stats.listings,        color: 'text-blue-600',    bg: 'bg-blue-50'     },
@@ -206,7 +208,8 @@ function DashboardTab({ realtimeEvents }) {
           { label: 'Bu həftə elanlar',        value: stats.newListings,     color: 'text-orange-600',  bg: 'bg-orange-50'   },
           { label: 'Cəmi istifadəçilər',     value: stats.users,           color: 'text-emerald-600', bg: 'bg-emerald-50'  },
           { label: 'Bu həftə qeydiyyat',     value: stats.newUsers,        color: 'text-pink-600',    bg: 'bg-pink-50'     },
-          { label: 'Bu həftə tel. kliklər',  value: stats.phoneClicks,     color: 'text-purple-600',  bg: 'bg-purple-50'   },
+          { label: 'Tel. klik (üzv)',    value: stats.phoneClicksAuth, color: 'text-purple-600',  bg: 'bg-purple-50'   },
+          { label: 'Tel. klik (anonim)', value: stats.phoneClicksAnon, color: 'text-violet-600',  bg: 'bg-violet-50'   },
         ].map(c => (
           <div key={c.label} className={`${c.bg} rounded-2xl p-5`}>
             <p className="text-xs text-gray-500 mb-1 leading-snug">{c.label}</p>

@@ -121,7 +121,7 @@ export default function ListingDetail() {
         .single()
       setSellerPhone(data?.phone || '')
     }
-    supabase.from("phone_clicks").insert({ listing_id: id }).then(({ error }) => { if (error) console.error("phone click error:", error) })
+    supabase.from('phone_clicks').insert({ listing_id: id, user_id: user?.id || null }).then(({ error }) => { if (error) console.error('phone click error:', error) })
     setPhoneRevealed(true)
     setPhoneFetching(false)
   }
