@@ -1360,7 +1360,7 @@ export default function Admin() {
     </div>
   )
   if (profile !== null && !profile?.is_admin) return <Navigate to="/" replace />
-
+  if (!user) return <Navigate to="/" replace />
   return (
     <div className="flex min-h-screen bg-gray-50">
       <aside className="w-56 flex-shrink-0 bg-[#0A2342] text-white flex flex-col">
