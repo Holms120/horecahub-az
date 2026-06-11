@@ -46,7 +46,6 @@ export default function Navbar() {
   const servicesTimer = useRef(null)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
   const [unreadCount, setUnreadCount]     = useState(0)
-  const [searchQ, setSearchQ]             = useState('')
 
   const displayName = useMemo(
     () => getNavbarDisplayName(user, profile),
@@ -79,12 +78,6 @@ export default function Navbar() {
     return () => { supabase.removeChannel(channel) }
   }, [user])
 
-  function handleNavSearch(e) {
-    e.preventDefault()
-    const q = searchQ.trim()
-    navigate(q ? `/listings?q=${encodeURIComponent(q)}` : '/listings')
-  }
-
   async function handleSignOut() {
     await signOut()
     setDropOpen(false)
@@ -96,14 +89,14 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16 gap-3 lg:gap-4 xl:gap-8">
+        <div className="flex items-center h-16 gap-4 lg:gap-8">
 
           <Link to="/" className="flex-shrink-0">
             <Logo height={32} />
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-3 xl:gap-6 flex-1 min-w-0">
+          <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0">
             {/* Avadanlıq */}
             <Link to="/listings"
               className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
@@ -116,8 +109,8 @@ export default function Navbar() {
               {t('nav.staff')}
             </Link>
 
-            {/* Xidmətlər dropdown — xl+ only */}
-            <div className="relative hidden xl:block"
+            {/* Xidmətlər dropdown */}
+            <div className="relative"
               onMouseEnter={() => { clearTimeout(servicesTimer.current); setServicesOpen(true) }}
               onMouseLeave={() => { servicesTimer.current = setTimeout(() => setServicesOpen(false), 150) }}
             >
@@ -137,40 +130,26 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Necə işləyir — xl+ only */}
+            {/* Necə işləyir */}
             <Link to="/how-it-works"
-              className="hidden xl:block text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
               {t('nav.howItWorks')}
             </Link>
           </nav>
 
           {/* Desktop right: Search | Post | Lang | User */}
-          <div className="hidden md:flex items-center flex-shrink-0 ml-auto gap-2">
-            {/* Search icon: md–xl only */}
-            <Link to="/listings" className="xl:hidden p-2 text-gray-500 hover:text-navy hover:bg-gray-50 rounded-lg transition-colors">
+          <div className="hidden md:flex items-center flex-shrink-0 ml-auto">
+            <Link to="/listings" className="p-2 text-gray-500 hover:text-navy hover:bg-gray-50 rounded-lg transition-colors">
               <Search size={20} />
             </Link>
-            {/* Search input: xl+ only */}
-            <form onSubmit={handleNavSearch} className="hidden xl:flex items-center">
-              <div className="relative">
-                <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQ}
-                  onChange={e => setSearchQ(e.target.value)}
-                  placeholder={t('hero.searchPlaceholder')}
-                  className="w-48 pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 bg-gray-50"
-                />
-              </div>
-            </form>
 
-            <div className="flex items-center gap-2 xl:gap-4 border-l border-gray-200 pl-3 xl:pl-4 ml-1 xl:ml-3">
+            <div className="flex items-center gap-4 border-l border-gray-200 pl-4 ml-3">
               <Link to="/sell"
                 className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap">
                 <Plus size={16} /> {t('nav.postListing')}
               </Link>
 
-              <div className="hidden xl:flex items-center gap-1 text-xs font-semibold">
+              <div className="flex items-center gap-1 text-xs font-semibold">
                 {['az', 'ru', 'en'].map(lang => (
                   <button
                     key={lang}
@@ -186,7 +165,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setDropOpen(v => !v)}
-                    className="flex items-center gap-0 xl:gap-2 px-2 xl:px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors max-w-[160px]"
                   >
                     <div className="relative flex-shrink-0">
                       <div className="w-7 h-7 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
@@ -201,7 +180,7 @@ export default function Navbar() {
                         </span>
                       )}
                     </div>
-                    <span className="hidden xl:inline text-sm font-medium text-navy truncate min-w-0">
+                    <span className="text-sm font-medium text-navy truncate min-w-0">
                       {displayName}
                     </span>
                   </button>
@@ -253,11 +232,11 @@ export default function Navbar() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Link to="/login"
-                    className="hidden xl:block px-4 py-2 text-sm font-semibold text-navy hover:text-blue-600 transition-colors">
+                    className="px-4 py-2 text-sm font-semibold text-navy hover:text-blue-600 transition-colors">
                     {t('nav.login')}
                   </Link>
                   <Link to="/register"
-                    className="px-3 xl:px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">
                     {t('nav.register')}
                   </Link>
                 </div>
