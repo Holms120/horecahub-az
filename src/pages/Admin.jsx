@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import {
   Users, MessageSquare, LayoutDashboard, List,
@@ -308,13 +308,13 @@ function ModerationTab({ adminId }) {
     try {
       const { data, error: err } = await supabase
         .from('listings')
-        .select('*, profiles!left(id, full_name, company_name, phone, logo_url)')
+        .select('id, title, category, city, images, user_id, created_at, profiles(id, full_name, company_name, phone)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
-      if (err) throw err
+      if (err) { setError('Supabase xətası: ' + err.message); setLoading(false); return }
       setListings(data || [])
     } catch (e) {
-      setError('Moderasiya elanları yüklənərkən xəta: ' + (e.message || ''))
+      setError('Moderasiya elanları yüklənərkən xəta: ' + (e.message || String(e)))
     } finally {
       setLoading(false)
     }
@@ -679,19 +679,23 @@ function UsersTab({ adminId }) {
 
   useEffect(() => {
     async function load() {
+      setLoading(true)
       try {
-        const { data: profiles, error: err } = await supabase
+        const { data: profileData, error: err } = await supabase
           .from('profiles')
           .select('id, full_name, company_name, email, phone, city, account_type, is_blocked, created_at')
           .order('created_at', { ascending: false })
-        if (err) throw err
-        setUsers(profiles || [])
-        const { data: lData } = await supabase.from('listings').select('user_id').eq('status', 'active')
-        const counts = {}
-        ;(lData || []).forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1 })
-        setListingCounts(counts)
+        if (err) { setError('Supabase xətası: ' + err.message); setLoading(false); return }
+        setUsers(profileData || [])
+        const { data: lData, error: lErr } = await supabase
+          .from('listings').select('user_id').eq('status', 'active')
+        if (!lErr) {
+          const counts = {}
+          ;(lData || []).forEach(r => { counts[r.user_id] = (counts[r.user_id] || 0) + 1 })
+          setListingCounts(counts)
+        }
       } catch (e) {
-        setError('İstifadəçilər yüklənərkən xəta: ' + (e.message || ''))
+        setError('İstifadəçilər yüklənərkən xəta: ' + (e.message || String(e)))
       } finally {
         setLoading(false)
       }
@@ -771,7 +775,12 @@ function UsersTab({ adminId }) {
         <span className="text-xs text-gray-400 self-center">{filtered.length} nəticə</span>
       </div>
       {error && <ErrorBanner msg={error} />}
-      {loading ? <Spinner /> : (
+      {loading ? <Spinner /> : filtered.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
+          <Users size={40} className="text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">{searchQ || typeFilter !== 'all' ? 'Axtarış nəticəsi tapılmadı' : 'İstifadəçi yoxdur'}</p>
+        </div>
+      ) : (
         <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -783,8 +792,8 @@ function UsersTab({ adminId }) {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.map(u => (
-                <>
-                  <tr key={u.id} className={`hover:bg-gray-50 cursor-pointer ${u.is_blocked ? 'opacity-60' : ''}`}
+                <Fragment key={u.id}>
+                  <tr className={`hover:bg-gray-50 cursor-pointer ${u.is_blocked ? 'opacity-60' : ''}`}
                     onClick={() => expandUser(u.id)}>
                     <td className="px-3 py-3 font-medium text-[#0A2342] whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -824,10 +833,10 @@ function UsersTab({ adminId }) {
                     </td>
                   </tr>
                   {expanded === u.id && (
-                    <tr key={`${u.id}-detail`}>
+                    <tr>
                       <td colSpan={9} className="px-6 py-4 bg-gray-50 border-b border-gray-200">
                         <p className="text-xs font-semibold text-gray-500 mb-2">Son elanlar:</p>
-                        {!userListings[u.id] ? (
+                        {userListings[u.id] === undefined ? (
                           <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                         ) : userListings[u.id].length === 0 ? (
                           <p className="text-xs text-gray-400">Elan yoxdur</p>
@@ -847,7 +856,7 @@ function UsersTab({ adminId }) {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>
@@ -872,38 +881,44 @@ function SupportTab({ adminId }) {
   const [error, setError]       = useState(null)
   const threadRef = useRef(null)
 
-  async function load() {
-    setLoading(true); setError(null)
-    try {
-      const { data: msgs, error: err } = await supabase
-        .from('messages').select('*').eq('is_support', true)
-        .order('created_at', { ascending: true })
-      if (err) throw err
-      if (!msgs?.length) { setConvs([]); setLoading(false); return }
-      const map = {}
-      for (const m of msgs) {
-        const otherId = m.sender_id === adminId ? m.receiver_id : m.sender_id
-        if (!map[otherId]) map[otherId] = { userId: otherId, messages: [], unread: 0 }
-        map[otherId].messages.push(m)
-        if (m.receiver_id === adminId && !m.is_read) map[otherId].unread++
-      }
-      const list = Object.values(map).sort((a, b) =>
-        new Date(b.messages.at(-1).created_at) - new Date(a.messages.at(-1).created_at))
-      setConvs(list)
-      const ids = list.map(c => c.userId)
-      const { data: pData } = await supabase.from('profiles')
-        .select('id, full_name, company_name, email').in('id', ids)
-      const pm = {}
-      ;(pData || []).forEach(p => { pm[p.id] = p })
-      setProfiles(pm)
-    } catch (e) {
-      setError('Support mesajları yüklənərkən xəta: ' + (e.message || ''))
-    } finally {
-      setLoading(false)
-    }
-  }
+  const loadRef = useRef(null)
 
-  useEffect(() => { load() }, [adminId])
+  useEffect(() => {
+    async function load() {
+      setLoading(true); setError(null)
+      try {
+        const { data: msgs, error: err } = await supabase
+          .from('messages').select('*').eq('is_support', true)
+          .order('created_at', { ascending: true })
+        if (err) { setError('Supabase xətası: ' + err.message); setLoading(false); return }
+        if (!msgs?.length) { setConvs([]); setLoading(false); return }
+        const map = {}
+        for (const m of msgs) {
+          const otherId = m.sender_id === adminId ? m.receiver_id : m.sender_id
+          if (!map[otherId]) map[otherId] = { userId: otherId, messages: [], unread: 0 }
+          map[otherId].messages.push(m)
+          if (m.receiver_id === adminId && !m.is_read) map[otherId].unread++
+        }
+        const list = Object.values(map).sort((a, b) =>
+          new Date(b.messages.at(-1).created_at) - new Date(a.messages.at(-1).created_at))
+        setConvs(list)
+        const ids = list.map(c => c.userId)
+        if (ids.length) {
+          const { data: pData } = await supabase.from('profiles')
+            .select('id, full_name, company_name, email').in('id', ids)
+          const pm = {}
+          ;(pData || []).forEach(p => { pm[p.id] = p })
+          setProfiles(pm)
+        }
+      } catch (e) {
+        setError('Support mesajları yüklənərkən xəta: ' + (e.message || String(e)))
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadRef.current = load
+    load()
+  }, [adminId])
   useEffect(() => {
     if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight
   }, [activeId, convs])
@@ -923,7 +938,7 @@ function SupportTab({ adminId }) {
       sender_id: adminId, receiver_id: activeId,
       listing_id: null, content: reply.trim(), is_support: true,
     })
-    if (!error) { setReply(''); await load() }
+    if (!error) { setReply(''); await loadRef.current?.() }
     setSending(false)
   }
 
