@@ -24,7 +24,11 @@ export default function Messages() {
   const [sending, setSending]             = useState(false)
   const [loading, setLoading]             = useState(true)
   const [mobileView, setMobileView]       = useState('list')
-  const threadRef = useRef(null)
+  const [unreadKeys, setUnreadKeys]       = useState(new Set())
+  const threadRef          = useRef(null)
+  const activeKeyRef       = useRef(null)
+  const conversationsRef   = useRef([])
+  const profilesRef        = useRef({})
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/login', { state: { from: '/messages' } })
@@ -45,12 +49,62 @@ export default function Messages() {
       .then(() => {})
   }, [user])
 
+  // Keep refs in sync
+  useEffect(() => { activeKeyRef.current     = activeKey },     [activeKey])
+  useEffect(() => { conversationsRef.current = conversations }, [conversations])
+  useEffect(() => { profilesRef.current      = profiles },      [profiles])
+
   // Scroll to bottom when active conversation changes or messages update
   useEffect(() => {
     if (threadRef.current) {
       threadRef.current.scrollTop = threadRef.current.scrollHeight
     }
   }, [activeKey, conversations])
+
+  // Real-time subscription for incoming messages
+  useEffect(() => {
+    if (!user) return
+    const channel = supabase.channel('messages-rt')
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'messages',
+        filter: `receiver_id=eq.${user.id}`,
+      }, (payload) => {
+        const msg = payload.new
+        const key = `${msg.listing_id}::${msg.sender_id}`
+        const exists = conversationsRef.current.some(c => c.key === key)
+
+        if (!exists) {
+          // New conversation — full reload to get listing title and profile
+          loadMessages()
+          return
+        }
+
+        setConversations(prev => {
+          const updated = prev.map(c =>
+            c.key !== key ? c : { ...c, messages: [...c.messages, msg], lastMsg: msg }
+          )
+          return [...updated].sort((a, b) =>
+            new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at)
+          )
+        })
+
+        // Fetch sender profile if not cached
+        if (!profilesRef.current[msg.sender_id]) {
+          supabase.from('profiles').select('id, full_name, company_name, email')
+            .eq('id', msg.sender_id).single()
+            .then(({ data }) => {
+              if (data) setProfiles(p => ({ ...p, [data.id]: data }))
+            })
+        }
+
+        // Badge for inactive conversations
+        if (activeKeyRef.current !== key) {
+          setUnreadKeys(prev => new Set([...prev, key]))
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user])
 
   async function loadMessages() {
     setLoading(true)
@@ -179,22 +233,31 @@ export default function Messages() {
               return (
                 <button
                   key={conv.key}
-                  onClick={() => { setActiveKey(conv.key); setMobileView('thread') }}
+                  onClick={() => {
+                    setActiveKey(conv.key)
+                    setMobileView('thread')
+                    setUnreadKeys(prev => { const n = new Set(prev); n.delete(conv.key); return n })
+                  }}
                   className={`w-full text-left px-4 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                     isActive ? 'bg-blue-50 border-l-[3px] border-l-blue-600' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm flex-shrink-0">
-                      {name.charAt(0).toUpperCase()}
+                    <div className="relative w-10 h-10 flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                      {unreadKeys.has(conv.key) && (
+                        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-blue-600 rounded-full border-2 border-white" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-sm font-semibold text-navy truncate">{name}</span>
+                        <span className={`text-sm truncate ${unreadKeys.has(conv.key) ? 'font-bold' : 'font-semibold'} text-navy`}>{name}</span>
                         <RelativeTime dateStr={last.created_at} className="text-xs text-gray-400 flex-shrink-0 ml-2" />
                       </div>
                       <p className="text-xs text-blue-600 font-medium truncate mb-0.5">{conv.listingTitle}</p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className={`text-xs truncate ${unreadKeys.has(conv.key) ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
                         {isMine && <span className="text-gray-400">{t('messages.you')} </span>}
                         {last.content}
                       </p>
