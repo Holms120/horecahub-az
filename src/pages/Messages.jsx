@@ -48,11 +48,13 @@ function buildConvMap(data, userId) {
         messages:     [],
         lastMsg:      msg,
         unreadCount:  0,
+        isSupport:    false,
       })
     }
     const c = map.get(key)
     c.messages.push(msg)
     c.lastMsg = msg
+    if (msg.is_support) c.isSupport = true
     if (msg.receiver_id === userId && !msg.is_read) c.unreadCount++
   }
   return [...map.values()].sort(
@@ -109,7 +111,7 @@ export default function Messages() {
       const ids = [...new Set(convList.map(c => c.otherId))]
       if (ids.length) {
         const { data: ps } = await supabase
-          .from('profiles').select('id, full_name, company_name, email').in('id', ids)
+          .from('profiles').select('id, full_name, company_name, email, is_admin').in('id', ids)
         if (ps) {
           const map = {}; ps.forEach(p => { map[p.id] = p })
           setProfiles(map)
@@ -353,28 +355,38 @@ export default function Messages() {
 
         <div className="flex-1 overflow-y-auto">
           {conversations.map(conv => {
-            const other     = profiles[conv.otherId]
-            const name      = sellerName(other)
-            const isActive  = activeConv?.key === conv.key
-            const last      = conv.lastMsg
-            const isMine    = last.sender_id === user.id
-            const hasUnread = conv.unreadCount > 0
+            const other      = profiles[conv.otherId]
+            const isSupport  = conv.isSupport || other?.is_admin
+            const name       = isSupport ? 'HorecaHub Dəstək' : sellerName(other)
+            const isActive   = activeConv?.key === conv.key
+            const last       = conv.lastMsg
+            const isMine     = last.sender_id === user.id
+            const hasUnread  = conv.unreadCount > 0
 
             return (
               <button key={conv.key}
                 onClick={() => selectConversation(conv)}
                 className={`w-full text-left px-4 py-4 border-b border-gray-100
                   hover:bg-gray-50 transition-colors
-                  ${isActive ? 'bg-blue-50 border-l-[3px] border-l-blue-600' : ''}
+                  ${isActive
+                    ? isSupport ? 'bg-green-50 border-l-[3px] border-l-green-600'
+                                : 'bg-blue-50 border-l-[3px] border-l-blue-600'
+                    : ''}
                 `}
               >
                 <div className="flex items-start gap-3">
                   <div className="relative w-10 h-10 flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
-                      {name.charAt(0).toUpperCase()}
-                    </div>
+                    {isSupport ? (
+                      <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-base">
+                        🛡
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     {hasUnread && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white px-0.5">
+                      <span className={`absolute -top-0.5 -right-0.5 min-w-[16px] h-4 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white px-0.5 ${isSupport ? 'bg-green-600' : 'bg-blue-600'}`}>
                         {conv.unreadCount}
                       </span>
                     )}
@@ -382,14 +394,14 @@ export default function Messages() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className={`text-sm truncate text-navy ${hasUnread ? 'font-bold' : 'font-semibold'}`}>
-                        {name}
+                      <span className={`text-sm truncate ${hasUnread ? 'font-bold' : 'font-semibold'} ${isSupport ? 'text-green-700' : 'text-navy'}`}>
+                        {isSupport && <span className="mr-1">🛡</span>}{name}
                       </span>
                       <RelativeTime dateStr={last.created_at}
                         className="text-xs text-gray-400 flex-shrink-0 ml-2" />
                     </div>
-                    <p className="text-xs text-blue-600 font-medium truncate mb-0.5">
-                      {conv.listingTitle}
+                    <p className={`text-xs font-medium truncate mb-0.5 ${isSupport ? 'text-green-600' : 'text-blue-600'}`}>
+                      {isSupport ? 'Dəstək xidməti' : conv.listingTitle}
                     </p>
                     <p className={`text-xs truncate ${hasUnread ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
                       {isMine && <span className="text-gray-400">{t('messages.you')} </span>}
@@ -418,26 +430,35 @@ export default function Messages() {
         ) : (
           <>
             {/* Header */}
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-3 flex-shrink-0">
-              <button className="sm:hidden p-1 -ml-1 text-gray-500 hover:text-navy"
-                onClick={() => { setMobileView('list'); setActiveConv(null) }}>
-                <ChevronLeft size={20} />
-              </button>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-navy text-sm truncate">
-                    {sellerName(profiles[activeConv.otherId])}
-                  </p>
-                  {otherOnline && (
-                    <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-                  )}
+            {(() => {
+              const convIsSupport = activeConv.isSupport || profiles[activeConv.otherId]?.is_admin
+              return (
+                <div className={`px-4 py-3 border-b flex items-center gap-3 flex-shrink-0 ${convIsSupport ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                  <button className="sm:hidden p-1 -ml-1 text-gray-500 hover:text-navy"
+                    onClick={() => { setMobileView('list'); setActiveConv(null) }}>
+                    <ChevronLeft size={20} />
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className={`font-semibold text-sm truncate ${convIsSupport ? 'text-green-700' : 'text-navy'}`}>
+                        {convIsSupport ? '🛡 HorecaHub Dəstək' : sellerName(profiles[activeConv.otherId])}
+                      </p>
+                      {!convIsSupport && otherOnline && (
+                        <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                      )}
+                    </div>
+                    {convIsSupport ? (
+                      <p className="text-xs text-green-600 font-medium">Dəstək xidməti</p>
+                    ) : (
+                      <Link to={`/listings/${activeConv.listingId}`}
+                        className="text-xs text-blue-600 hover:underline truncate block">
+                        {activeConv.listingTitle} →
+                      </Link>
+                    )}
+                  </div>
                 </div>
-                <Link to={`/listings/${activeConv.listingId}`}
-                  className="text-xs text-blue-600 hover:underline truncate block">
-                  {activeConv.listingTitle} →
-                </Link>
-              </div>
-            </div>
+              )
+            })()}
 
             {/* Messages list */}
             <div ref={threadRef} className="flex-1 overflow-y-auto p-4 space-y-1">
@@ -454,7 +475,8 @@ export default function Messages() {
                   )
                 }
 
-                const mine = item.sender_id === user.id
+                const mine        = item.sender_id === user.id
+                const isAdminMsg  = !mine && item.is_support === true
                 return (
                   <div key={item.id}
                     className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
@@ -462,13 +484,18 @@ export default function Messages() {
                       max-w-[75%] px-4 py-2.5 rounded-2xl text-sm
                       ${mine
                         ? 'bg-blue-600 text-white rounded-br-sm'
-                        : 'bg-gray-100 text-navy rounded-bl-sm'}
+                        : isAdminMsg
+                          ? 'bg-green-50 border border-green-200 text-green-900 rounded-bl-sm'
+                          : 'bg-gray-100 text-navy rounded-bl-sm'}
                       ${item._opt ? 'opacity-60' : ''}
                     `}>
+                      {isAdminMsg && (
+                        <p className="text-[10px] font-bold text-green-600 mb-1">🛡 HorecaHub Dəstək</p>
+                      )}
                       <p className="leading-relaxed break-words whitespace-pre-wrap">
                         {item.content}
                       </p>
-                      <p className={`text-[11px] mt-1 ${mine ? 'text-blue-200' : 'text-gray-400'}`}>
+                      <p className={`text-[11px] mt-1 ${mine ? 'text-blue-200' : isAdminMsg ? 'text-green-500' : 'text-gray-400'}`}>
                         <RelativeTime dateStr={item.created_at} />
                       </p>
                     </div>
