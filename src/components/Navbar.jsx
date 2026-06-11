@@ -61,7 +61,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!user) { setUnreadCount(0); return }
-    async function fetchUnread() {
+    async function fetchCount() {
       try {
         const { count } = await supabase
           .from('messages')
@@ -71,9 +71,11 @@ export default function Navbar() {
         setUnreadCount(count || 0)
       } catch { setUnreadCount(0) }
     }
-    fetchUnread()
-    const iv = setInterval(fetchUnread, 30000)
-    return () => clearInterval(iv)
+    fetchCount()
+    const channel = supabase.channel('navbar-messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchCount)
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [user])
 
   async function handleSignOut() {
@@ -165,11 +167,18 @@ export default function Navbar() {
                     onClick={() => setDropOpen(v => !v)}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors max-w-[160px]"
                   >
-                    <div className="w-7 h-7 rounded-full flex-shrink-0 overflow-hidden bg-blue-600 flex items-center justify-center">
-                      {profile?.logo_url
-                        ? <img src={profile.logo_url} alt="" className="w-full h-full object-cover" />
-                        : <span className="text-white text-xs font-bold">{userInitial}</span>
-                      }
+                    <div className="relative flex-shrink-0">
+                      <div className="w-7 h-7 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
+                        {profile?.logo_url
+                          ? <img src={profile.logo_url} alt="" className="w-full h-full object-cover" />
+                          : <span className="text-white text-xs font-bold">{userInitial}</span>
+                        }
+                      </div>
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none border border-white">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
                     </div>
                     <span className="text-sm font-medium text-navy truncate min-w-0">
                       {displayName}
