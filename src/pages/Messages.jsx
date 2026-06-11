@@ -76,7 +76,7 @@ export default function Messages() {
   const [sending, setSending]             = useState(false)
   const [mobileView, setMobileView]       = useState('list')  // 'list' | 'thread'
 
-  const bottomRef     = useRef(null)
+  const threadRef     = useRef(null)
   const textareaRef   = useRef(null)
   const activeConvRef = useRef(null)
 
@@ -168,7 +168,7 @@ export default function Messages() {
         }
 
         setTimeout(() => {
-          bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+          if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight
         }, 50)
       })
       .subscribe()
@@ -179,7 +179,9 @@ export default function Messages() {
   /* ── helpers ── */
 
   function scrollToBottom() {
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'instant' }), 30)
+    setTimeout(() => {
+      if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight
+    }, 30)
   }
 
   function selectConversation(conv) {
@@ -215,7 +217,9 @@ export default function Messages() {
     }
     setMessages(prev => [...prev, optMsg])
     setReplyText('')
-    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+    setTimeout(() => {
+      if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight
+    }, 50)
 
     const { data, error } = await supabase
       .from('messages')
@@ -274,12 +278,11 @@ export default function Messages() {
   const grouped = withDateSeparators(messages)
 
   return (
-    /* Full viewport height minus navbar (64px = 4rem) */
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-white">
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-white">
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside className={`
-        w-full sm:w-80 flex-shrink-0
+        w-full sm:min-w-[280px] sm:max-w-[320px] flex-shrink-0
         border-r border-gray-200 flex flex-col bg-white
         ${mobileView === 'thread' ? 'hidden sm:flex' : 'flex'}
       `}>
@@ -375,7 +378,7 @@ export default function Messages() {
             </div>
 
             {/* Messages list */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-1">
+            <div ref={threadRef} className="flex-1 overflow-y-auto p-4 space-y-1">
               {grouped.map((item, i) => {
                 if (item._sep) {
                   return (
@@ -411,7 +414,6 @@ export default function Messages() {
                 )
               })}
 
-              <div ref={bottomRef} className="h-1" />
             </div>
 
             {/* Reply input */}
