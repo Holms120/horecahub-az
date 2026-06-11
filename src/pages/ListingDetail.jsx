@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import {
   MapPin, Clock, Heart, Share2, ShieldCheck,
   Star, ChevronLeft, MessageSquare, Phone, ArrowRight, Send, CheckCircle2,
-  Pencil, Trash2, Eye
+  Pencil, Trash2, Eye, Copy
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
@@ -36,7 +36,8 @@ export default function ListingDetail() {
   const [sellerPhone, setSellerPhone]     = useState('')
   const [phoneFetching, setPhoneFetching] = useState(false)
 
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied]           = useState(false)
+  const [phoneCopied, setPhoneCopied] = useState(false)
 
   // Messaging
   const [msgOpen, setMsgOpen]     = useState(false)
@@ -122,6 +123,13 @@ export default function ListingDetail() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
+  }
+
+  async function copyPhone() {
+    if (!sellerPhone) return
+    await navigator.clipboard.writeText(sellerPhone)
+    setPhoneCopied(true)
+    setTimeout(() => setPhoneCopied(false), 2000)
   }
 
   async function revealPhone() {
@@ -332,19 +340,42 @@ export default function ListingDetail() {
 
           {/* CTAs */}
           <div className="flex flex-col gap-3 mb-6">
-            {/* Phone reveal button */}
-            <button
-              onClick={revealPhone}
-              disabled={phoneFetching}
-              className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
-            >
-              <Phone size={18} />
-              {phoneFetching
-                ? t('listingDetail.loading')
-                : phoneRevealed
-                  ? (sellerPhone || t('listingDetail.noPhone'))
+            {/* Phone reveal / action buttons */}
+            {!phoneRevealed ? (
+              <button
+                onClick={revealPhone}
+                disabled={phoneFetching}
+                className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                <Phone size={18} />
+                {phoneFetching
+                  ? t('listingDetail.loading')
                   : (listing.category === 'staff' && listing.listingType === 'vacancy' ? t('listingDetail.apply') : t('listingDetail.contact'))}
-            </button>
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <div className="w-full py-2.5 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center gap-2">
+                  <Phone size={15} className="text-gray-500" />
+                  <span className="font-bold text-navy">{sellerPhone || t('listingDetail.noPhone')}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={copyPhone}
+                    className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Copy size={16} />
+                    {phoneCopied ? 'Kopyalandı!' : 'Kopyala'}
+                  </button>
+                  <a
+                    href={sellerPhone ? `tel:${sellerPhone.replace(/\s/g, '')}` : undefined}
+                    className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Phone size={16} />
+                    Zəng et
+                  </a>
+                </div>
+              </div>
+            )}
 
             {/* Message button */}
             <button
@@ -548,10 +579,26 @@ export default function ListingDetail() {
             className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-50">
             {msgSent ? t('listingDetail.mobileMessage') : t('listingDetail.sendMessage')}
           </button>
-          <button onClick={revealPhone} disabled={phoneFetching}
-            className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 disabled:opacity-70">
-            {phoneFetching ? '...' : phoneRevealed ? (sellerPhone || t('listingDetail.mobileNoPhone')) : t('listingDetail.mobileContact')}
-          </button>
+          {!phoneRevealed ? (
+            <button onClick={revealPhone} disabled={phoneFetching}
+              className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 disabled:opacity-70 flex items-center justify-center gap-1.5">
+              <Phone size={15} />
+              {phoneFetching ? '...' : t('listingDetail.mobileContact')}
+            </button>
+          ) : (
+            <>
+              <button onClick={copyPhone}
+                className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-50 flex items-center justify-center gap-1.5">
+                <Copy size={15} />
+                {phoneCopied ? 'Kopyalandı!' : 'Kopyala'}
+              </button>
+              <a href={sellerPhone ? `tel:${sellerPhone.replace(/\s/g, '')}` : undefined}
+                className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 flex items-center justify-center gap-1.5">
+                <Phone size={15} />
+                Zəng et
+              </a>
+            </>
+          )}
         </div>
       </div>
       <div className="h-20 lg:hidden" />
