@@ -93,7 +93,7 @@ export default function Home() {
       </Helmet>
       {/* ── HERO ── */}
       <section className="bg-gradient-to-br from-navy to-blue-700 text-white py-16 md:py-24">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
           <p className="text-blue-200 text-xs font-semibold tracking-widest uppercase mb-3">
             {t('hero.badge')}
           </p>
@@ -160,7 +160,7 @@ export default function Home() {
               {t('home.viewAll')} <ArrowRight size={15} />
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {CATEGORIES.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
               return (
@@ -211,7 +211,7 @@ export default function Home() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {listings.map(listing => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
