@@ -1302,11 +1302,23 @@ const TABS = [
 ]
 
 export default function Admin() {
-  const { user, profile, loading, signOut } = useAuth()
+  const { user, loading: authLoading, signOut } = useAuth()
+  const [isAdmin, setIsAdmin]           = useState(null)
   const [tab, setTab]                   = useState('dashboard')
   const [supportBadge, setSupportBadge] = useState(0)
   const [pendingBadge, setPendingBadge] = useState(0)
   const [realtimeEvents, setRealtimeEvents] = useState([])
+
+  useEffect(() => {
+    if (authLoading) return
+    if (!user) { setIsAdmin(false); return }
+    supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => setIsAdmin(!!data?.is_admin))
+  }, [user, authLoading])
 
   function addEvent(type, title) {
     setRealtimeEvents(prev => [
@@ -1354,13 +1366,12 @@ export default function Admin() {
     return () => { supabase.removeChannel(channel) }
   }, [user])
 
-  if (loading) return (
+  if (authLoading || isAdmin === null) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   )
-  if (profile !== null && !profile?.is_admin) return <Navigate to="/" replace />
-  if (!user) return <Navigate to="/" replace />
+  if (!user || !isAdmin) return <Navigate to="/" replace />
   return (
     <div className="flex min-h-screen bg-gray-50">
       <aside className="w-56 flex-shrink-0 bg-[#0A2342] text-white flex flex-col">
