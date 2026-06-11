@@ -1302,23 +1302,30 @@ const TABS = [
 ]
 
 export default function Admin() {
-  const { user, loading: authLoading, signOut } = useAuth()
+  const { signOut } = useAuth()
   const [isAdmin, setIsAdmin]           = useState(null)
+  const [adminId, setAdminId]           = useState(null)
   const [tab, setTab]                   = useState('dashboard')
   const [supportBadge, setSupportBadge] = useState(0)
   const [pendingBadge, setPendingBadge] = useState(0)
   const [realtimeEvents, setRealtimeEvents] = useState([])
 
   useEffect(() => {
-    if (authLoading) return
-    if (!user) { setIsAdmin(false); return }
-    supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single()
-      .then(({ data }) => setIsAdmin(!!data?.is_admin))
-  }, [user, authLoading])
+    let cancelled = false
+    ;(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (cancelled) return
+      if (!session?.user) { setIsAdmin(false); return }
+      const uid = session.user.id
+      const { data, error } = await supabase
+        .from('profiles').select('is_admin').eq('id', uid).maybeSingle()
+      if (cancelled) return
+      if (error) console.error('[Admin] is_admin check failed:', error)
+      if (data?.is_admin) { setAdminId(uid); setIsAdmin(true) }
+      else setIsAdmin(false)
+    })()
+    return () => { cancelled = true }
+  }, [])
 
   function addEvent(type, title) {
     setRealtimeEvents(prev => [
@@ -1328,18 +1335,18 @@ export default function Admin() {
   }
 
   useEffect(() => {
-    if (!user) return
+    if (!adminId) return
     supabase.from('messages')
       .select('*', { count: 'exact', head: true })
-      .eq('is_support', true).eq('receiver_id', user.id).eq('is_read', false)
+      .eq('is_support', true).eq('receiver_id', adminId).eq('is_read', false)
       .then(({ count }) => setSupportBadge(count || 0))
     supabase.from('listings')
       .select('*', { count: 'exact', head: true }).eq('status', 'pending')
       .then(({ count }) => setPendingBadge(count || 0))
-  }, [user])
+  }, [adminId])
 
   useEffect(() => {
-    if (!user) return
+    if (!adminId) return
     const channel = supabase.channel('admin-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'listings' }, payload => {
         if (payload.new?.status === 'pending') {
@@ -1354,7 +1361,7 @@ export default function Admin() {
           setPendingBadge(n => n + 1)
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        if (payload.new?.is_support && payload.new?.receiver_id === user.id) {
+        if (payload.new?.is_support && payload.new?.receiver_id === adminId) {
           setSupportBadge(n => n + 1)
           addEvent('support', 'Yeni support mesajı alındı')
         }
@@ -1364,14 +1371,14 @@ export default function Admin() {
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [user])
+  }, [adminId])
 
-  if (authLoading || isAdmin === null) return (
+  if (isAdmin === null) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   )
-  if (!user || !isAdmin) return <Navigate to="/" replace />
+  if (!isAdmin) return <Navigate to="/" replace />
   return (
     <div className="flex min-h-screen bg-gray-50">
       <aside className="w-56 flex-shrink-0 bg-[#0A2342] text-white flex flex-col">
@@ -1410,10 +1417,10 @@ export default function Admin() {
 
       <main className="flex-1 overflow-auto p-8">
         {tab === 'dashboard'  && <DashboardTab  realtimeEvents={realtimeEvents} />}
-        {tab === 'moderation' && <ModerationTab adminId={user.id} />}
-        {tab === 'listings'   && <ListingsTab   adminId={user.id} />}
-        {tab === 'users'      && <UsersTab      adminId={user.id} />}
-        {tab === 'support'    && <SupportTab    adminId={user.id} />}
+        {tab === 'moderation' && <ModerationTab adminId={adminId} />}
+        {tab === 'listings'   && <ListingsTab   adminId={adminId} />}
+        {tab === 'users'      && <UsersTab      adminId={adminId} />}
+        {tab === 'support'    && <SupportTab    adminId={adminId} />}
         {tab === 'analytics'  && <AnalyticsTab />}
         {tab === 'settings'   && <SettingsTab />}
       </main>
