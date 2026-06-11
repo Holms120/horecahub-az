@@ -47,6 +47,7 @@ export default function Messages() {
   const [otherTyping, setOtherTyping]     = useState(false)
 
   const threadRef      = useRef(null)
+  const bottomRef      = useRef(null)
   const chatChanRef    = useRef(null)
   const typingTimer    = useRef(null)
   const activeConvRef  = useRef(null)
@@ -69,26 +70,8 @@ export default function Messages() {
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'messages',
         filter: `receiver_id=eq.${user.id}`,
-      }, (payload) => {
-        const msg = payload.new
-        const key = `${msg.listing_id}::${msg.sender_id}`
-        const isActive = activeConvRef.current?.key === key
-
-        setConversations(prev => {
-          const exists = prev.some(c => c.key === key)
-          if (!exists) { loadConversations(); return prev }
-          return [...prev.map(c => c.key !== key ? c : {
-            ...c,
-            lastMsg:    msg,
-            unreadCount: isActive ? 0 : c.unreadCount + 1,
-          })].sort((a, b) => new Date(b.lastMsg.created_at) - new Date(a.lastMsg.created_at))
-        })
-
-        if (!profilesRef.current[msg.sender_id]) {
-          supabase.from('profiles').select('id, full_name, company_name, email')
-            .eq('id', msg.sender_id).single()
-            .then(({ data }) => { if (data) setProfiles(p => ({ ...p, [data.id]: data })) })
-        }
+      }, () => {
+        loadConversations(true)
       })
       .subscribe()
     return () => { supabase.removeChannel(ch) }
@@ -103,13 +86,14 @@ export default function Messages() {
 
   function scrollToBottom(smooth = false) {
     setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'instant' })
       if (threadRef.current)
         threadRef.current.scrollTo({ top: threadRef.current.scrollHeight, behavior: smooth ? 'smooth' : 'instant' })
-    }, 30)
+    }, 50)
   }
 
-  async function loadConversations() {
-    setLoadingConvs(true)
+  async function loadConversations(silent = false) {
+    if (!silent) setLoadingConvs(true)
     const { data, error } = await supabase
       .from('messages')
       .select('*, listings(id, title)')
@@ -409,6 +393,7 @@ export default function Messages() {
                     </div>
                   </div>
                 )}
+                <div ref={bottomRef} />
               </div>
 
               {/* Reply box */}
