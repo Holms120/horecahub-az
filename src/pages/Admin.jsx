@@ -4,7 +4,7 @@ import {
   Users, MessageSquare, LayoutDashboard, List,
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
-  Download, Search, Settings, BarChart2, Bell,
+  Download, Search, Settings, BarChart2, Bell, Phone,
   ChevronDown, ChevronUp, Check, XCircle,
 } from 'lucide-react'
 import {
@@ -136,7 +136,7 @@ function DashboardTab({ realtimeEvents }) {
     async function load() {
       try {
         const ws = weekStart()
-        const [allRes, activeRes, pendingRes, usersRes, newListRes, newUsrRes, catRes] = await Promise.all([
+        const [allRes, activeRes, pendingRes, usersRes, newListRes, newUsrRes, catRes, phoneClicksRes] = await Promise.all([
           supabase.from('listings').select('*', { count: 'exact', head: true }),
           supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'active'),
           supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -144,14 +144,16 @@ function DashboardTab({ realtimeEvents }) {
           supabase.from('listings').select('*', { count: 'exact', head: true }).gte('created_at', ws),
           supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', ws),
           supabase.from('listings').select('category').eq('status', 'active'),
+          supabase.from('phone_clicks').select('*', { count: 'exact', head: true }).gte('created_at', ws),
         ])
         setStats({
-          allListings:     allRes.count     ?? 0,
-          listings:        activeRes.count  ?? 0,
-          pendingListings: pendingRes.count ?? 0,
-          users:           usersRes.count   ?? 0,
-          newListings:     newListRes.count ?? 0,
-          newUsers:        newUsrRes.count  ?? 0,
+          allListings:     allRes.count          ?? 0,
+          listings:        activeRes.count       ?? 0,
+          pendingListings: pendingRes.count      ?? 0,
+          users:           usersRes.count        ?? 0,
+          newListings:     newListRes.count      ?? 0,
+          newUsers:        newUsrRes.count       ?? 0,
+          phoneClicks:     phoneClicksRes.count  ?? 0,
         })
         const cc = {}
         ;(catRes.data || []).forEach(r => { cc[r.category] = (cc[r.category] || 0) + 1 })
@@ -196,14 +198,15 @@ function DashboardTab({ realtimeEvents }) {
       <h2 className="text-xl font-bold text-[#0A2342]">Ümumi statistika</h2>
       {error && <ErrorBanner msg={error} />}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         {stats && [
-          { label: 'Cəmi elanlar',         value: stats.allListings,     color: 'text-gray-700',    bg: 'bg-gray-100'    },
-          { label: 'Aktiv elanlar',         value: stats.listings,        color: 'text-blue-600',    bg: 'bg-blue-50'     },
-          { label: 'Gözləyir',             value: stats.pendingListings, color: 'text-amber-600',   bg: 'bg-amber-50'    },
-          { label: 'Bu həftə elanlar',      value: stats.newListings,     color: 'text-orange-600',  bg: 'bg-orange-50'   },
-          { label: 'Cəmi istifadəçilər',   value: stats.users,           color: 'text-emerald-600', bg: 'bg-emerald-50'  },
-          { label: 'Bu həftə qeydiyyat',   value: stats.newUsers,        color: 'text-pink-600',    bg: 'bg-pink-50'     },
+          { label: 'Cəmi elanlar',           value: stats.allListings,     color: 'text-gray-700',    bg: 'bg-gray-100'    },
+          { label: 'Aktiv elanlar',           value: stats.listings,        color: 'text-blue-600',    bg: 'bg-blue-50'     },
+          { label: 'Gözləyir',               value: stats.pendingListings, color: 'text-amber-600',   bg: 'bg-amber-50'    },
+          { label: 'Bu həftə elanlar',        value: stats.newListings,     color: 'text-orange-600',  bg: 'bg-orange-50'   },
+          { label: 'Cəmi istifadəçilər',     value: stats.users,           color: 'text-emerald-600', bg: 'bg-emerald-50'  },
+          { label: 'Bu həftə qeydiyyat',     value: stats.newUsers,        color: 'text-pink-600',    bg: 'bg-pink-50'     },
+          { label: 'Bu həftə tel. kliklər',  value: stats.phoneClicks,     color: 'text-purple-600',  bg: 'bg-purple-50'   },
         ].map(c => (
           <div key={c.label} className={`${c.bg} rounded-2xl p-5`}>
             <p className="text-xs text-gray-500 mb-1 leading-snug">{c.label}</p>
@@ -480,14 +483,16 @@ function ListingsTab({ adminId }) {
         if (err) throw err
         const items = data || []
         const ids = items.map(l => l.id)
-        const [viewsRes, favsRes] = await Promise.all([
+        const [viewsRes, favsRes, clicksRes] = await Promise.all([
           ids.length ? supabase.from('listing_views').select('listing_id').in('listing_id', ids) : { data: [] },
           ids.length ? supabase.from('favorites').select('listing_id').in('listing_id', ids)     : { data: [] },
+          ids.length ? supabase.from('phone_clicks').select('listing_id').in('listing_id', ids)  : { data: [] },
         ])
-        const vc = {}, fc = {}
-        ;(viewsRes.data || []).forEach(v => { vc[v.listing_id] = (vc[v.listing_id] || 0) + 1 })
-        ;(favsRes.data  || []).forEach(f => { fc[f.listing_id] = (fc[f.listing_id] || 0) + 1 })
-        setListings(items.map(l => ({ ...l, views: vc[l.id] || 0, favorites: fc[l.id] || 0 })))
+        const vc = {}, fc = {}, pc = {}
+        ;(viewsRes.data  || []).forEach(v => { vc[v.listing_id] = (vc[v.listing_id] || 0) + 1 })
+        ;(favsRes.data   || []).forEach(f => { fc[f.listing_id] = (fc[f.listing_id] || 0) + 1 })
+        ;(clicksRes.data || []).forEach(c => { pc[c.listing_id] = (pc[c.listing_id] || 0) + 1 })
+        setListings(items.map(l => ({ ...l, views: vc[l.id] || 0, favorites: fc[l.id] || 0, phoneClicks: pc[l.id] || 0 })))
       } catch (e) {
         setError('Elanlar yüklənərkən xəta: ' + (e.message || ''))
       } finally {
@@ -512,6 +517,7 @@ function ListingsTab({ adminId }) {
       sahibi: l.profiles?.full_name || l.profiles?.company_name || '',
       baxış: l.views,
       bəyənmə: l.favorites,
+      tel_klik: l.phoneClicks,
       tarix: shortDate(l.created_at),
     })), 'elanlar.csv')
   }
@@ -582,7 +588,7 @@ function ListingsTab({ adminId }) {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                {['Başlıq', 'Kateqoriya', 'Sahibi', 'Şəhər', 'Baxış', 'Fav', 'Status', 'Tarix', ''].map(h => (
+                {['Başlıq', 'Kateqoriya', 'Sahibi', 'Şəhər', 'Baxış', 'Fav', 'Tel', 'Status', 'Tarix', ''].map(h => (
                   <th key={h} className="text-left px-3 py-3 text-xs font-semibold text-gray-500 uppercase whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -598,6 +604,7 @@ function ListingsTab({ adminId }) {
                   <td className="px-3 py-3 text-gray-500">{l.city || '—'}</td>
                   <td className="px-3 py-3"><span className="text-xs text-gray-600 flex items-center gap-1"><Eye size={11} className="text-gray-400" /> {l.views}</span></td>
                   <td className="px-3 py-3"><span className="text-xs text-gray-600 flex items-center gap-1"><Heart size={11} className="text-gray-400" /> {l.favorites}</span></td>
+                  <td className="px-3 py-3"><span className="text-xs text-gray-600 flex items-center gap-1"><Phone size={11} className="text-gray-400" /> {l.phoneClicks}</span></td>
                   <td className="px-3 py-3">
                     <select value={l.status} onChange={e => changeStatus(l.id, e.target.value)}
                       className={`text-xs font-semibold px-2 py-1 rounded-lg border-0 cursor-pointer focus:outline-none ${statusColor(l.status)}`}>

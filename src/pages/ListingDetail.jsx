@@ -113,7 +113,6 @@ export default function ListingDetail() {
   async function revealPhone() {
     if (phoneRevealed) return
     setPhoneFetching(true)
-    // If phone not already in normalized data, fetch it directly
     if (!sellerPhone && listing?.userId) {
       const { data } = await supabase
         .from('profiles')
@@ -122,6 +121,7 @@ export default function ListingDetail() {
         .single()
       setSellerPhone(data?.phone || '')
     }
+    supabase.from('phone_clicks').insert({ listing_id: id })
     setPhoneRevealed(true)
     setPhoneFetching(false)
   }
