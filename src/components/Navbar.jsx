@@ -245,13 +245,20 @@ export default function Navbar() {
             </div>
           </div>
 
-          <button
-            className="md:hidden p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors ml-auto"
-            onClick={() => setMenuOpen(v => !v)}
-            aria-label={t('nav.menu')}
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          <div className="relative md:hidden ml-auto">
+            <button
+              className="p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors"
+              onClick={() => setMenuOpen(v => !v)}
+              aria-label={t('nav.menu')}
+            >
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+            {unreadCount > 0 && !menuOpen && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none pointer-events-none">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -336,7 +343,15 @@ export default function Navbar() {
                 </Link>
                 <Link to="/messages" onClick={() => { setMenuOpen(false); setUnreadCount(0) }}
                   className="flex items-center gap-2 py-2.5 px-2 text-sm font-medium text-navy hover:bg-gray-50 rounded-lg">
-                  <MessageSquare size={16} /> {t('nav.messages')}
+                  <span className="relative">
+                    <MessageSquare size={16} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </span>
+                  {t('nav.messages')}
                   {unreadCount > 0 && (
                     <span className="ml-auto bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
                       {unreadCount > 9 ? '9+' : unreadCount}
