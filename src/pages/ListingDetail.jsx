@@ -36,6 +36,8 @@ export default function ListingDetail() {
   const [sellerPhone, setSellerPhone]     = useState('')
   const [phoneFetching, setPhoneFetching] = useState(false)
 
+  const [copied, setCopied] = useState(false)
+
   // Messaging
   const [msgOpen, setMsgOpen]     = useState(false)
   const [msgText, setMsgText]     = useState('')
@@ -108,6 +110,18 @@ export default function ListingDetail() {
       setIsFavorited(true)
     }
     setFavLoading(false)
+  }
+
+  async function handleShare() {
+    const url = window.location.href
+    const title = listing?.title || 'HorecaHub.az'
+    if (navigator.share) {
+      await navigator.share({ title, url })
+    } else {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   async function revealPhone() {
@@ -275,9 +289,17 @@ export default function ListingDetail() {
                 className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50">
                 <Heart size={18} className={isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-500'} />
               </button>
-              <button className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                <Share2 size={18} className="text-gray-500" />
-              </button>
+              <div className="relative">
+                <button onClick={handleShare}
+                  className="p-2 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                  <Share2 size={18} className="text-gray-500" />
+                </button>
+                {copied && (
+                  <div className="absolute right-0 top-full mt-1.5 whitespace-nowrap bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-lg pointer-events-none">
+                    Link kopyalandı!
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
