@@ -106,6 +106,14 @@ export default function Messages() {
 
     if (!error && data) {
       const convList = buildConvMap(data, user.id)
+
+      // Keep unreadCount at 0 for the currently open conversation (race-condition guard)
+      const activeKey = activeConvRef.current?.key
+      if (activeKey) {
+        const idx = convList.findIndex(c => c.key === activeKey)
+        if (idx >= 0) convList[idx] = { ...convList[idx], unreadCount: 0 }
+      }
+
       setConversations(convList)
 
       const ids = [...new Set(convList.map(c => c.otherId))]
@@ -230,20 +238,37 @@ export default function Messages() {
   }
 
   function selectConversation(conv) {
+    // Mark messages as read in local state immediately
+    const readMsgs = conv.messages.map(m =>
+      m.receiver_id === user.id ? { ...m, is_read: true } : m
+    )
     setActiveConv(conv)
-    setMessages(conv.messages)
+    setMessages(readMsgs)
     setMobileView('thread')
     scrollToBottom()
-    if (conv.unreadCount > 0) {
-      setConversations(prev =>
-        prev.map(c => c.key === conv.key ? { ...c, unreadCount: 0 } : c)
+
+    // Update conversations list: unreadCount → 0, messages → read
+    setConversations(prev =>
+      prev.map(c => c.key === conv.key
+        ? { ...c, unreadCount: 0, messages: readMsgs }
+        : c
       )
-      supabase.from('messages').update({ is_read: true })
-        .eq('listing_id', conv.listingId)
-        .eq('receiver_id', user.id)
-        .eq('sender_id', conv.otherId)
-        .eq('is_read', false)
+    )
+
+    // DB update — .neq catches both false and null; handle null listingId explicitly
+    let q = supabase.from('messages')
+      .update({ is_read: true })
+      .eq('receiver_id', user.id)
+      .eq('sender_id', conv.otherId)
+      .neq('is_read', true)
+
+    if (conv.listingId === null) {
+      q = q.is('listing_id', null)
+    } else {
+      q = q.eq('listing_id', conv.listingId)
     }
+
+    q  // fire and forget — Navbar subscription picks up the UPDATE event
   }
 
   function handleTextareaChange(e) {
