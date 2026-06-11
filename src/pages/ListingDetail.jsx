@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import {
   MapPin, Clock, Heart, Share2, ShieldCheck,
   Star, ChevronLeft, MessageSquare, Phone, ArrowRight, Send, CheckCircle2,
-  Pencil, Trash2, Eye, Copy
+  Pencil, Trash2, Eye
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
@@ -36,8 +36,7 @@ export default function ListingDetail() {
   const [sellerPhone, setSellerPhone]     = useState('')
   const [phoneFetching, setPhoneFetching] = useState(false)
 
-  const [copied, setCopied]           = useState(false)
-  const [phoneCopied, setPhoneCopied] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   // Messaging
   const [msgOpen, setMsgOpen]     = useState(false)
@@ -123,13 +122,6 @@ export default function ListingDetail() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
-  }
-
-  async function copyPhone() {
-    if (!sellerPhone) return
-    await navigator.clipboard.writeText(sellerPhone)
-    setPhoneCopied(true)
-    setTimeout(() => setPhoneCopied(false), 2000)
   }
 
   async function revealPhone() {
@@ -359,15 +351,15 @@ export default function ListingDetail() {
                   <span className="font-bold text-navy">{sellerPhone || t('listingDetail.noPhone')}</span>
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    onClick={copyPhone}
-                    className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
-                  >
-                    <Copy size={16} />
-                    {phoneCopied ? 'Kopyalandı!' : 'Kopyala'}
-                  </button>
                   <a
-                    href={sellerPhone ? `tel:${sellerPhone.replace(/\s/g, '')}` : undefined}
+                    href={sellerPhone ? `https://wa.me/${sellerPhone.replace(/[^0-9]/g, '')}` : undefined}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    💬 WhatsApp
+                  </a>
+                  <a
+                    href={sellerPhone ? `tel:${sellerPhone}` : undefined}
                     className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <Phone size={16} />
@@ -587,12 +579,12 @@ export default function ListingDetail() {
             </button>
           ) : (
             <>
-              <button onClick={copyPhone}
-                className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-50 flex items-center justify-center gap-1.5">
-                <Copy size={15} />
-                {phoneCopied ? 'Kopyalandı!' : 'Kopyala'}
-              </button>
-              <a href={sellerPhone ? `tel:${sellerPhone.replace(/\s/g, '')}` : undefined}
+              <a href={sellerPhone ? `https://wa.me/${sellerPhone.replace(/[^0-9]/g, '')}` : undefined}
+                target="_blank" rel="noopener noreferrer"
+                className="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-600 flex items-center justify-center gap-1.5">
+                💬 WhatsApp
+              </a>
+              <a href={sellerPhone ? `tel:${sellerPhone}` : undefined}
                 className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 flex items-center justify-center gap-1.5">
                 <Phone size={15} />
                 Zəng et
