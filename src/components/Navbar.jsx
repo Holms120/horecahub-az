@@ -73,7 +73,14 @@ export default function Navbar() {
     }
     fetchCount()
     const channel = supabase.channel('navbar-messages')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, fetchCount)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'messages',
+        filter: `receiver_id=eq.${user.id}`,
+      }, fetchCount)
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'messages',
+        filter: `receiver_id=eq.${user.id}`,
+      }, fetchCount)
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [user])

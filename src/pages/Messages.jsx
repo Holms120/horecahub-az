@@ -7,7 +7,7 @@ import RelativeTime from '../components/RelativeTime'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index.js'
 
-/* ─── pure helpers ────────────────────────────────────────── */
+/* ─── helpers ─────────────────────────────────────────────── */
 
 function sellerName(p) {
   if (!p) return i18n.t('messages.unknownUser')
@@ -74,11 +74,15 @@ export default function Messages() {
   const [loadingConvs, setLoadingConvs]   = useState(true)
   const [replyText, setReplyText]         = useState('')
   const [sending, setSending]             = useState(false)
-  const [mobileView, setMobileView]       = useState('list')  // 'list' | 'thread'
+  const [mobileView, setMobileView]       = useState('list')
+  const [otherOnline, setOtherOnline]     = useState(false)
+  const [otherTyping, setOtherTyping]     = useState(false)
 
-  const threadRef     = useRef(null)
-  const textareaRef   = useRef(null)
-  const activeConvRef = useRef(null)
+  const threadRef       = useRef(null)
+  const textareaRef     = useRef(null)
+  const activeConvRef   = useRef(null)
+  const presenceChanRef = useRef(null)
+  const typingTimerRef  = useRef(null)
 
   useEffect(() => { activeConvRef.current = activeConv }, [activeConv])
 
@@ -117,7 +121,7 @@ export default function Messages() {
 
   useEffect(() => { if (user) loadConversations() }, [user, loadConversations])
 
-  /* ── sidebar real-time (any incoming message) ── */
+  /* ── sidebar real-time ── */
   useEffect(() => {
     if (!user) return
     const ch = supabase.channel('sidebar-unread')
@@ -129,7 +133,7 @@ export default function Messages() {
     return () => { supabase.removeChannel(ch) }
   }, [user, loadConversations])
 
-  /* ── per-conversation real-time (active thread) ── */
+  /* ── per-conversation messages real-time ── */
   useEffect(() => {
     if (!activeConv?.listingId) return
 
@@ -143,25 +147,21 @@ export default function Messages() {
         filter: `listing_id=eq.${listingId}`,
       }, (payload) => {
         const msg = payload.new
-
-        // only messages in THIS two-person conversation
         const belongs =
-          (msg.sender_id === otherId   && msg.receiver_id === user.id) ||
-          (msg.sender_id === user.id   && msg.receiver_id === otherId)
+          (msg.sender_id === otherId && msg.receiver_id === user.id) ||
+          (msg.sender_id === user.id && msg.receiver_id === otherId)
         if (!belongs) return
 
         setMessages(prev =>
           prev.some(m => m.id === msg.id) ? prev : [...prev, msg]
         )
 
-        // mark incoming as read
         if (msg.receiver_id === user.id) {
           supabase.from('messages').update({ is_read: true }).eq('id', msg.id)
           setConversations(prev => prev.map(c =>
             c.key === convKey ? { ...c, lastMsg: msg, unreadCount: 0 } : c
           ))
         } else {
-          // our own message confirmed by server — update lastMsg in sidebar
           setConversations(prev => prev.map(c =>
             c.key === convKey ? { ...c, lastMsg: msg } : c
           ))
@@ -174,6 +174,49 @@ export default function Messages() {
       .subscribe()
 
     return () => { supabase.removeChannel(ch) }
+  }, [activeConv?.listingId, activeConv?.otherId, user?.id])    // eslint-disable-line
+
+  /* ── presence: online status + typing indicator ── */
+  useEffect(() => {
+    if (!activeConv?.listingId || !user) return
+
+    const listingId = activeConv.listingId
+    const otherId   = activeConv.otherId
+    const chanName  = `presence-${listingId}-${[user.id, otherId].sort().join('-')}`
+
+    setOtherOnline(false)
+    setOtherTyping(false)
+
+    const ch = supabase.channel(chanName, { config: { presence: { key: user.id } } })
+      .on('presence', { event: 'sync' }, () => {
+        const state   = ch.presenceState()
+        const others  = (state[otherId] || [])
+        setOtherOnline(others.length > 0)
+        setOtherTyping(others.some(p => p.typing === true))
+      })
+      .on('presence', { event: 'join' }, ({ key }) => {
+        if (key === otherId) setOtherOnline(true)
+      })
+      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        if (key === otherId) {
+          setOtherOnline(false)
+          setOtherTyping(false)
+        }
+        void leftPresences
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await ch.track({ user_id: user.id, typing: false })
+        }
+      })
+
+    presenceChanRef.current = ch
+
+    return () => {
+      clearTimeout(typingTimerRef.current)
+      presenceChanRef.current = null
+      supabase.removeChannel(ch)
+    }
   }, [activeConv?.listingId, activeConv?.otherId, user?.id])    // eslint-disable-line
 
   /* ── helpers ── */
@@ -201,10 +244,26 @@ export default function Messages() {
     }
   }
 
+  function handleTextareaChange(e) {
+    setReplyText(e.target.value)
+    const ch = presenceChanRef.current
+    if (ch) {
+      ch.track({ user_id: user.id, typing: true })
+      clearTimeout(typingTimerRef.current)
+      typingTimerRef.current = setTimeout(() => {
+        presenceChanRef.current?.track({ user_id: user.id, typing: false })
+      }, 2000)
+    }
+  }
+
   async function sendMessage() {
     const text = replyText.trim()
     if (!text || !activeConv || sending) return
     setSending(true)
+
+    // stop typing immediately on send
+    clearTimeout(typingTimerRef.current)
+    presenceChanRef.current?.track({ user_id: user.id, typing: false })
 
     const optId  = `opt-${Date.now()}`
     const optMsg = {
@@ -310,7 +369,6 @@ export default function Messages() {
                 `}
               >
                 <div className="flex items-start gap-3">
-                  {/* avatar + badge */}
                   <div className="relative w-10 h-10 flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
                       {name.charAt(0).toUpperCase()}
@@ -351,7 +409,6 @@ export default function Messages() {
         ${mobileView === 'list' && !activeConv ? 'hidden sm:flex' : 'flex'}
       `}>
         {!activeConv ? (
-          /* Empty state */
           <div className="flex-1 flex items-center justify-center text-center px-8">
             <div>
               <MessageSquare size={48} className="text-gray-200 mx-auto mb-4" />
@@ -366,10 +423,15 @@ export default function Messages() {
                 onClick={() => { setMobileView('list'); setActiveConv(null) }}>
                 <ChevronLeft size={20} />
               </button>
-              <div className="min-w-0">
-                <p className="font-semibold text-navy text-sm truncate">
-                  {sellerName(profiles[activeConv.otherId])}
-                </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-navy text-sm truncate">
+                    {sellerName(profiles[activeConv.otherId])}
+                  </p>
+                  {otherOnline && (
+                    <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                  )}
+                </div>
                 <Link to={`/listings/${activeConv.listingId}`}
                   className="text-xs text-blue-600 hover:underline truncate block">
                   {activeConv.listingTitle} →
@@ -414,6 +476,21 @@ export default function Messages() {
                 )
               })}
 
+              {/* Typing indicator */}
+              {otherTyping && (
+                <div className="flex justify-start pt-1">
+                  <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-sm">
+                    <div className="flex gap-1 items-center h-3">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Reply input */}
@@ -422,7 +499,7 @@ export default function Messages() {
                 <textarea
                   ref={textareaRef}
                   value={replyText}
-                  onChange={e => setReplyText(e.target.value)}
+                  onChange={handleTextareaChange}
                   onKeyDown={handleKeyDown}
                   disabled={sending}
                   placeholder={t('messages.replyPlaceholder')}
