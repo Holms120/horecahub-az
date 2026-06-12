@@ -535,20 +535,14 @@ export default function Messages() {
                   <div key={item.id}
                     className={`group flex items-end gap-1 ${mine ? 'justify-end' : 'justify-start'}`}>
 
-                    {/* Delete button — left of bubble, own messages only, hover */}
+                    {/* Delete button — left of bubble, own messages only */}
                     {mine && !item._opt && (
                       <button
                         onClick={() => deleteMessage(item.id)}
                         disabled={isDeleting}
-                        title="Sil"
-                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity
-                          p-1.5 rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50
-                          disabled:cursor-not-allowed order-first"
+                        className="flex-shrink-0 p-1 rounded text-gray-300 hover:text-red-400 order-first"
                       >
-                        {isDeleting
-                          ? <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
-                          : <Trash2 size={13} />
-                        }
+                        <Trash2 size={12} />
                       </button>
                     )}
 
