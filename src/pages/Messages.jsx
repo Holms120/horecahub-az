@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Send, ChevronLeft, MessageSquare, Inbox, Trash2 } from 'lucide-react'
+import { Send, ChevronLeft, MessageSquare, Inbox, Trash2, MoreVertical } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import RelativeTime from '../components/RelativeTime'
@@ -79,7 +79,10 @@ export default function Messages() {
   const [mobileView, setMobileView]       = useState('list')
   const [otherOnline, setOtherOnline]     = useState(false)
   const [otherTyping, setOtherTyping]     = useState(false)
-  const [deletingMsgId, setDeletingMsgId] = useState(null)
+  const [deletingMsgId, setDeletingMsgId]     = useState(null)
+  const [confirmDeleteConv, setConfirmDeleteConv] = useState(null)
+  const [openMenuConvKey, setOpenMenuConvKey]     = useState(null)
+  const [deletingConv, setDeletingConv]           = useState(false)
 
   const threadRef       = useRef(null)
   const textareaRef     = useRef(null)
@@ -362,6 +365,26 @@ export default function Messages() {
     setDeletingMsgId(null)
   }
 
+  async function deleteConversation(conv) {
+    setDeletingConv(true)
+    let q = supabase.from('messages').delete()
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+    if (conv.listingId === null) {
+      q = q.is('listing_id', null)
+    } else {
+      q = q.eq('listing_id', conv.listingId)
+    }
+    await q
+    setConversations(prev => prev.filter(c => c.key !== conv.key))
+    if (activeConv?.key === conv.key) {
+      setActiveConv(null)
+      setMessages([])
+      setMobileView('list')
+    }
+    setDeletingConv(false)
+    setConfirmDeleteConv(null)
+  }
+
   /* ─── render ──────────────────────────────────────────────── */
 
   if (authLoading || loadingConvs) {
@@ -417,52 +440,85 @@ export default function Messages() {
             const hasUnread  = conv.unreadCount > 0
 
             return (
-              <button key={conv.key}
-                onClick={() => selectConversation(conv)}
-                className={`w-full text-left px-4 py-4 border-b border-gray-100
-                  hover:bg-gray-50 transition-colors
-                  ${isActive
-                    ? isSupport ? 'bg-green-50 border-l-[3px] border-l-green-600'
-                                : 'bg-blue-50 border-l-[3px] border-l-blue-600'
-                    : ''}
-                `}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="relative w-10 h-10 flex-shrink-0">
-                    {isSupport ? (
-                      <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-base">
-                        🛡
-                      </div>
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
-                        {name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    {hasUnread && (
-                      <span className={`absolute -top-0.5 -right-0.5 min-w-[16px] h-4 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white px-0.5 ${isSupport ? 'bg-green-600' : 'bg-blue-600'}`}>
-                        {conv.unreadCount}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className={`text-sm truncate ${hasUnread ? 'font-bold' : 'font-semibold'} ${isSupport ? 'text-green-700' : 'text-navy'}`}>
-                        {isSupport && <span className="mr-1">🛡</span>}{name}
-                      </span>
-                      <RelativeTime dateStr={last.created_at}
-                        className="text-xs text-gray-400 flex-shrink-0 ml-2" />
+              <div key={conv.key} className={`relative group border-b border-gray-100
+                ${isActive
+                  ? isSupport ? 'bg-green-50 border-l-[3px] border-l-green-600'
+                              : 'bg-blue-50 border-l-[3px] border-l-blue-600'
+                  : 'hover:bg-gray-50'}
+                transition-colors
+              `}>
+                <button
+                  onClick={() => selectConversation(conv)}
+                  className="w-full text-left px-4 py-4 pr-10"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="relative w-10 h-10 flex-shrink-0">
+                      {isSupport ? (
+                        <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white text-base">
+                          🛡
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                          {name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      {hasUnread && (
+                        <span className={`absolute -top-0.5 -right-0.5 min-w-[16px] h-4 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white px-0.5 ${isSupport ? 'bg-green-600' : 'bg-blue-600'}`}>
+                          {conv.unreadCount}
+                        </span>
+                      )}
                     </div>
-                    <p className={`text-xs font-medium truncate mb-0.5 ${isSupport ? 'text-green-600' : 'text-blue-600'}`}>
-                      {isSupport ? 'Dəstək xidməti' : conv.listingTitle}
-                    </p>
-                    <p className={`text-xs truncate ${hasUnread ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
-                      {isMine && <span className="text-gray-400">{t('messages.you')} </span>}
-                      {last.content}
-                    </p>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className={`text-sm truncate ${hasUnread ? 'font-bold' : 'font-semibold'} ${isSupport ? 'text-green-700' : 'text-navy'}`}>
+                          {isSupport && <span className="mr-1">🛡</span>}{name}
+                        </span>
+                        <RelativeTime dateStr={last.created_at}
+                          className="text-xs text-gray-400 flex-shrink-0 ml-2" />
+                      </div>
+                      <p className={`text-xs font-medium truncate mb-0.5 ${isSupport ? 'text-green-600' : 'text-blue-600'}`}>
+                        {isSupport ? 'Dəstək xidməti' : conv.listingTitle}
+                      </p>
+                      <p className={`text-xs truncate ${hasUnread ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
+                        {isMine && <span className="text-gray-400">{t('messages.you')} </span>}
+                        {last.content}
+                      </p>
+                    </div>
                   </div>
+                </button>
+
+                {/* ··· menu */}
+                <div className="absolute top-3 right-2">
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      setOpenMenuConvKey(k => k === conv.key ? null : conv.key)
+                    }}
+                    className="p-1 rounded text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                  >
+                    <MoreVertical size={15} />
+                  </button>
+                  {openMenuConvKey === conv.key && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setOpenMenuConvKey(null)} />
+                      <div className="absolute right-0 top-7 z-20 bg-white border border-gray-200 rounded-xl shadow-lg py-1 min-w-[160px]">
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            setOpenMenuConvKey(null)
+                            setConfirmDeleteConv(conv)
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <Trash2 size={14} />
+                          Söhbəti sil
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </button>
+              </div>
             )
           })}
         </div>
@@ -535,7 +591,6 @@ export default function Messages() {
                   <div key={item.id}
                     className={`group flex items-end gap-1 ${mine ? 'justify-end' : 'justify-start'}`}>
 
-                    {/* Delete button — left of bubble, own messages only */}
                     {mine && !item._opt && (
                       <button
                         onClick={() => deleteMessage(item.id)}
@@ -618,6 +673,35 @@ export default function Messages() {
           </>
         )}
       </section>
+
+      {/* ── Delete conversation modal ── */}
+      {confirmDeleteConv && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold text-navy mb-2">Söhbəti sil</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Bu söhbəti silmək istəyirsiniz? Bütün mesajlar silinəcək və bu əməliyyat geri qaytarıla bilməz.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmDeleteConv(null)}
+                disabled={deletingConv}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                Ləğv et
+              </button>
+              <button
+                onClick={() => deleteConversation(confirmDeleteConv)}
+                disabled={deletingConv}
+                className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deletingConv && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                Sil
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
