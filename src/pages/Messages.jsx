@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Send, ChevronLeft, MessageSquare, Inbox } from 'lucide-react'
+import { Send, ChevronLeft, MessageSquare, Inbox, Trash2 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import RelativeTime from '../components/RelativeTime'
@@ -79,6 +79,7 @@ export default function Messages() {
   const [mobileView, setMobileView]       = useState('list')
   const [otherOnline, setOtherOnline]     = useState(false)
   const [otherTyping, setOtherTyping]     = useState(false)
+  const [deletingMsgId, setDeletingMsgId] = useState(null)
 
   const threadRef       = useRef(null)
   const textareaRef     = useRef(null)
@@ -334,6 +335,33 @@ export default function Messages() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
   }
 
+  async function deleteMessage(msgId) {
+    setDeletingMsgId(msgId)
+    const { error } = await supabase.from('messages').delete().eq('id', msgId)
+    if (!error) {
+      const newMsgs = messages.filter(m => m.id !== msgId)
+      setMessages(newMsgs)
+
+      const convKey = activeConvRef.current?.key
+      setConversations(prev =>
+        prev
+          .map(c => {
+            if (c.key !== convKey) return c
+            const remaining = c.messages.filter(m => m.id !== msgId)
+            if (remaining.length === 0) return null
+            return { ...c, messages: remaining, lastMsg: remaining[remaining.length - 1] }
+          })
+          .filter(Boolean)
+      )
+
+      if (newMsgs.length === 0) {
+        setActiveConv(null)
+        setMobileView('list')
+      }
+    }
+    setDeletingMsgId(null)
+  }
+
   /* ─── render ──────────────────────────────────────────────── */
 
   if (authLoading || loadingConvs) {
@@ -502,9 +530,28 @@ export default function Messages() {
 
                 const mine        = item.sender_id === user.id
                 const isAdminMsg  = !mine && item.is_support === true
+                const isDeleting  = deletingMsgId === item.id
                 return (
                   <div key={item.id}
-                    className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
+                    className={`group flex items-end gap-1 ${mine ? 'justify-end' : 'justify-start'}`}>
+
+                    {/* Delete button — left of bubble, own messages only, hover */}
+                    {mine && !item._opt && (
+                      <button
+                        onClick={() => deleteMessage(item.id)}
+                        disabled={isDeleting}
+                        title="Sil"
+                        className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity
+                          p-1.5 rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50
+                          disabled:cursor-not-allowed order-first"
+                      >
+                        {isDeleting
+                          ? <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+                          : <Trash2 size={13} />
+                        }
+                      </button>
+                    )}
+
                     <div className={`
                       max-w-[75%] px-4 py-2.5 rounded-2xl text-sm
                       ${mine
@@ -512,7 +559,7 @@ export default function Messages() {
                         : isAdminMsg
                           ? 'bg-green-50 border border-green-200 text-green-900 rounded-bl-sm'
                           : 'bg-gray-100 text-navy rounded-bl-sm'}
-                      ${item._opt ? 'opacity-60' : ''}
+                      ${item._opt || isDeleting ? 'opacity-60' : ''}
                     `}>
                       {isAdminMsg && (
                         <p className="text-[10px] font-bold text-green-600 mb-1">🛡 HorecaHub Dəstək</p>
