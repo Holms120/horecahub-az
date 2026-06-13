@@ -89,6 +89,7 @@ export default function Messages() {
   const activeConvRef   = useRef(null)
   const presenceChanRef = useRef(null)
   const typingTimerRef  = useRef(null)
+  const typingActiveRef = useRef(false)
 
   useEffect(() => { activeConvRef.current = activeConv }, [activeConv])
 
@@ -136,11 +137,25 @@ export default function Messages() {
   /* ── sidebar real-time ── */
   useEffect(() => {
     if (!user) return
+    const userId = user.id
     const ch = supabase.channel('sidebar-unread')
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'messages',
-        filter: `receiver_id=eq.${user.id}`,
-      }, () => loadConversations(true))
+      }, (payload) => {
+        if (payload.new.receiver_id === userId) loadConversations(true)
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'messages',
+      }, (payload) => {
+        if (payload.new.is_read && !payload.old.is_read) {
+          setConversations(prev => prev.map(c => {
+            const sameConv = c.listingId === payload.new.listing_id ||
+              (c.listingId === null && payload.new.listing_id === null)
+            if (!sameConv) return c
+            return { ...c, unreadCount: Math.max(0, c.unreadCount - 1) }
+          }))
+        }
+      })
       .subscribe()
     return () => { supabase.removeChannel(ch) }
   }, [user, loadConversations])
@@ -152,23 +167,24 @@ export default function Messages() {
     const listingId = activeConv.listingId
     const otherId   = activeConv.otherId
     const convKey   = activeConv.key
+    const userId    = user.id
 
-    const ch = supabase.channel(`thread-${listingId}`)
+    const ch = supabase.channel(`thread-${listingId}-${otherId}`)
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'messages',
-        filter: `listing_id=eq.${listingId}`,
       }, (payload) => {
         const msg = payload.new
         const belongs =
-          (msg.sender_id === otherId && msg.receiver_id === user.id) ||
-          (msg.sender_id === user.id && msg.receiver_id === otherId)
+          (msg.listing_id === listingId) &&
+          ((msg.sender_id === otherId && msg.receiver_id === userId) ||
+           (msg.sender_id === userId  && msg.receiver_id === otherId))
         if (!belongs) return
 
         setMessages(prev =>
           prev.some(m => m.id === msg.id) ? prev : [...prev, msg]
         )
 
-        if (msg.receiver_id === user.id) {
+        if (msg.receiver_id === userId) {
           supabase.from('messages').update({ is_read: true }).eq('id', msg.id)
           setConversations(prev => prev.map(c =>
             c.key === convKey ? { ...c, lastMsg: msg, unreadCount: 0 } : c
@@ -257,29 +273,39 @@ export default function Messages() {
       )
     )
 
-    // DB update — .neq catches both false and null; handle null listingId explicitly
-    let q = supabase.from('messages')
-      .update({ is_read: true })
-      .eq('receiver_id', user.id)
-      .eq('sender_id', conv.otherId)
-      .neq('is_read', true)
-
-    if (conv.listingId === null) {
-      q = q.is('listing_id', null)
+    // DB update
+    if (conv.listingId) {
+      supabase
+        .from('messages')
+        .update({ is_read: true })
+        .eq('listing_id', conv.listingId)
+        .eq('receiver_id', user.id)
+        .eq('sender_id', conv.otherId)
+        .eq('is_read', false)
+        .then(() => {})
     } else {
-      q = q.eq('listing_id', conv.listingId)
+      supabase
+        .from('messages')
+        .update({ is_read: true })
+        .is('listing_id', null)
+        .eq('receiver_id', user.id)
+        .eq('sender_id', conv.otherId)
+        .eq('is_read', false)
+        .then(() => {})
     }
-
-    q  // fire and forget — Navbar subscription picks up the UPDATE event
   }
 
   function handleTextareaChange(e) {
     setReplyText(e.target.value)
     const ch = presenceChanRef.current
     if (ch) {
-      ch.track({ user_id: user.id, typing: true })
+      if (!typingActiveRef.current) {
+        typingActiveRef.current = true
+        ch.track({ user_id: user.id, typing: true })
+      }
       clearTimeout(typingTimerRef.current)
       typingTimerRef.current = setTimeout(() => {
+        typingActiveRef.current = false
         presenceChanRef.current?.track({ user_id: user.id, typing: false })
       }, 2000)
     }
@@ -292,6 +318,7 @@ export default function Messages() {
 
     // stop typing immediately on send
     clearTimeout(typingTimerRef.current)
+    typingActiveRef.current = false
     presenceChanRef.current?.track({ user_id: user.id, typing: false })
 
     const optId  = `opt-${Date.now()}`

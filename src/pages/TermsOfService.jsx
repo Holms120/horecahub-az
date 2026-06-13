@@ -27,7 +27,7 @@ export default function TermsOfService() {
       <div className="mb-10">
         <p className="text-xs font-semibold text-blue-600 tracking-widest uppercase mb-2">Hüquqi sənəd</p>
         <h1 className="text-3xl font-bold text-navy mb-3">İstifadə Şərtləri</h1>
-        <p className="text-sm text-gray-500">Son yenilənmə: 1 yanvar 2025</p>
+        <p className="text-sm text-gray-500">Son yenilənmə: 2026</p>
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-2xl px-6 py-4 mb-10 text-sm text-blue-800">
