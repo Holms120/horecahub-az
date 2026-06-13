@@ -1,13 +1,13 @@
-export default function Logo({ light = false, height = 38 }) {
+export default function Logo({ height = 38, light = false }) {
   return (
-    <img
-      src="/logo.svg"
-      alt="HorecaHub.az"
-      height={height}
-      style={{
+    <img 
+      src="/logo.svg" 
+      alt="HorecaHub.az" 
+      height={height} 
+      style={{ 
         height,
-        filter: light ? 'brightness(0) invert(1)' : 'none',
-      }}
+        filter: light ? 'brightness(0) invert(1)' : 'none'
+      }} 
     />
   )
 }
