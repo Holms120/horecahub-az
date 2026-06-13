@@ -83,12 +83,28 @@ function SendMsgModal({ receiverId, senderId, receiverName, onClose }) {
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [listingId, setListingId] = useState(undefined) // undefined = loading, null = none
+
+  useEffect(() => {
+    supabase
+      .from('listings')
+      .select('id')
+      .eq('user_id', receiverId)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then(({ data }) => setListingId(data?.[0]?.id ?? null))
+  }, [receiverId])
+
   async function handleSend() {
-    if (!text.trim()) return
+    if (!text.trim() || listingId === undefined) return
     setSending(true)
+    const isSupport = listingId === null
     const { error } = await supabase.from('messages').insert({
       sender_id: senderId, receiver_id: receiverId,
-      listing_id: null, content: text.trim(), is_support: true,
+      listing_id: listingId,
+      content: text.trim(),
+      is_support: isSupport,
     })
     if (!error) { setSent(true); setTimeout(onClose, 1500) }
     setSending(false)
@@ -111,7 +127,7 @@ function SendMsgModal({ receiverId, senderId, receiverName, onClose }) {
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 resize-none mb-4" />
             <div className="flex gap-2 justify-end">
               <button onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50">Ləğv et</button>
-              <button onClick={handleSend} disabled={!text.trim() || sending}
+              <button onClick={handleSend} disabled={!text.trim() || sending || listingId === undefined}
                 className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2">
                 <Send size={14} /> {sending ? 'Göndərilir...' : 'Göndər'}
               </button>

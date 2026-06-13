@@ -457,7 +457,7 @@ export default function Messages() {
         <div className="flex-1 overflow-y-auto">
           {conversations.map(conv => {
             const other      = profiles[conv.otherId]
-            const isSupport  = conv.isSupport || other?.is_admin
+            const isSupport  = conv.isSupport
             const name       = isSupport ? 'HorecaHub Dəstək' : sellerName(other)
             const isActive   = activeConv?.key === conv.key
             const last       = conv.lastMsg
@@ -565,7 +565,7 @@ export default function Messages() {
           <>
             {/* Header */}
             {(() => {
-              const convIsSupport = activeConv.isSupport || profiles[activeConv.otherId]?.is_admin
+              const convIsSupport = activeConv.isSupport
               return (
                 <div className={`px-4 py-3 border-b flex items-center gap-3 flex-shrink-0 ${convIsSupport ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                   <button className="sm:hidden p-1 -ml-1 text-gray-500 hover:text-navy"
