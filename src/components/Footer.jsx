@@ -50,7 +50,7 @@ export default function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-white/40 text-xs">
                 <MapPin size={12} />
-                <span>Sumqayıt, Azərbaycan</span>
+                
               </div>
               <div className="flex items-center gap-2 text-white/40 text-xs">
                 <Phone size={12} />
