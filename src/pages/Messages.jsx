@@ -164,7 +164,7 @@ export default function Messages() {
 
   /* ── per-conversation messages real-time ── */
   useEffect(() => {
-    if (!activeConv?.listingId) return
+    if (!activeConv) return
 
     const listingId = activeConv.listingId
     const otherId   = activeConv.otherId
@@ -177,7 +177,7 @@ export default function Messages() {
       }, (payload) => {
         const msg = payload.new
         const belongs =
-          (msg.listing_id === listingId) &&
+          (msg.listing_id === listingId || (msg.listing_id === null && listingId === null)) &&
           ((msg.sender_id === otherId && msg.receiver_id === userId) ||
            (msg.sender_id === userId  && msg.receiver_id === otherId))
         if (!belongs) return
