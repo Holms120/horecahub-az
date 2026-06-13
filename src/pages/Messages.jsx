@@ -48,13 +48,12 @@ function buildConvMap(data, userId) {
         messages:     [],
         lastMsg:      msg,
         unreadCount:  0,
-        isSupport:    false,
+        isSupport:    msg.listing_id === null,
       })
     }
     const c = map.get(key)
     c.messages.push(msg)
     c.lastMsg = msg
-    if (msg.is_support) c.isSupport = true
     if (msg.receiver_id === userId && !msg.is_read) c.unreadCount++
   }
   return [...map.values()].sort(
@@ -457,7 +456,7 @@ export default function Messages() {
         <div className="flex-1 overflow-y-auto">
           {conversations.map(conv => {
             const other      = profiles[conv.otherId]
-            const isSupport  = conv.isSupport
+            const isSupport  = conv.listingId === null
             const name       = isSupport ? 'HorecaHub Dəstək' : sellerName(other)
             const isActive   = activeConv?.key === conv.key
             const last       = conv.lastMsg
@@ -565,7 +564,7 @@ export default function Messages() {
           <>
             {/* Header */}
             {(() => {
-              const convIsSupport = activeConv.isSupport
+              const convIsSupport = activeConv.listingId === null
               return (
                 <div className={`px-4 py-3 border-b flex items-center gap-3 flex-shrink-0 ${convIsSupport ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                   <button className="sm:hidden p-1 -ml-1 text-gray-500 hover:text-navy"
