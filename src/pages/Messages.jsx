@@ -137,11 +137,14 @@ export default function Messages() {
   useEffect(() => {
     if (!user) return
     const userId = user.id
-    const ch = supabase.channel('sidebar-unread')
+    const ch = supabase.channel('sidebar-all')
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'messages',
       }, (payload) => {
-        if (payload.new.receiver_id === userId) loadConversations(true)
+        const msg = payload.new
+        if (msg.receiver_id === userId || msg.sender_id === userId) {
+          loadConversations(true)
+        }
       })
       .on('postgres_changes', {
         event: 'UPDATE', schema: 'public', table: 'messages',
