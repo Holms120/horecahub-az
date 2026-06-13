@@ -49,10 +49,6 @@ export default function Footer() {
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-white/40 text-xs">
-                <MapPin size={12} />
-                
-              </div>
-              <div className="flex items-center gap-2 text-white/40 text-xs">
                 <Phone size={12} />
                 <a href="tel:+9940556222912" className="hover:text-white transition-colors">
                   +994 055 622 29 12
