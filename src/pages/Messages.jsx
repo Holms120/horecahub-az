@@ -111,14 +111,12 @@ export default function Messages() {
     if (!error && data) {
       const convList = buildConvMap(data, user.id)
 
-      // Keep unreadCount at 0 for the currently open conversation (race-condition guard)
+      // Aktiv söhbətin unreadCount-unu sıfır saxla
       const activeKey = activeConvRef.current?.key
-      if (activeKey) {
-        const idx = convList.findIndex(c => c.key === activeKey)
-        if (idx >= 0) convList[idx] = { ...convList[idx], unreadCount: 0 }
-      }
-
-      setConversations(convList)
+      const finalList = convList.map(c =>
+        c.key === activeKey ? { ...c, unreadCount: 0 } : c
+      )
+      setConversations(finalList)
 
       const ids = [...new Set(convList.map(c => c.otherId))]
       if (ids.length) {
