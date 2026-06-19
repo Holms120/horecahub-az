@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +12,24 @@ serve(async (req) => {
   }
 
   try {
-    const { to, name, title, reason } = await req.json()
+    const { user_id, name, title, reason } = await req.json()
+
+    // Create admin client to access auth.users
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
+
+    // Get user email from auth
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(user_id)
+    if (authError || !authData?.user?.email) {
+      return new Response(JSON.stringify({ error: 'User email not found' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      })
+    }
+
+    const userEmail = authData.user.email
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -21,7 +39,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: 'HorecaHub <noreply@horecahub.az>',
-        to,
+        to: userEmail,
         subject: 'Elanınız rədd edildi — HorecaHub',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
