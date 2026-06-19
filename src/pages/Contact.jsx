@@ -1,9 +1,16 @@
+import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useTranslation } from 'react-i18next'
-import { Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Phone, Mail, Instagram, Facebook, MessageCircle } from 'lucide-react'
+import { supabase } from '../supabaseClient'
+import { useAuth } from '../context/AuthContext'
 
 export default function Contact() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const [loadingSupport, setLoadingSupport] = useState(false)
 
   const items = [
     {
@@ -34,14 +41,38 @@ export default function Contact() {
       href: 'https://www.facebook.com/profile.php?id=61589830914631',
       color: 'bg-indigo-50 text-indigo-600',
     },
-    {
-      Icon: MapPin,
-      label: t('contact.address'),
-      value: t('contact.addressValue'),
-      href: null,
-      color: 'bg-amber-50 text-amber-600',
-    },
   ]
+
+  async function handleSupportMessage() {
+    if (!user) { navigate('/login', { state: { from: '/contact' } }); return }
+    setLoadingSupport(true)
+    const { data: admins } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('is_admin', true)
+      .limit(1)
+    const adminId = admins?.[0]?.id
+    if (!adminId) { setLoadingSupport(false); return }
+    // Check if support conversation already exists
+    const { data: existing } = await supabase
+      .from('messages')
+      .select('id')
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .or(`sender_id.eq.${adminId},receiver_id.eq.${adminId}`)
+      .is('listing_id', null)
+      .limit(1)
+    if (!existing?.length) {
+      await supabase.from('messages').insert({
+        sender_id: user.id,
+        receiver_id: adminId,
+        listing_id: null,
+        content: 'Salam! Sizinlə əlaqə saxlamaq istəyirəm.',
+        is_support: true,
+      })
+    }
+    setLoadingSupport(false)
+    navigate('/messages')
+  }
 
   return (
     <div>
@@ -81,6 +112,23 @@ export default function Contact() {
                 <div key={label}>{inner}</div>
               )
             })}
+
+            {/* Support message button */}
+            <button
+              onClick={handleSupportMessage}
+              disabled={loadingSupport}
+              className="w-full bg-white border border-gray-200 rounded-2xl p-6 flex items-center gap-5 hover:shadow-md transition-shadow text-left disabled:opacity-60"
+            >
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-green-50 text-green-600">
+                {loadingSupport
+                  ? <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                  : <MessageCircle size={22} />}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Canlı dəstək</p>
+                <p className="text-base font-semibold text-navy">Supporta yaz</p>
+              </div>
+            </button>
           </div>
         </div>
       </section>

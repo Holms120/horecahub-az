@@ -265,8 +265,8 @@ export default function Register() {
             </div>
 
             {/* Password */}
-            <div className="flex gap-3">
-              <div className="flex-1">
+            <div className="flex flex-col gap-3">
+              <div>
                 <label className="block text-sm font-medium text-navy mb-1.5">{t('auth.password')} *</label>
                 <div className="relative">
                   <input type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={form.password}
@@ -280,7 +280,7 @@ export default function Register() {
                 </div>
                 {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
               </div>
-              <div className="flex-1">
+              <div>
                 <label className="block text-sm font-medium text-navy mb-1.5">{t('auth.confirmPassword')}</label>
                 <div className="relative">
                   <input type={showConfirm ? 'text' : 'password'} autoComplete="new-password" value={form.confirmPassword}

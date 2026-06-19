@@ -115,7 +115,7 @@ export default function Home() {
             >
               <option value="">{t('hero.allCategories')}</option>
               {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map(c => (
-                <option key={c.id} value={c.id}>{c.label}</option>
+                <option key={c.id} value={c.id}>{t(c.key) || c.label}</option>
               ))}
             </select>
             <div className="flex flex-1 gap-2">
