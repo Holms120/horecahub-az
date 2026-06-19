@@ -4,14 +4,19 @@ import { Check, ChevronRight, Upload, AlertCircle, X, ImageOff } from 'lucide-re
 import {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap,
-  Package, Store, ShoppingBasket
+  Package, Store, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
 import { useTranslation } from 'react-i18next'
 
-const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap, Package, Store, ShoppingBasket }
+const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap, Package, Store, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale }
+
+const NO_CONDITION_CATEGORIES = [
+  'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
+  'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
+]
 const EMPTY     = {
   category: '', subcategory: '', otherDescription: '',
   title: '', description: '', condition: 'Yeni', city: '', price: '', paymentType: 'cash',
@@ -109,6 +114,12 @@ export default function AddListing() {
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
+  useEffect(() => {
+    if (NO_CONDITION_CATEGORIES.includes(form.category)) {
+      setForm(f => ({ ...f, condition: 'Yeni' }))
+    }
+  }, [form.category])
+
   function getDescPlaceholder() {
     if (form.category === 'training')      return t('addListing.descPlaceholderTraining')
     if (form.category === 'consulting')    return t('addListing.descPlaceholderConsulting')
@@ -164,7 +175,7 @@ export default function AddListing() {
     if (step === 1) {
       if (strip(form.title).length < 5) e.title = t('addListing.errTitle')
       if (!form.city) e.city = t('addListing.errCity')
-      if (!['staff', 'consulting', 'software', 'training', 'business_sale'].includes(form.category) && !form.condition) e.condition = t('addListing.errCondition')
+      if (!NO_CONDITION_CATEGORIES.includes(form.category) && !form.condition) e.condition = t('addListing.errCondition')
       if (form.category === 'staff') {
         if (!form.experienceYears) e.experienceYears = t('addListing.errExp')
         if (form.listingType === 'cv' && strip(form.bio).length < 20)
@@ -438,7 +449,7 @@ export default function AddListing() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none" />
               </div>
             )}
-            {!['staff', 'consulting', 'software', 'training', 'business_sale'].includes(form.category) && (
+            {!NO_CONDITION_CATEGORIES.includes(form.category) && (
               <div>
                 <label className="block text-sm font-medium text-navy mb-2">{t('addListing.condition')}</label>
                 <div className="flex gap-3">

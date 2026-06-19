@@ -4,14 +4,20 @@ import {
   ChevronLeft, Check, Upload, X, AlertCircle, ImageOff,
   CheckCircle2, Loader2,
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
-  LayoutGrid, Wine, Users, Truck, ShoppingBasket
+  LayoutGrid, Wine, Users, Truck, ShoppingBasket,
+  Shirt, Wrench, Printer, HardHat, Scale
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
 import { useTranslation } from 'react-i18next'
 
-const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket }
+const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale }
+
+const NO_CONDITION_CATEGORIES = [
+  'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
+  'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
+]
 
 const MAX_FILES   = 5
 const MAX_MB      = 5
@@ -50,6 +56,12 @@ export default function EditListing() {
   const totalImages = existingImages.length + newFiles.length
 
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
+
+  useEffect(() => {
+    if (NO_CONDITION_CATEGORIES.includes(form.category)) {
+      setForm(f => ({ ...f, condition: 'Yeni' }))
+    }
+  }, [form.category])
 
   // Fetch listing and verify ownership
   useEffect(() => {
@@ -325,6 +337,7 @@ export default function EditListing() {
             />
           </div>
 
+          {!NO_CONDITION_CATEGORIES.includes(form.category) && (
           <div>
             <label className="block text-sm font-medium text-navy mb-2">{t('addListing.condition')}</label>
             <div className="flex gap-3">
@@ -342,6 +355,7 @@ export default function EditListing() {
               ))}
             </div>
           </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-navy mb-1.5">{t('addListing.city')}</label>

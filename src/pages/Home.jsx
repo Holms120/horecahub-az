@@ -5,7 +5,8 @@ import {
   Search, ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, ShieldCheck, MessageCircle,
   Target, ArrowRight, Plus, Briefcase, Monitor, GraduationCap,
-  Package, Store, ShoppingBasket
+  Package, Store, ShoppingBasket,
+  Shirt, Wrench, Printer, HardHat, Scale
 } from 'lucide-react'
 import { CATEGORIES } from '../data/mockData'
 import { supabase } from '../supabaseClient'
@@ -17,6 +18,7 @@ const ICON_MAP = {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap,
   Package, Store, ShoppingBasket,
+  Shirt, Wrench, Printer, HardHat, Scale,
 }
 
 const CAT_COLORS = [
