@@ -594,7 +594,17 @@
     "takeaway_sale": "Продажа takeaway",
     "franchise": "Франшиза",
     "equipment_complex": "Комплект оборудования",
-    "other_business": "Другой бизнес"
+    "other_business": "Другой бизнес",
+    "coffee_beans": "Кофе (зерно / молотое)",
+    "alternative_milk": "Альтернативное молоко (овсяное, миндальное, соевое)",
+    "matcha": "Маття (порошок)",
+    "chocolate_powder": "Шоколадный порошок и какао",
+    "salep": "Салеп",
+    "chai_tea": "Чай чай и травяные чаи",
+    "syrups_toppings": "Сиропы и топпинги",
+    "flour_sugar": "Мука, сахар и кондитерское сырьё",
+    "spices": "Специи и смеси",
+    "food_other": "Другие продукты питания"
   },
   "cat": {
     "kitchen": "Кухонное оборудование",
@@ -609,7 +619,8 @@
     "software": "Программное обеспечение",
     "training": "Обучение & Курсы",
     "packaging": "Упаковка",
-    "business_sale": "Продажа бизнеса"
+    "business_sale": "Продажа бизнеса",
+    "food_ingredients": "Продукты питания"
   },
   "contact": {
     "title": "Связаться с нами",

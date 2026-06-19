@@ -4,14 +4,14 @@ import { Check, ChevronRight, Upload, AlertCircle, X, ImageOff } from 'lucide-re
 import {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap,
-  Package, Store
+  Package, Store, ShoppingBasket
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
 import { useTranslation } from 'react-i18next'
 
-const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap, Package, Store }
+const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap, Package, Store, ShoppingBasket }
 const EMPTY     = {
   category: '', subcategory: '', otherDescription: '',
   title: '', description: '', condition: 'Yeni', city: '', price: '', paymentType: 'cash',

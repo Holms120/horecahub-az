@@ -4,14 +4,14 @@ import {
   ChevronLeft, Check, Upload, X, AlertCircle, ImageOff,
   CheckCircle2, Loader2,
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
-  LayoutGrid, Wine, Users, Truck
+  LayoutGrid, Wine, Users, Truck, ShoppingBasket
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
 import { useTranslation } from 'react-i18next'
 
-const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck }
+const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket }
 
 const MAX_FILES   = 5
 const MAX_MB      = 5

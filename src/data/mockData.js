@@ -11,7 +11,8 @@ export const CATEGORIES = [
   { id: 'software',      key: 'cat.software',      label: 'Proqram təminatı',  icon: 'Monitor'       },
   { id: 'training',      key: 'cat.training',      label: 'Təlim & Kurslar',   icon: 'GraduationCap' },
   { id: 'packaging',     key: 'cat.packaging',     label: 'Qablaşdırma',       icon: 'Package'       },
-  { id: 'business_sale', key: 'cat.business_sale', label: 'Biznes satışı',     icon: 'Store'         },
+  { id: 'business_sale',    key: 'cat.business_sale',    label: 'Biznes satışı',       icon: 'Store'          },
+  { id: 'food_ingredients', key: 'cat.food_ingredients', label: 'Yeyinti məhsulları',  icon: 'ShoppingBasket' },
 ]
 
 export const CITIES = [
@@ -160,5 +161,17 @@ export const SUBCATEGORIES = {
     { id: 'cleaning',        key: 'subcat.cleaning',        label: 'Təmizlik məhsulları' },
     { id: 'packaging',       key: 'subcat.packaging',       label: 'Sarf materiallar' },
     { id: 'suppliers_other', key: 'subcat.suppliers_other', label: 'Digər təchizat' },
+  ],
+  food_ingredients: [
+    { id: 'coffee_beans',     key: 'subcat.coffee_beans',     label: 'Qəhvə (çəkilməmiş / üyüdülmüş)' },
+    { id: 'alternative_milk', key: 'subcat.alternative_milk', label: 'Alternativ süd (oat, almond, soy)' },
+    { id: 'matcha',           key: 'subcat.matcha',           label: 'Matcha tozu' },
+    { id: 'chocolate_powder', key: 'subcat.chocolate_powder', label: 'Şokolad tozu və kakao' },
+    { id: 'salep',            key: 'subcat.salep',            label: 'Salep' },
+    { id: 'chai_tea',         key: 'subcat.chai_tea',         label: 'Chai tea və bitki çayları' },
+    { id: 'syrups_toppings',  key: 'subcat.syrups_toppings',  label: 'Siroplar və toppinglər' },
+    { id: 'flour_sugar',      key: 'subcat.flour_sugar',      label: 'Un, şəkər və qənnadı xammalı' },
+    { id: 'spices',           key: 'subcat.spices',           label: 'Ədviyyat və qarışıqlar' },
+    { id: 'food_other',       key: 'subcat.food_other',       label: 'Digər yeyinti məhsulları' },
   ],
 }

@@ -594,7 +594,17 @@
     "takeaway_sale": "Takeaway satışı",
     "franchise": "Franşiza",
     "equipment_complex": "Kompleks avadanlıq",
-    "other_business": "Digər biznes"
+    "other_business": "Digər biznes",
+    "coffee_beans": "Qəhvə (çəkilməmiş / üyüdülmüş)",
+    "alternative_milk": "Alternativ süd (oat, almond, soy)",
+    "matcha": "Matcha tozu",
+    "chocolate_powder": "Şokolad tozu və kakao",
+    "salep": "Salep",
+    "chai_tea": "Chai tea və bitki çayları",
+    "syrups_toppings": "Siroplar və toppinglər",
+    "flour_sugar": "Un, şəkər və qənnadı xammalı",
+    "spices": "Ədviyyat və qarışıqlar",
+    "food_other": "Digər yeyinti məhsulları"
   },
   "cat": {
     "kitchen": "Mətbəx avadanlığı",
@@ -609,7 +619,8 @@
     "software": "Proqram təminatı",
     "training": "Təlim & Kurslar",
     "packaging": "Qablaşdırma",
-    "business_sale": "Biznes satışı"
+    "business_sale": "Biznes satışı",
+    "food_ingredients": "Yeyinti məhsulları"
   },
   "contact": {
     "title": "Bizimlə əlaqə",

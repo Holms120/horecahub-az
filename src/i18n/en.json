@@ -594,7 +594,17 @@
     "takeaway_sale": "Takeaway for sale",
     "franchise": "Franchise",
     "equipment_complex": "Equipment complex",
-    "other_business": "Other business"
+    "other_business": "Other business",
+    "coffee_beans": "Coffee beans / ground coffee",
+    "alternative_milk": "Alternative milk (oat, almond, soy)",
+    "matcha": "Matcha powder",
+    "chocolate_powder": "Chocolate powder & cocoa",
+    "salep": "Salep",
+    "chai_tea": "Chai tea & herbal teas",
+    "syrups_toppings": "Syrups & toppings",
+    "flour_sugar": "Flour, sugar & confectionery ingredients",
+    "spices": "Spices & blends",
+    "food_other": "Other food products"
   },
   "cat": {
     "kitchen": "Kitchen equipment",
@@ -609,7 +619,8 @@
     "software": "Software",
     "training": "Training & Courses",
     "packaging": "Packaging",
-    "business_sale": "Business for Sale"
+    "business_sale": "Business for Sale",
+    "food_ingredients": "Food & Ingredients"
   },
   "contact": {
     "title": "Contact us",
