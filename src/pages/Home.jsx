@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 
 const ICON_MAP = {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
-  LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap,
+  LayoutGrid, Wine, Users, Truck, ShieldCheck, Briefcase, Monitor, GraduationCap,
   Package, Store, ShoppingBasket,
   Shirt, Wrench, Printer, HardHat, Scale,
 }
