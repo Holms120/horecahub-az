@@ -693,5 +693,40 @@
     "followUs": "Follow us",
     "liveSupport": "Live support",
     "writeSupport": "Message support"
+  },
+  "support": {
+    "welcome": "Hello! Welcome to HorecaHub Support. How can I help you today?",
+    "selectQuestion": "Select one of the questions below:",
+    "askAnother": "I have another question",
+    "endChat": "End chat",
+    "closedMessage": "Chat ended. Start a new chat if you have another question.",
+    "openPrompt": "Write your question and an admin will respond as soon as possible.",
+    "inputPlaceholder": "Type your message...",
+    "faq": {
+      "1": {
+        "question": "How do I post a listing?",
+        "answer": "Click the \"Post listing\" button in the top right corner. Complete 5 steps: category → details → photos → price → review. Your listing will be reviewed by an admin."
+      },
+      "2": {
+        "question": "Why isn't my listing being approved?",
+        "answer": "Listings are usually reviewed within 24 hours. If rejected, you'll receive an email with the reason. Pay attention to photo quality, price, and description completeness."
+      },
+      "3": {
+        "question": "How do I register as a seller?",
+        "answer": "Create an account on the registration page. Enable the \"Supplier\" option in your profile. After that, you can post listings."
+      },
+      "4": {
+        "question": "How do I edit my listing?",
+        "answer": "Go to Profile → \"My listings\". Click the pencil icon next to the listing you want to edit."
+      },
+      "5": {
+        "question": "I have a problem with my account",
+        "answer": "Please describe your account problem below and an admin will respond as soon as possible."
+      },
+      "6": {
+        "question": "I have another question",
+        "answer": ""
+      }
+    }
   }
 }

@@ -710,5 +710,40 @@
     "maxPhotosReached": "Maksimum şəkil sayına çatılıb",
     "minPrice": "Qiymət ən azı ₼1 olmalıdır",
     "listingTitle": "Elan"
+  },
+  "support": {
+    "welcome": "Salam! HorecaHub Dəstək xidmətinə xoş gəldiniz. Sizə necə kömək edə bilərəm?",
+    "selectQuestion": "Aşağıdakı suallardan birini seçin:",
+    "askAnother": "Başqa sualım var",
+    "endChat": "Söhbəti bitir",
+    "closedMessage": "Söhbət tamamlandı. Yeni sual üçün yenidən Support-a müraciət edin.",
+    "openPrompt": "Sualınızı yazın, admin ən qısa zamanda cavab verəcək.",
+    "inputPlaceholder": "Mesajınızı yazın...",
+    "faq": {
+      "1": {
+        "question": "Elan necə yerləşdirirəm?",
+        "answer": "Saytın yuxarı sağ küncündəki \"Elan yerləşdir\" düyməsinə basın. 5 addımı tamamlayın: kateqoriya → detallar → şəkillər → qiymət → nəzərdən keçir. Elanınız admin tərəfindən təsdiqlənəcək."
+      },
+      "2": {
+        "question": "Elanım niyə təsdiqlənmir?",
+        "answer": "Elanlar adətən 24 saat ərzində yoxlanılır. Rədd edilərsə, e-poçtunuza səbəb göndərilir. Şəkil keyfiyyəti, qiymət və təsvirin dolğunluğuna diqqət edin."
+      },
+      "3": {
+        "question": "Satıcı kimi necə qeydiyyatdan keçirəm?",
+        "answer": "Qeydiyyat səhifəsindən hesab açın. Profil səhifənizdə \"Təchizatçı\" seçimini aktivləşdirin. Bundan sonra elan yerləşdirə bilərsiniz."
+      },
+      "4": {
+        "question": "Elanımı necə redaktə edirəm?",
+        "answer": "Profil → \"Mənim elanlarım\" bölməsinə keçin. Redaktə etmək istədiyiniz elanın yanındakı qalem ikonuna basın."
+      },
+      "5": {
+        "question": "Hesabımla bağlı problem var",
+        "answer": "Hesab probleminizi aşağıda ətraflı təsvir edin, admin ən qısa zamanda cavab verəcək."
+      },
+      "6": {
+        "question": "Başqa sualım var",
+        "answer": ""
+      }
+    }
   }
 }

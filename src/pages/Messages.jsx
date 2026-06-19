@@ -4,6 +4,7 @@ import { Send, ChevronLeft, MessageSquare, Inbox, Trash2, MoreVertical } from 'l
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import RelativeTime from '../components/RelativeTime'
+import SupportChat from '../components/SupportChat'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index.js'
 
@@ -596,107 +597,113 @@ export default function Messages() {
               )
             })()}
 
-            {/* Messages list */}
-            <div ref={threadRef} className="flex-1 overflow-y-auto p-4 space-y-1">
-              {grouped.map((item, i) => {
-                if (item._sep) {
-                  return (
-                    <div key={`sep-${i}`} className="flex items-center gap-3 py-3">
-                      <div className="flex-1 h-px bg-gray-100" />
-                      <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
-                        {dayLabel(item.date)}
-                      </span>
-                      <div className="flex-1 h-px bg-gray-100" />
+            {activeConv.listingId === null ? (
+              <SupportChat conv={activeConv} user={user} messages={messages} />
+            ) : (
+              <>
+                {/* Messages list */}
+                <div ref={threadRef} className="flex-1 overflow-y-auto p-4 space-y-1">
+                  {grouped.map((item, i) => {
+                    if (item._sep) {
+                      return (
+                        <div key={`sep-${i}`} className="flex items-center gap-3 py-3">
+                          <div className="flex-1 h-px bg-gray-100" />
+                          <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
+                            {dayLabel(item.date)}
+                          </span>
+                          <div className="flex-1 h-px bg-gray-100" />
+                        </div>
+                      )
+                    }
+
+                    const mine        = item.sender_id === user.id
+                    const isAdminMsg  = !mine && item.is_support === true
+                    const isDeleting  = deletingMsgId === item.id
+                    return (
+                      <div key={item.id}
+                        className={`group flex items-end gap-1 ${mine ? 'justify-end' : 'justify-start'}`}>
+
+                        {mine && !item._opt && (
+                          <button
+                            onClick={() => deleteMessage(item.id)}
+                            disabled={isDeleting}
+                            className="flex-shrink-0 p-1 rounded text-gray-300 hover:text-red-400 order-first"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+
+                        <div className={`
+                          max-w-[75%] px-4 py-2.5 rounded-2xl text-sm
+                          ${mine
+                            ? 'bg-blue-600 text-white rounded-br-sm'
+                            : isAdminMsg
+                              ? 'bg-green-50 border border-green-200 text-green-900 rounded-bl-sm'
+                              : 'bg-gray-100 text-navy rounded-bl-sm'}
+                          ${item._opt || isDeleting ? 'opacity-60' : ''}
+                        `}>
+                          {isAdminMsg && (
+                            <p className="text-[10px] font-bold text-green-600 mb-1">🛡 {t('messages.supportName')}</p>
+                          )}
+                          <p className="leading-relaxed break-words whitespace-pre-wrap">
+                            {item.content}
+                          </p>
+                          <p className={`text-[11px] mt-1 ${mine ? 'text-blue-200' : isAdminMsg ? 'text-green-500' : 'text-gray-400'}`}>
+                            <RelativeTime dateStr={item.created_at} />
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  {/* Typing indicator */}
+                  {otherTyping && (
+                    <div className="flex justify-start pt-1">
+                      <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-sm">
+                        <div className="flex gap-1 items-center h-3">
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: '0ms' }} />
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: '150ms' }} />
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                            style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
                     </div>
-                  )
-                }
+                  )}
+                </div>
 
-                const mine        = item.sender_id === user.id
-                const isAdminMsg  = !mine && item.is_support === true
-                const isDeleting  = deletingMsgId === item.id
-                return (
-                  <div key={item.id}
-                    className={`group flex items-end gap-1 ${mine ? 'justify-end' : 'justify-start'}`}>
-
-                    {mine && !item._opt && (
-                      <button
-                        onClick={() => deleteMessage(item.id)}
-                        disabled={isDeleting}
-                        className="flex-shrink-0 p-1 rounded text-gray-300 hover:text-red-400 order-first"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    )}
-
-                    <div className={`
-                      max-w-[75%] px-4 py-2.5 rounded-2xl text-sm
-                      ${mine
-                        ? 'bg-blue-600 text-white rounded-br-sm'
-                        : isAdminMsg
-                          ? 'bg-green-50 border border-green-200 text-green-900 rounded-bl-sm'
-                          : 'bg-gray-100 text-navy rounded-bl-sm'}
-                      ${item._opt || isDeleting ? 'opacity-60' : ''}
-                    `}>
-                      {isAdminMsg && (
-                        <p className="text-[10px] font-bold text-green-600 mb-1">🛡 {t('messages.supportName')}</p>
-                      )}
-                      <p className="leading-relaxed break-words whitespace-pre-wrap">
-                        {item.content}
-                      </p>
-                      <p className={`text-[11px] mt-1 ${mine ? 'text-blue-200' : isAdminMsg ? 'text-green-500' : 'text-gray-400'}`}>
-                        <RelativeTime dateStr={item.created_at} />
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-
-              {/* Typing indicator */}
-              {otherTyping && (
-                <div className="flex justify-start pt-1">
-                  <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-sm">
-                    <div className="flex gap-1 items-center h-3">
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: '300ms' }} />
-                    </div>
+                {/* Reply input */}
+                <div className="flex-shrink-0 border-t border-gray-100 p-3">
+                  <div className="flex gap-2 items-end">
+                    <textarea
+                      ref={textareaRef}
+                      value={replyText}
+                      onChange={handleTextareaChange}
+                      onKeyDown={handleKeyDown}
+                      disabled={sending}
+                      placeholder={t('messages.replyPlaceholder')}
+                      rows={2}
+                      className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm
+                        focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+                        resize-none disabled:opacity-60"
+                    />
+                    <button
+                      onClick={sendMessage}
+                      disabled={!replyText.trim() || sending}
+                      className="w-11 h-11 flex-shrink-0 bg-blue-600 text-white rounded-xl
+                        hover:bg-blue-700 disabled:opacity-50 transition-colors
+                        flex items-center justify-center"
+                    >
+                      {sending
+                        ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        : <Send size={18} />
+                      }
+                    </button>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* Reply input */}
-            <div className="flex-shrink-0 border-t border-gray-100 p-3">
-              <div className="flex gap-2 items-end">
-                <textarea
-                  ref={textareaRef}
-                  value={replyText}
-                  onChange={handleTextareaChange}
-                  onKeyDown={handleKeyDown}
-                  disabled={sending}
-                  placeholder={t('messages.replyPlaceholder')}
-                  rows={2}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm
-                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500
-                    resize-none disabled:opacity-60"
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!replyText.trim() || sending}
-                  className="w-11 h-11 flex-shrink-0 bg-blue-600 text-white rounded-xl
-                    hover:bg-blue-700 disabled:opacity-50 transition-colors
-                    flex items-center justify-center"
-                >
-                  {sending
-                    ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    : <Send size={18} />
-                  }
-                </button>
-              </div>
-            </div>
+              </>
+            )}
           </>
         )}
       </section>
