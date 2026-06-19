@@ -21,16 +21,24 @@ const ICON_MAP = {
   Shirt, Wrench, Printer, HardHat, Scale,
 }
 
-const CAT_COLORS = [
-  'bg-orange-50 text-orange-600 border-orange-100',
-  'bg-amber-50 text-amber-700 border-amber-100',
-  'bg-blue-50 text-blue-600 border-blue-100',
-  'bg-purple-50 text-purple-600 border-purple-100',
-  'bg-emerald-50 text-emerald-600 border-emerald-100',
-  'bg-pink-50 text-pink-600 border-pink-100',
-  'bg-indigo-50 text-indigo-600 border-indigo-100',
-  'bg-teal-50 text-teal-600 border-teal-100',
-]
+const CAT_COLORS = {
+  kitchen:          'bg-orange-50 text-orange-600 border-orange-100',
+  coffee:           'bg-amber-50 text-amber-700 border-amber-100',
+  cold:             'bg-blue-50 text-blue-600 border-blue-100',
+  service:          'bg-purple-50 text-purple-600 border-purple-100',
+  furniture:        'bg-emerald-50 text-emerald-600 border-emerald-100',
+  tableware:        'bg-pink-50 text-pink-600 border-pink-100',
+  packaging:        'bg-indigo-50 text-indigo-600 border-indigo-100',
+  business_sale:    'bg-teal-50 text-teal-600 border-teal-100',
+  food_ingredients: 'bg-lime-50 text-lime-600 border-lime-100',
+  hygiene:          'bg-cyan-50 text-cyan-600 border-cyan-100',
+  alcohol:          'bg-violet-50 text-violet-600 border-violet-100',
+  textile:          'bg-rose-50 text-rose-600 border-rose-100',
+  maintenance:      'bg-orange-50 text-orange-600 border-orange-100',
+  print_ads:        'bg-indigo-50 text-indigo-600 border-indigo-100',
+  construction:     'bg-yellow-50 text-yellow-600 border-yellow-100',
+  legal_finance:    'bg-teal-50 text-teal-600 border-teal-100',
+}
 
 export default function Home() {
   const { t, i18n } = useTranslation()
@@ -162,17 +170,22 @@ export default function Home() {
               {t('home.viewAll')} <ArrowRight size={15} />
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
             {CATEGORIES.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
+              const color = CAT_COLORS[cat.id] || 'bg-gray-50 text-gray-600 border-gray-100'
               return (
                 <button
                   key={cat.id}
                   onClick={() => navigate(`/listings?category=${cat.id}`)}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border hover:border-blue-400 hover:shadow-sm transition-all duration-150 ${CAT_COLORS[i]}`}
+                  className={`${i >= 8 ? 'hidden sm:flex' : 'flex'} flex-col items-center gap-1 sm:gap-2 p-2 sm:p-4 rounded-xl border hover:border-blue-400 hover:shadow-sm transition-all duration-150 ${color}`}
                 >
-                  {Icon && <Icon size={24} />}
-                  <span className="text-xs font-semibold text-center leading-tight text-navy">
+                  {Icon && (
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 flex items-center justify-center">
+                      <Icon className="w-full h-full" />
+                    </div>
+                  )}
+                  <span className="text-[10px] sm:text-xs font-semibold text-center leading-tight text-navy">
                     {t(cat.key) || cat.label}
                   </span>
                 </button>
