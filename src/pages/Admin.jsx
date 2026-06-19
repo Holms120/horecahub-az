@@ -357,15 +357,20 @@ function ModerationTab({ adminId }) {
 
       const { data: userData } = await supabase
         .from('profiles')
-        .select('email, full_name')
+        .select('full_name')
         .eq('id', rejectModal.user_id)
         .single()
 
-      console.log('Sending rejection email to:', userData?.email)
+      const { data: authUser } = await supabase.auth.admin.getUserById(rejectModal.user_id)
+
+      const userEmail = authUser?.user?.email
+      const userName = userData?.full_name
+
+      console.log('Sending rejection email to:', userEmail)
       const invokeResult = await supabase.functions.invoke('send-rejection-email', {
         body: {
-          to: userData?.email,
-          name: userData?.full_name,
+          to: userEmail,
+          name: userName,
           title: rejectModal.title,
           reason: rejectReason || null,
         },
