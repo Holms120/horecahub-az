@@ -361,16 +361,16 @@ function ModerationTab({ adminId }) {
         .eq('id', rejectModal.user_id)
         .single()
 
-      if (userData?.email) {
-        await supabase.functions.invoke('send-rejection-email', {
-          body: {
-            to: userData.email,
-            name: userData.full_name,
-            title: rejectModal.title,
-            reason: rejectReason || null,
-          },
-        })
-      }
+      console.log('Sending rejection email to:', userData?.email)
+      const invokeResult = await supabase.functions.invoke('send-rejection-email', {
+        body: {
+          to: userData?.email,
+          name: userData?.full_name,
+          title: rejectModal.title,
+          reason: rejectReason || null,
+        },
+      })
+      console.log('Invoke result:', invokeResult)
 
       setListings(ls => ls.filter(l => l.id !== rejectModal.id))
     }
