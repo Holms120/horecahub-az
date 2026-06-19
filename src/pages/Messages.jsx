@@ -19,8 +19,8 @@ function dayLabel(iso) {
   const d    = new Date(iso)
   const now  = new Date()
   const yest = new Date(now); yest.setDate(now.getDate() - 1)
-  if (d.toDateString() === now.toDateString())  return 'Bu gün'
-  if (d.toDateString() === yest.toDateString()) return 'Dünən'
+  if (d.toDateString() === now.toDateString())  return i18n.t('messages.today')
+  if (d.toDateString() === yest.toDateString()) return i18n.t('messages.yesterday')
   return d.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })
 }
 
@@ -460,7 +460,7 @@ export default function Messages() {
           {conversations.map(conv => {
             const other      = profiles[conv.otherId]
             const isSupport  = conv.listingId === null
-            const name       = isSupport ? 'HorecaHub Dəstək' : sellerName(other)
+            const name       = isSupport ? t('messages.supportName') : sellerName(other)
             const isActive   = activeConv?.key === conv.key
             const last       = conv.lastMsg
             const isMine     = last.sender_id === user.id
@@ -505,7 +505,7 @@ export default function Messages() {
                           className="text-xs text-gray-400 flex-shrink-0 ml-2" />
                       </div>
                       <p className={`text-xs font-medium truncate mb-0.5 ${isSupport ? 'text-green-600' : 'text-blue-600'}`}>
-                        {isSupport ? 'Dəstək xidməti' : conv.listingTitle}
+                        {isSupport ? t('messages.supportService') : conv.listingTitle}
                       </p>
                       <p className={`text-xs truncate ${hasUnread ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
                         {isMine && <span className="text-gray-400">{t('messages.you')} </span>}
@@ -539,7 +539,7 @@ export default function Messages() {
                           className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                         >
                           <Trash2 size={14} />
-                          Söhbəti sil
+                          {t('messages.deleteConv')}
                         </button>
                       </div>
                     </>
@@ -577,14 +577,14 @@ export default function Messages() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className={`font-semibold text-sm truncate ${convIsSupport ? 'text-green-700' : 'text-navy'}`}>
-                        {convIsSupport ? '🛡 HorecaHub Dəstək' : sellerName(profiles[activeConv.otherId])}
+                        {convIsSupport ? `🛡 ${t('messages.supportName')}` : sellerName(profiles[activeConv.otherId])}
                       </p>
                       {!convIsSupport && otherOnline && (
                         <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
                       )}
                     </div>
                     {convIsSupport ? (
-                      <p className="text-xs text-green-600 font-medium">Dəstək xidməti</p>
+                      <p className="text-xs text-green-600 font-medium">{t('messages.supportService')}</p>
                     ) : (
                       <Link to={`/listings/${activeConv.listingId}`}
                         className="text-xs text-blue-600 hover:underline truncate block">
@@ -638,7 +638,7 @@ export default function Messages() {
                       ${item._opt || isDeleting ? 'opacity-60' : ''}
                     `}>
                       {isAdminMsg && (
-                        <p className="text-[10px] font-bold text-green-600 mb-1">🛡 HorecaHub Dəstək</p>
+                        <p className="text-[10px] font-bold text-green-600 mb-1">🛡 {t('messages.supportName')}</p>
                       )}
                       <p className="leading-relaxed break-words whitespace-pre-wrap">
                         {item.content}
@@ -705,9 +705,9 @@ export default function Messages() {
       {confirmDeleteConv && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-navy mb-2">Söhbəti sil</h3>
+            <h3 className="text-lg font-bold text-navy mb-2">{t('messages.deleteConvTitle')}</h3>
             <p className="text-sm text-gray-600 mb-6">
-              Bu söhbəti silmək istəyirsiniz? Bütün mesajlar silinəcək və bu əməliyyat geri qaytarıla bilməz.
+              {t('messages.deleteConvDesc')}
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -715,7 +715,7 @@ export default function Messages() {
                 disabled={deletingConv}
                 className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
               >
-                Ləğv et
+                {t('messages.cancel')}
               </button>
               <button
                 onClick={() => deleteConversation(confirmDeleteConv)}
@@ -723,7 +723,7 @@ export default function Messages() {
                 className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {deletingConv && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                Sil
+                {t('messages.delete')}
               </button>
             </div>
           </div>

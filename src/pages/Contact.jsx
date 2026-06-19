@@ -125,8 +125,8 @@ export default function Contact() {
                   : <MessageCircle size={22} />}
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Canlı dəstək</p>
-                <p className="text-base font-semibold text-navy">Supporta yaz</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">{t('contact.liveSupport')}</p>
+                <p className="text-base font-semibold text-navy">{t('contact.writeSupport')}</p>
               </div>
             </button>
           </div>

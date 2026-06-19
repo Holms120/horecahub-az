@@ -389,7 +389,16 @@
     "you": "Siz:",
     "selectConversation": "Söhbəti açmaq üçün sol tərəfdən seçin",
     "replyPlaceholder": "Mesaj yazın... (Enter ilə göndərin)",
-    "unknownUser": "İstifadəçi"
+    "unknownUser": "İstifadəçi",
+    "today": "Bu gün",
+    "yesterday": "Dünən",
+    "deleteConv": "Söhbəti sil",
+    "deleteConvTitle": "Söhbəti sil",
+    "deleteConvDesc": "Bu söhbəti silmək istəyirsiniz? Bütün mesajlar silinəcək və bu əməliyyat geri qaytarıla bilməz.",
+    "cancel": "Ləğv et",
+    "delete": "Sil",
+    "supportName": "HorecaHub Dəstək",
+    "supportService": "Dəstək xidməti"
   },
   "notFound": {
     "code": "404",
@@ -679,8 +688,27 @@
     "instagram": "Instagram",
     "facebook": "Facebook",
     "address": "Ünvan",
-    
     "callUs": "Zəng edin",
-    "followUs": "Bizi izləyin"
+    "followUs": "Bizi izləyin",
+    "liveSupport": "Canlı dəstək",
+    "writeSupport": "Supporta yaz"
+  },
+  "common": {
+    "callBtn": "Zəng et",
+    "linkCopied": "Link kopyalandı!",
+    "pendingBadge": "Gözləmədə",
+    "views": "baxış",
+    "listings": "elan",
+    "unknownUser": "İstifadəçi"
+  },
+  "editListing": {
+    "title": "Elanı redaktə et",
+    "updated": "Elan yeniləndi!",
+    "redirecting": "Elan səhifəsinə yönləndirilirsiniz...",
+    "existingPhotos": "Mövcud şəkillər",
+    "newPhotos": "Yeni şəkillər",
+    "maxPhotosReached": "Maksimum şəkil sayına çatılıb",
+    "minPrice": "Qiymət ən azı ₼1 olmalıdır",
+    "listingTitle": "Elan"
   }
 }

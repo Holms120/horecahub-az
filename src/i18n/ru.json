@@ -389,7 +389,16 @@
     "you": "Вы:",
     "selectConversation": "Выберите диалог слева",
     "replyPlaceholder": "Написать сообщение... (Enter для отправки)",
-    "unknownUser": "Пользователь"
+    "unknownUser": "Пользователь",
+    "today": "Сегодня",
+    "yesterday": "Вчера",
+    "deleteConv": "Удалить диалог",
+    "deleteConvTitle": "Удалить диалог",
+    "deleteConvDesc": "Вы уверены, что хотите удалить этот диалог? Все сообщения будут удалены, и это действие нельзя отменить.",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "supportName": "Поддержка HorecaHub",
+    "supportService": "Служба поддержки"
   },
   "notFound": {
     "code": "404",
@@ -681,6 +690,8 @@
     "address": "Адрес",
     "addressValue": "Сумгайыт, Азербайджан",
     "callUs": "Позвоните нам",
-    "followUs": "Следите за нами"
+    "followUs": "Следите за нами",
+    "liveSupport": "Живая поддержка",
+    "writeSupport": "Написать в поддержку"
   }
 }
