@@ -354,6 +354,24 @@ function ModerationTab({ adminId }) {
         content: `❌ "${rejectModal.title}" adlı elanınız rədd edildi.${rejectReason ? ` Səbəb: ${rejectReason}` : ''}`,
         is_support: true,
       })
+
+      const { data: userData } = await supabase
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', rejectModal.user_id)
+        .single()
+
+      if (userData?.email) {
+        await supabase.functions.invoke('send-rejection-email', {
+          body: {
+            to: userData.email,
+            name: userData.full_name,
+            title: rejectModal.title,
+            reason: rejectReason || null,
+          },
+        })
+      }
+
       setListings(ls => ls.filter(l => l.id !== rejectModal.id))
     }
     setProcessing(null)
