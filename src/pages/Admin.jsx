@@ -5,7 +5,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle,
+  ChevronDown, ChevronUp, Check, XCircle, Tag,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -1316,6 +1316,268 @@ function SettingsTab() {
   )
 }
 
+/* ─── Categories Tab ───────────────────────────────────── */
+function CategoriesTab() {
+  const [cats, setCats] = useState([])
+  const [subs, setSubs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedCat, setSelectedCat] = useState(null)
+  const [modal, setModal] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  async function load() {
+    setLoading(true)
+    const [{ data: c }, { data: s }] = await Promise.all([
+      supabase.from('categories').select('*').order('sort_order'),
+      supabase.from('subcategories').select('*').order('sort_order'),
+    ])
+    setCats(c || [])
+    setSubs(s || [])
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [])
+
+  async function toggleCat(id, val) {
+    await supabase.from('categories').update({ is_active: !val }).eq('id', id)
+    setCats(prev => prev.map(x => x.id === id ? { ...x, is_active: !val } : x))
+  }
+  async function toggleSub(id, val) {
+    await supabase.from('subcategories').update({ is_active: !val }).eq('id', id)
+    setSubs(prev => prev.map(x => x.id === id ? { ...x, is_active: !val } : x))
+  }
+  async function deleteCat(id) {
+    if (!window.confirm('Kateqoriyanı silmək istədiyinizə əminsiniz? Alt kateqoriyalar da silinəcək.')) return
+    await supabase.from('subcategories').delete().eq('category_id', id)
+    await supabase.from('categories').delete().eq('id', id)
+    setCats(prev => prev.filter(x => x.id !== id))
+    setSubs(prev => prev.filter(x => x.category_id !== id))
+    if (selectedCat === id) setSelectedCat(null)
+  }
+  async function deleteSub(id) {
+    if (!window.confirm('Alt kateqoriyanı silmək istədiyinizə əminsiniz?')) return
+    await supabase.from('subcategories').delete().eq('id', id)
+    setSubs(prev => prev.filter(x => x.id !== id))
+  }
+
+  async function saveModal() {
+    if (!modal) return
+    setSaving(true)
+    const { mode, data } = modal
+    if (mode === 'cat_add') {
+      const { error } = await supabase.from('categories').insert({
+        id: data.id, key: `cat.${data.id}`, label: data.label,
+        icon: data.icon || '', sort_order: Number(data.sort_order) || 99, is_active: true,
+      })
+      if (!error) { await load(); setModal(null) }
+    } else if (mode === 'cat_edit') {
+      const { error } = await supabase.from('categories').update({
+        label: data.label, icon: data.icon || '', sort_order: Number(data.sort_order) || 0,
+      }).eq('id', data.id)
+      if (!error) { await load(); setModal(null) }
+    } else if (mode === 'sub_add') {
+      const { error } = await supabase.from('subcategories').insert({
+        id: data.id, category_id: data.category_id,
+        key: `subcat.${data.id}`, label: data.label,
+        sort_order: Number(data.sort_order) || 99, is_active: true,
+      })
+      if (!error) { await load(); setModal(null) }
+    } else if (mode === 'sub_edit') {
+      const { error } = await supabase.from('subcategories').update({
+        label: data.label, sort_order: Number(data.sort_order) || 0,
+      }).eq('id', data.id)
+      if (!error) { await load(); setModal(null) }
+    }
+    setSaving(false)
+  }
+
+  const catSubs = subs.filter(s => s.category_id === selectedCat)
+
+  if (loading) return <Spinner />
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-[#0A2342]">Kateqoriyalar</h2>
+        <button
+          onClick={() => setModal({ mode: 'cat_add', data: { id: '', label: '', icon: '', sort_order: '' } })}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700"
+        >
+          <Tag size={14} /> Yeni kateqoriya
+        </button>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+            <tr>
+              <th className="px-4 py-3 text-left">ID</th>
+              <th className="px-4 py-3 text-left">Adı</th>
+              <th className="px-4 py-3 text-left">İkon</th>
+              <th className="px-4 py-3 text-center">Sıra</th>
+              <th className="px-4 py-3 text-center">Aktiv</th>
+              <th className="px-4 py-3 text-center">Əməliyyat</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {cats.map(cat => (
+              <tr
+                key={cat.id}
+                onClick={() => setSelectedCat(selectedCat === cat.id ? null : cat.id)}
+                className={`hover:bg-gray-50 cursor-pointer ${selectedCat === cat.id ? 'bg-blue-50' : ''}`}
+              >
+                <td className="px-4 py-3 font-mono text-xs text-gray-500">{cat.id}</td>
+                <td className="px-4 py-3 font-medium text-gray-800">{cat.label}</td>
+                <td className="px-4 py-3 text-gray-500">{cat.icon}</td>
+                <td className="px-4 py-3 text-center text-gray-500">{cat.sort_order}</td>
+                <td className="px-4 py-3 text-center">
+                  <button
+                    onClick={e => { e.stopPropagation(); toggleCat(cat.id, cat.is_active) }}
+                    className={`w-9 h-5 rounded-full transition-colors relative ${cat.is_active ? 'bg-blue-600' : 'bg-gray-200'}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${cat.is_active ? 'translate-x-4' : ''}`} />
+                  </button>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <div className="flex items-center justify-center gap-2" onClick={e => e.stopPropagation()}>
+                    <button onClick={() => setModal({ mode: 'cat_edit', data: { ...cat } })}
+                      className="text-xs text-blue-600 hover:underline">Düzəlt</button>
+                    <button onClick={() => deleteCat(cat.id)}
+                      className="text-xs text-red-500 hover:underline">Sil</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {selectedCat && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-bold text-[#0A2342]">
+              Alt kateqoriyalar — <span className="text-blue-600">{selectedCat}</span>
+            </h3>
+            <button
+              onClick={() => setModal({ mode: 'sub_add', data: { id: '', label: '', sort_order: '', category_id: selectedCat } })}
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700"
+            >
+              <Tag size={12} /> Yeni alt kateqoriya
+            </button>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+                <tr>
+                  <th className="px-4 py-3 text-left">ID</th>
+                  <th className="px-4 py-3 text-left">Adı</th>
+                  <th className="px-4 py-3 text-center">Sıra</th>
+                  <th className="px-4 py-3 text-center">Aktiv</th>
+                  <th className="px-4 py-3 text-center">Əməliyyat</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {catSubs.length === 0 ? (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-sm">Alt kateqoriya yoxdur</td></tr>
+                ) : catSubs.map(sub => (
+                  <tr key={sub.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono text-xs text-gray-500">{sub.id}</td>
+                    <td className="px-4 py-3 font-medium text-gray-800">{sub.label}</td>
+                    <td className="px-4 py-3 text-center text-gray-500">{sub.sort_order}</td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => toggleSub(sub.id, sub.is_active)}
+                        className={`w-9 h-5 rounded-full transition-colors relative ${sub.is_active ? 'bg-blue-600' : 'bg-gray-200'}`}
+                      >
+                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${sub.is_active ? 'translate-x-4' : ''}`} />
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button onClick={() => setModal({ mode: 'sub_edit', data: { ...sub } })}
+                          className="text-xs text-blue-600 hover:underline">Düzəlt</button>
+                        <button onClick={() => deleteSub(sub.id)}
+                          className="text-xs text-red-500 hover:underline">Sil</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {modal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-bold text-[#0A2342]">
+                {modal.mode === 'cat_add' && 'Yeni kateqoriya'}
+                {modal.mode === 'cat_edit' && 'Kateqoriyanı düzəlt'}
+                {modal.mode === 'sub_add' && 'Yeni alt kateqoriya'}
+                {modal.mode === 'sub_edit' && 'Alt kateqoriyanı düzəlt'}
+              </h3>
+              <button onClick={() => setModal(null)} className="p-1 text-gray-400 hover:text-gray-600"><X size={18} /></button>
+            </div>
+            <div className="space-y-4">
+              {(modal.mode === 'cat_add' || modal.mode === 'sub_add') && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">ID (sonradan dəyişdirilə bilməz)</label>
+                  <input
+                    value={modal.data.id}
+                    onChange={e => setModal(m => ({ ...m, data: { ...m.data, id: e.target.value } }))}
+                    placeholder="məs: new_category"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Ad</label>
+                <input
+                  value={modal.data.label}
+                  onChange={e => setModal(m => ({ ...m, data: { ...m.data, label: e.target.value } }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              {(modal.mode === 'cat_add' || modal.mode === 'cat_edit') && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">İkon adı (lucide-react)</label>
+                  <input
+                    value={modal.data.icon || ''}
+                    onChange={e => setModal(m => ({ ...m, data: { ...m.data, icon: e.target.value } }))}
+                    placeholder="məs: Coffee"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Sıra nömrəsi</label>
+                <input
+                  type="number"
+                  value={modal.data.sort_order}
+                  onChange={e => setModal(m => ({ ...m, data: { ...m.data, sort_order: e.target.value } }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end mt-6">
+              <button onClick={() => setModal(null)} className="px-4 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50">Ləğv et</button>
+              <button
+                onClick={saveModal}
+                disabled={saving || !modal.data.label}
+                className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50"
+              >
+                {saving ? 'Saxlanılır...' : 'Saxla'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ─── Main Admin ────────────────────────────────────────── */
 const TABS = [
   { id: 'dashboard',  label: 'Ümumi',        icon: LayoutDashboard },
@@ -1323,7 +1585,8 @@ const TABS = [
   { id: 'listings',   label: 'Elanlar',       icon: List },
   { id: 'users',      label: 'İstifadəçilər', icon: Users },
   { id: 'support',    label: 'Support',       icon: MessageSquare },
-  { id: 'analytics',  label: 'Analitika',     icon: BarChart2 },
+  { id: 'analytics',   label: 'Analitika',      icon: BarChart2 },
+  { id: 'categories', label: 'Kateqoriyalar', icon: Tag },
   { id: 'settings',   label: 'Ayarlar',       icon: Settings },
 ]
 
@@ -1447,8 +1710,9 @@ export default function Admin() {
         {tab === 'listings'   && <ListingsTab   adminId={adminId} />}
         {tab === 'users'      && <UsersTab      adminId={adminId} />}
         {tab === 'support'    && <SupportTab    adminId={adminId} />}
-        {tab === 'analytics'  && <AnalyticsTab />}
-        {tab === 'settings'   && <SettingsTab />}
+        {tab === 'analytics'   && <AnalyticsTab />}
+        {tab === 'categories'  && <CategoriesTab />}
+        {tab === 'settings'    && <SettingsTab />}
       </main>
     </div>
   )

@@ -8,12 +8,13 @@ import {
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
+import { CITIES } from '../data/mockData'
+import { useCategories } from '../hooks/useCategories'
 import { useTranslation } from 'react-i18next'
 
 const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap, Package, Store, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale }
 
-const NO_CONDITION_CATEGORIES = [
+const NO_CONDITION_categories = [
   'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
   'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
 ]
@@ -71,6 +72,7 @@ export default function AddListing() {
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState(null)
+  const { categories, subcategories } = useCategories()
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -115,7 +117,7 @@ export default function AddListing() {
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
   useEffect(() => {
-    if (NO_CONDITION_CATEGORIES.includes(form.category)) {
+    if (NO_CONDITION_categories.includes(form.category)) {
       setForm(f => ({ ...f, condition: 'Yeni' }))
     }
   }, [form.category])
@@ -175,7 +177,7 @@ export default function AddListing() {
     if (step === 1) {
       if (strip(form.title).length < 5) e.title = t('addListing.errTitle')
       if (!form.city) e.city = t('addListing.errCity')
-      if (!NO_CONDITION_CATEGORIES.includes(form.category) && !form.condition) e.condition = t('addListing.errCondition')
+      if (!NO_CONDITION_categories.includes(form.category) && !form.condition) e.condition = t('addListing.errCondition')
       if (form.category === 'staff') {
         if (!form.experienceYears) e.experienceYears = t('addListing.errExp')
         if (form.listingType === 'cv' && strip(form.bio).length < 20)
@@ -203,7 +205,7 @@ export default function AddListing() {
     if (step === 0) {
       if (!form.category) return false
       if (form.category === 'suppliers' && userProfile && userProfile.account_type !== 'supplier') return false
-      const subs = SUBCATEGORIES[form.category]
+      const subs = subcategories[form.category]
       if (subs?.length && !form.subcategory) return false
       return true
     }
@@ -328,7 +330,7 @@ export default function AddListing() {
           <div>
             <h2 className="text-lg font-bold text-navy mb-6">{t('addListing.selectCategory')}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {CATEGORIES.map(cat => {
+              {categories.map(cat => {
                 const Icon = ICON_MAP[cat.icon]
                 return (
                   <button key={cat.id} type="button"
@@ -346,11 +348,11 @@ export default function AddListing() {
             </div>
 
             {/* Subcategory selector */}
-            {form.category && SUBCATEGORIES[form.category]?.length > 0 && (
+            {form.category && subcategories[form.category]?.length > 0 && (
               <div className="mt-5 pt-5 border-t border-gray-100">
                 <h3 className="text-sm font-semibold text-navy mb-3">{t('addListing.subcategory')}</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {SUBCATEGORIES[form.category].map(sub => (
+                  {subcategories[form.category].map(sub => (
                     <button
                       key={sub.id}
                       type="button"
@@ -359,7 +361,7 @@ export default function AddListing() {
                         subcategory:     sub.id,
                         otherDescription: '',
                         ...(['staff', 'consulting', 'software', 'training', 'business_sale'].includes(f.category)
-                          ? { title: SUBCATEGORIES[f.category]?.find(s => s.id === sub.id)?.label || '' }
+                          ? { title: subcategories[f.category]?.find(s => s.id === sub.id)?.label || '' }
                           : {}),
                       }))}
                       className={`text-left px-3 py-2.5 rounded-xl border-2 text-sm transition-all ${
@@ -449,7 +451,7 @@ export default function AddListing() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none" />
               </div>
             )}
-            {!NO_CONDITION_CATEGORIES.includes(form.category) && (
+            {!NO_CONDITION_categories.includes(form.category) && (
               <div>
                 <label className="block text-sm font-medium text-navy mb-2">{t('addListing.condition')}</label>
                 <div className="flex gap-3">
@@ -726,9 +728,9 @@ export default function AddListing() {
             )}
             <div className="divide-y divide-gray-100">
               {[
-                { label: t('addListing.reviewCategory'),    value: (() => { const c = CATEGORIES.find(c => c.id === form.category); return c ? (t(c.key) || c.label) : '—' })() },
-                ...(SUBCATEGORIES[form.category]?.length > 0
-                  ? [{ label: t('addListing.reviewSubcategory'), value: (() => { const s = SUBCATEGORIES[form.category]?.find(s => s.id === form.subcategory); return s ? (t(s.key) || s.label) : '—' })() }]
+                { label: t('addListing.reviewCategory'),    value: (() => { const c = categories.find(c => c.id === form.category); return c ? (t(c.key) || c.label) : '—' })() },
+                ...(subcategories[form.category]?.length > 0
+                  ? [{ label: t('addListing.reviewSubcategory'), value: (() => { const s = subcategories[form.category]?.find(s => s.id === form.subcategory); return s ? (t(s.key) || s.label) : '—' })() }]
                   : []
                 ),
                 { label: t('addListing.reviewTitle2'),      value: strip(form.title) || '—' },

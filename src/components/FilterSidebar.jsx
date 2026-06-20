@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
+import { CITIES } from '../data/mockData'
+import { useCategories } from '../hooks/useCategories'
 import { supabase } from '../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
@@ -22,6 +23,7 @@ function Section({ title, children }) {
 
 export default function FilterSidebar({ filters, onChange, onClear }) {
   const { t } = useTranslation()
+  const { categories, subcategories } = useCategories()
   const [categoryCounts, setCategoryCounts] = useState({})
 
   const PAYMENT_OPTS = [
@@ -97,7 +99,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
               />
               <span className="text-sm text-gray-700">{t('filter.all')}</span>
             </label>
-            {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map(cat => (
+            {categories.filter(c => !['staff', 'suppliers'].includes(c.id)).map(cat => (
               <label key={cat.id} className="flex items-center justify-between cursor-pointer group">
                 <div className="flex items-center gap-2">
                   <input
@@ -120,10 +122,10 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
       )}
 
       {/* Subcategory filter — shown when a category with subcategories is selected */}
-      {filters.category && SUBCATEGORIES[filters.category]?.length > 0 && (
+      {filters.category && subcategories[filters.category]?.length > 0 && (
         <Section title={t('filter.subcategory')}>
           <div className="space-y-1.5">
-            {SUBCATEGORIES[filters.category].map(sub => (
+            {subcategories[filters.category].map(sub => (
               <label key={sub.id} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"

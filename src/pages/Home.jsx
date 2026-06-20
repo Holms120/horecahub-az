@@ -8,7 +8,7 @@ import {
   Package, Store, ShoppingBasket,
   Shirt, Wrench, Printer, HardHat, Scale
 } from 'lucide-react'
-import { CATEGORIES } from '../data/mockData'
+import { useCategories } from '../hooks/useCategories'
 import { supabase } from '../supabaseClient'
 import { normalizeListing } from '../lib/normalize'
 import ListingCard from '../components/ListingCard'
@@ -48,6 +48,7 @@ export default function Home() {
   const [loadingListings, setLoadingListings] = useState(true)
   const [stats, setStats] = useState({ listings: 0, sellers: 0 })
   const navigate = useNavigate()
+  const { categories } = useCategories()
 
   const trustItems = [
     { Icon: ShieldCheck, color: 'bg-green-50 text-green-600', title: t('home.verified'), desc: t('home.verifiedDesc') },
@@ -122,7 +123,7 @@ export default function Home() {
               className="sm:w-44 flex-shrink-0 px-3 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
             >
               <option value="">{t('hero.allCategories')}</option>
-              {CATEGORIES.filter(c => !['staff', 'suppliers'].includes(c.id)).map(c => (
+              {categories.filter(c => !['staff', 'suppliers'].includes(c.id)).map(c => (
                 <option key={c.id} value={c.id}>{t(c.key) || c.label}</option>
               ))}
             </select>
@@ -153,12 +154,12 @@ export default function Home() {
             <span className="w-px h-4 bg-blue-500" />
             <span><strong className="text-white text-lg">{stats.sellers}</strong> {t('hero.sellers')}</span>
             <span className="w-px h-4 bg-blue-500" />
-            <span><strong className="text-white text-lg">{CATEGORIES.length}</strong> {t('hero.categories')}</span>
+            <span><strong className="text-white text-lg">{categories.length}</strong> {t('hero.categories')}</span>
           </div>
         </div>
       </section>
 
-      {/* ── CATEGORIES ── */}
+      {/* ── categories ── */}
       <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
@@ -171,7 +172,7 @@ export default function Home() {
             </button>
           </div>
           <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-            {CATEGORIES.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).map((cat, i) => {
+            {categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
               const color = CAT_COLORS[cat.id] || 'bg-gray-50 text-gray-600 border-gray-100'
               return (

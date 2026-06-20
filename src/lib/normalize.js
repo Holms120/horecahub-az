@@ -1,5 +1,3 @@
-import { CATEGORIES, SUBCATEGORIES } from '../data/mockData'
-
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80'
 
 const STAFF_PLACEHOLDERS = {
@@ -41,10 +39,10 @@ export function normalizeListing(row) {
     city: row.city || '',
     createdAt: row.created_at ? String(row.created_at).trim() : '',
     category: row.category || '',
-    categoryKey:   CATEGORIES.find(c => c.id === row.category)?.key   || '',
-    categoryLabel: CATEGORIES.find(c => c.id === row.category)?.label || row.category || '',
-    subcategory: row.subcategory || '',
-    subcategoryLabel: SUBCATEGORIES[row.category]?.find(s => s.id === row.subcategory)?.label || '',
+    categoryKey:      row.category    ? `cat.${row.category}`     : '',
+    categoryLabel:    row.category    || '',
+    subcategory:      row.subcategory || '',
+    subcategoryLabel: row.subcategory || '',
     otherDescription: row.other_description || '',
     listingType:    row.listing_type ?? 'item',
     experienceYears: row.experience_years || '',

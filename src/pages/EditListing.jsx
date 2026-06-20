@@ -9,12 +9,13 @@ import {
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import { CATEGORIES, CITIES, SUBCATEGORIES } from '../data/mockData'
+import { CITIES } from '../data/mockData'
+import { useCategories } from '../hooks/useCategories'
 import { useTranslation } from 'react-i18next'
 
 const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale }
 
-const NO_CONDITION_CATEGORIES = [
+const NO_CONDITION_categories = [
   'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
   'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
 ]
@@ -41,6 +42,7 @@ export default function EditListing() {
     { value: 'order',  label: t('addListing.order') },
   ]
 
+  const { categories, subcategories } = useCategories()
   const [form, setForm]             = useState(EMPTY_FORM)
   const [existingImages, setExistingImages] = useState([])
   const [newFiles, setNewFiles]     = useState([])
@@ -58,7 +60,7 @@ export default function EditListing() {
   function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
 
   useEffect(() => {
-    if (NO_CONDITION_CATEGORIES.includes(form.category)) {
+    if (NO_CONDITION_categories.includes(form.category)) {
       setForm(f => ({ ...f, condition: 'Yeni' }))
     }
   }, [form.category])
@@ -141,7 +143,7 @@ export default function EditListing() {
     e.preventDefault()
     const fe = {}
     if (!form.category)                                                       fe.category       = t('addListing.selectCategory')
-    if (SUBCATEGORIES[form.category]?.length > 0 && !form.subcategory)       fe.subcategory    = t('addListing.subcategory').replace(' *','')
+    if (subcategories[form.category]?.length > 0 && !form.subcategory)       fe.subcategory    = t('addListing.subcategory').replace(' *','')
     if (strip(form.title).length < 5)                                         fe.title          = t('addListing.errTitle')
     if (!form.city)                                                            fe.city           = t('addListing.errCity')
     if (Number(form.price) < 1)                                               fe.price          = form.category === 'staff' ? t('addListing.errSalary') : t('addListing.errPrice')
@@ -241,7 +243,7 @@ export default function EditListing() {
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <h2 className="text-sm font-semibold text-navy mb-4">{t('filter.category')} *</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {CATEGORIES.map(cat => {
+            {categories.map(cat => {
               const Icon = ICON_MAP[cat.icon]
               return (
                 <button
@@ -262,11 +264,11 @@ export default function EditListing() {
           </div>
 
           {/* Subcategory selector */}
-          {form.category && SUBCATEGORIES[form.category]?.length > 0 && (
+          {form.category && subcategories[form.category]?.length > 0 && (
             <div className="mt-5 pt-5 border-t border-gray-100">
               <h3 className="text-sm font-semibold text-navy mb-3">{t('addListing.subcategory')}</h3>
               <div className="grid grid-cols-2 gap-2">
-                {SUBCATEGORIES[form.category].map(sub => (
+                {subcategories[form.category].map(sub => (
                   <button
                     key={sub.id}
                     type="button"
@@ -275,7 +277,7 @@ export default function EditListing() {
                       subcategory: sub.id,
                       otherDescription: '',
                       ...(['staff', 'consulting', 'software', 'training'].includes(f.category)
-                        ? { title: SUBCATEGORIES[f.category]?.find(s => s.id === sub.id)?.label || '' }
+                        ? { title: subcategories[f.category]?.find(s => s.id === sub.id)?.label || '' }
                         : {}),
                     }))}
                     className={`text-left px-3 py-2.5 rounded-xl border-2 text-sm transition-all ${
@@ -337,7 +339,7 @@ export default function EditListing() {
             />
           </div>
 
-          {!NO_CONDITION_CATEGORIES.includes(form.category) && (
+          {!NO_CONDITION_categories.includes(form.category) && (
           <div>
             <label className="block text-sm font-medium text-navy mb-2">{t('addListing.condition')}</label>
             <div className="flex gap-3">
