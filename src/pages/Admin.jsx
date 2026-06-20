@@ -1709,7 +1709,10 @@ export default function Admin() {
 
       <main className="flex-1 overflow-auto p-8">
         {tab === 'dashboard'  && <DashboardTab  realtimeEvents={realtimeEvents} />}
-        {tab === 'moderation' && <ModerationTab adminId={adminId} onApprove={() => setPendingBadge(n => Math.max(0, n - 1))} />}
+        {/* ModerationTab stays mounted to prevent re-fetch on tab switch */}
+        <div className={tab !== 'moderation' ? 'hidden' : ''}>
+          <ModerationTab adminId={adminId} onApprove={() => setPendingBadge(n => Math.max(0, n - 1))} />
+        </div>
         {tab === 'listings'   && <ListingsTab   adminId={adminId} />}
         {tab === 'users'      && <UsersTab      adminId={adminId} />}
         {tab === 'support'    && <SupportTab    adminId={adminId} />}
