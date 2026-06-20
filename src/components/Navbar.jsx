@@ -40,29 +40,42 @@ export default function Navbar() {
   const { t } = useTranslation()
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen]           = useState(false)
-  const [dropOpen, setDropOpen]           = useState(false)
-  const [servicesOpen, setServicesOpen]   = useState(false)
+  const [menuOpen, setMenuOpen]             = useState(false)
+  const [dropOpen, setDropOpen]             = useState(false)
+  const [equipmentOpen, setEquipmentOpen]   = useState(false)
+  const equipmentTimer = useRef(null)
+  const [servicesOpen, setServicesOpen]     = useState(false)
   const servicesTimer = useRef(null)
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
-  const [unreadCount, setUnreadCount]     = useState(0)
+  const [mobileEquipmentOpen, setMobileEquipmentOpen] = useState(false)
+  const [mobileServicesOpen, setMobileServicesOpen]   = useState(false)
+  const [unreadCount, setUnreadCount]       = useState(0)
 
   const displayName = useMemo(
     () => getNavbarDisplayName(user, profile),
     [user, profile],
   )
 
+  const EQUIPMENT_ITEMS = [
+    { id: 'kitchen',   key: 'cat.kitchen'   },
+    { id: 'coffee',    key: 'cat.coffee'    },
+    { id: 'cold',      key: 'cat.cold'      },
+    { id: 'service',   key: 'cat.service'   },
+    { id: 'furniture', key: 'cat.furniture' },
+    { id: 'tableware', key: 'cat.tableware' },
+  ]
+
   const SERVICES_ITEMS = [
-    { label: t('nav.suppliers'),        href: '/listings?category=suppliers' },
-    { label: t('cat.consulting'),       href: '/listings?category=consulting' },
-    { label: t('cat.software'),         href: '/listings?category=software' },
-    { label: t('cat.training'),         href: '/listings?category=training' },
-    { label: t('cat.hygiene'),          href: '/listings?category=hygiene' },
-    { label: t('cat.print_ads'),        href: '/listings?category=print_ads' },
-    { label: t('cat.construction'),     href: '/listings?category=construction' },
-    { label: t('cat.legal_finance'),    href: '/listings?category=legal_finance' },
-    { label: t('cat.maintenance'),      href: '/listings?category=maintenance' },
-    { label: t('cat.textile'),          href: '/listings?category=textile' },
+    { id: 'suppliers',     key: 'cat.suppliers'     },
+    { id: 'consulting',    key: 'cat.consulting'    },
+    { id: 'software',      key: 'cat.software'      },
+    { id: 'training',      key: 'cat.training'      },
+    { id: 'hygiene',       key: 'cat.hygiene'       },
+    { id: 'alcohol',       key: 'cat.alcohol'       },
+    { id: 'textile',       key: 'cat.textile'       },
+    { id: 'maintenance',   key: 'cat.maintenance'   },
+    { id: 'print_ads',     key: 'cat.print_ads'     },
+    { id: 'construction',  key: 'cat.construction'  },
+    { id: 'legal_finance', key: 'cat.legal_finance' },
   ]
 
   useEffect(() => {
@@ -109,16 +122,31 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0">
-            {/* Avadanlıq */}
-            <Link to="/listings"
-              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
-              {t('nav.equipment')}
-            </Link>
+          <nav className="hidden md:flex items-center gap-4 flex-1 min-w-0">
+            {/* Avadanlıq dropdown */}
+            <div className="relative"
+              onMouseEnter={() => { clearTimeout(equipmentTimer.current); setEquipmentOpen(true) }}
+              onMouseLeave={() => { equipmentTimer.current = setTimeout(() => setEquipmentOpen(false), 150) }}
+            >
+              <button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
+                {t('nav.equipment')} <ChevronDown size={14} className={`transition-transform ${equipmentOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {equipmentOpen && (
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+                  {EQUIPMENT_ITEMS.map(item => (
+                    <Link key={item.id} to={`/listings?category=${item.id}`}
+                      onClick={() => setEquipmentOpen(false)}
+                      className="block px-4 py-2.5 text-sm text-navy hover:bg-gray-50 transition-colors">
+                      {t(item.key)}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Kadrlar */}
             <Link to="/listings?category=staff"
-              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
               {t('nav.staff')}
             </Link>
 
@@ -127,25 +155,43 @@ export default function Navbar() {
               onMouseEnter={() => { clearTimeout(servicesTimer.current); setServicesOpen(true) }}
               onMouseLeave={() => { servicesTimer.current = setTimeout(() => setServicesOpen(false), 150) }}
             >
-              <button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              <button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
                 {t('nav.services')} <ChevronDown size={14} className={`transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
               </button>
               {servicesOpen && (
                 <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
                   {SERVICES_ITEMS.map(item => (
-                    <Link key={item.href} to={item.href}
+                    <Link key={item.id} to={`/listings?category=${item.id}`}
                       onClick={() => setServicesOpen(false)}
                       className="block px-4 py-2.5 text-sm text-navy hover:bg-gray-50 transition-colors">
-                      {item.label}
+                      {t(item.key)}
                     </Link>
                   ))}
                 </div>
               )}
             </div>
 
+            {/* Yeyinti */}
+            <Link to="/listings?category=food_ingredients"
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
+              {t('nav.food')}
+            </Link>
+
+            {/* Biznes satışı */}
+            <Link to="/listings?category=business_sale"
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
+              {t('nav.business')}
+            </Link>
+
+            {/* Qablaşdırma */}
+            <Link to="/listings?category=packaging"
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
+              {t('nav.packaging')}
+            </Link>
+
             {/* Necə işləyir */}
             <Link to="/how-it-works"
-              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150">
+              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
               {t('nav.howItWorks')}
             </Link>
           </nav>
@@ -300,11 +346,27 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Avadanlıq */}
-          <Link to="/listings" onClick={() => setMenuOpen(false)}
-            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-            {t('nav.equipment')}
-          </Link>
+          {/* Avadanlıq expandable */}
+          <div>
+            <button
+              onClick={() => setMobileEquipmentOpen(v => !v)}
+              className="flex items-center justify-between w-full py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+            >
+              {t('nav.equipment')}
+              <ChevronDown size={14} className={`transition-transform ${mobileEquipmentOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {mobileEquipmentOpen && (
+              <div className="pl-4 space-y-0.5">
+                {EQUIPMENT_ITEMS.map(item => (
+                  <Link key={item.id} to={`/listings?category=${item.id}`}
+                    onClick={() => { setMenuOpen(false); setMobileEquipmentOpen(false) }}
+                    className="block py-2 px-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                    {t(item.key)}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Kadrlar */}
           <Link to="/listings?category=staff" onClick={() => setMenuOpen(false)}
@@ -324,14 +386,33 @@ export default function Navbar() {
             {mobileServicesOpen && (
               <div className="pl-4 space-y-0.5">
                 {SERVICES_ITEMS.map(item => (
-                  <Link key={item.href} to={item.href} onClick={() => { setMenuOpen(false); setMobileServicesOpen(false) }}
+                  <Link key={item.id} to={`/listings?category=${item.id}`}
+                    onClick={() => { setMenuOpen(false); setMobileServicesOpen(false) }}
                     className="block py-2 px-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-                    {item.label}
+                    {t(item.key)}
                   </Link>
                 ))}
               </div>
             )}
           </div>
+
+          {/* Yeyinti */}
+          <Link to="/listings?category=food_ingredients" onClick={() => setMenuOpen(false)}
+            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            {t('nav.food')}
+          </Link>
+
+          {/* Biznes satışı */}
+          <Link to="/listings?category=business_sale" onClick={() => setMenuOpen(false)}
+            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            {t('nav.business')}
+          </Link>
+
+          {/* Qablaşdırma */}
+          <Link to="/listings?category=packaging" onClick={() => setMenuOpen(false)}
+            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+            {t('nav.packaging')}
+          </Link>
 
           {/* Necə işləyir */}
           <Link to="/how-it-works" onClick={() => setMenuOpen(false)}

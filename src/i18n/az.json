@@ -13,7 +13,10 @@
     "register": "Qeydiyyat",
     "menu": "Menyu",
     "equipment": "Avadanlıq",
-    "services": "Xidmətlər"
+    "services": "Xidmətlər",
+    "food": "Yeyinti",
+    "business": "Biznes satışı",
+    "packaging": "Qablaşdırma"
   },
   "hero": {
     "badge": "Azərbaycanda ilk",

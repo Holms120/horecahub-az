@@ -13,7 +13,10 @@
     "register": "Register",
     "menu": "Menu",
     "equipment": "Equipment",
-    "services": "Services"
+    "services": "Services",
+    "food": "Food",
+    "business": "Business Sale",
+    "packaging": "Packaging"
   },
   "hero": {
     "badge": "First in Azerbaijan",

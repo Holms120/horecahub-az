@@ -301,7 +301,7 @@ function DashboardTab({ realtimeEvents }) {
 }
 
 /* ─── Tab 2: Moderation ─────────────────────────────────── */
-function ModerationTab({ adminId }) {
+function ModerationTab({ adminId, onApprove }) {
   const [listings, setListings]     = useState([])
   const [loading, setLoading]       = useState(true)
   const [error, setError]           = useState(null)
@@ -339,6 +339,7 @@ function ModerationTab({ adminId }) {
         is_support: true,
       })
       setListings(ls => ls.filter(l => l.id !== listing.id))
+      onApprove?.()
     }
     setProcessing(null)
   }
@@ -1644,10 +1645,12 @@ export default function Admin() {
         }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings' }, payload => {
-        if (payload.new?.status === 'active' && payload.old?.status === 'pending')
+        if (payload.new?.status === 'active' && payload.old?.status === 'pending') {
           setPendingBadge(n => Math.max(0, n - 1))
-        if (payload.new?.status === 'pending' && payload.old?.status !== 'pending')
+        }
+        if (payload.new?.status === 'pending' && payload.old?.status !== 'pending') {
           setPendingBadge(n => n + 1)
+        }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
         if (payload.new?.is_support && payload.new?.receiver_id === adminId) {
@@ -1706,7 +1709,7 @@ export default function Admin() {
 
       <main className="flex-1 overflow-auto p-8">
         {tab === 'dashboard'  && <DashboardTab  realtimeEvents={realtimeEvents} />}
-        {tab === 'moderation' && <ModerationTab adminId={adminId} />}
+        {tab === 'moderation' && <ModerationTab adminId={adminId} onApprove={() => setPendingBadge(n => Math.max(0, n - 1))} />}
         {tab === 'listings'   && <ListingsTab   adminId={adminId} />}
         {tab === 'users'      && <UsersTab      adminId={adminId} />}
         {tab === 'support'    && <SupportTab    adminId={adminId} />}
