@@ -114,7 +114,7 @@ export default function ListingCard({ listing }) {
         ) : null}
         {isOwner && status === 'pending' && (
           <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded text-xs font-semibold bg-amber-500 text-white">
-            Gözləmədə
+            {t('common.pendingBadge')}
           </span>
         )}
         <button

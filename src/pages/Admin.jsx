@@ -1346,7 +1346,7 @@ export default function Admin() {
       const { data, error } = await supabase
         .from('profiles').select('is_admin').eq('id', uid).maybeSingle()
       if (cancelled) return
-      if (error) console.error('[Admin] is_admin check failed:', error)
+      if (error) return
       if (data?.is_admin) { setAdminId(uid); setIsAdmin(true) }
       else setIsAdmin(false)
     })()

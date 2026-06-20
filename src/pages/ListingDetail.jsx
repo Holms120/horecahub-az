@@ -79,7 +79,7 @@ export default function ListingDetail() {
   // Track view
   useEffect(() => {
     if (!id) return
-    supabase.from("listing_views").insert({ listing_id: id }).then(({ error }) => { if (error) console.error("view error:", error) })
+    supabase.from("listing_views").insert({ listing_id: id }).then(() => {})
   }, [id])
   // Fetch view count
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function ListingDetail() {
         .single()
       setSellerPhone(data?.phone || '')
     }
-    supabase.from('phone_clicks').insert({ listing_id: id, user_id: user?.id || null }).then(({ error }) => { if (error) console.error('phone click error:', error) })
+    supabase.from('phone_clicks').insert({ listing_id: id, user_id: user?.id || null }).then(() => {})
     setPhoneRevealed(true)
     setPhoneFetching(false)
   }
@@ -218,10 +218,12 @@ export default function ListingDetail() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <Helmet>
         <title>{`${listing.title || 'Elan'} — ₼${listing.price || ''} | HorecaHub`}</title>
-        <meta name="description" content={listing.description?.slice(0, 160) || listing.title || ''} />
-        <meta property="og:title" content={`${title} — HorecaHub`} />
-        <meta property="og:description" content={description?.slice(0, 160) || ''} />
-        <meta property="og:image" content={listing.image || 'https://horecahub.az/logo.png'} />
+        <meta name="description" content={listing.description?.slice(0, 155) || listing.title || ''} />
+        <meta property="og:title" content={`${listing.title} — HorecaHub.az`} />
+        <meta property="og:description" content={listing.description?.slice(0, 155) || ''} />
+        <meta property="og:image" content={listing.images?.[0] || 'https://horecahub.az/og-image.jpg'} />
+        <meta property="og:url" content={`https://horecahub.az/listings/${listing.id}`} />
+        <meta property="og:type" content="product" />
       </Helmet>
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">

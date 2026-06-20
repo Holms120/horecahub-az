@@ -128,6 +128,8 @@ export default function Profile() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Helmet>
         <title>{`${profile.full_name || profile.company_name || 'Profil'} — HorecaHub`}</title>
+        <meta property="og:title" content={`${profile.full_name || profile.company_name || 'Profil'} — HorecaHub.az`} />
+        <meta property="og:url" content={`https://horecahub.az/profile/${profile.id}`} />
       </Helmet>
       {/* Header card */}
       <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
