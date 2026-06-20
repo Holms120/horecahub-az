@@ -53,10 +53,16 @@ export default function Navbar() {
   )
 
   const SERVICES_ITEMS = [
-    { label: t('nav.suppliers'),  href: '/listings?category=suppliers' },
-    { label: t('cat.consulting'), href: '/listings?category=consulting' },
-    { label: t('cat.software'),   href: '/listings?category=software' },
-    { label: t('cat.training'),   href: '/listings?category=training' },
+    { label: t('nav.suppliers'),        href: '/listings?category=suppliers' },
+    { label: t('cat.consulting'),       href: '/listings?category=consulting' },
+    { label: t('cat.software'),         href: '/listings?category=software' },
+    { label: t('cat.training'),         href: '/listings?category=training' },
+    { label: t('cat.hygiene'),          href: '/listings?category=hygiene' },
+    { label: t('cat.print_ads'),        href: '/listings?category=print_ads' },
+    { label: t('cat.construction'),     href: '/listings?category=construction' },
+    { label: t('cat.legal_finance'),    href: '/listings?category=legal_finance' },
+    { label: t('cat.maintenance'),      href: '/listings?category=maintenance' },
+    { label: t('cat.textile'),          href: '/listings?category=textile' },
   ]
 
   useEffect(() => {
