@@ -330,16 +330,28 @@ function ModerationTab({ adminId, onApprove }) {
 
   async function handleApprove(listing) {
     setProcessing(listing.id)
-    const { error } = await supabase.from('listings').update({ status: 'active' }).eq('id', listing.id)
+    const { error } = await supabase
+      .from('listings')
+      .update({ status: 'active' })
+      .eq('id', listing.id)
+
     if (!error) {
-      await supabase.from('messages').insert({
-        sender_id: adminId, receiver_id: listing.user_id,
-        listing_id: listing.id,
-        content: `✅ "${listing.title}" adlı elanınız təsdiqləndi və saytda aktiv oldu.`,
-        is_support: true,
-      })
       setListings(ls => ls.filter(l => l.id !== listing.id))
       onApprove?.()
+
+      if (adminId) {
+        supabase.from('messages').insert({
+          sender_id: adminId,
+          receiver_id: listing.user_id,
+          listing_id: listing.id,
+          content: `✅ "${listing.title}" adlı elanınız təsdiqləndi və saytda aktiv oldu.`,
+          is_support: true,
+        }).then(({ error: msgError }) => {
+          if (msgError) console.warn('Message insert failed:', msgError)
+        })
+      }
+    } else {
+      console.warn('Approve failed:', error)
     }
     setProcessing(null)
   }
