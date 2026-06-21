@@ -171,24 +171,6 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Yeyinti */}
-            <Link to="/listings?category=food_ingredients"
-              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
-              {t('nav.food')}
-            </Link>
-
-            {/* Biznes satışı */}
-            <Link to="/listings?category=business_sale"
-              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
-              {t('nav.business')}
-            </Link>
-
-            {/* Qablaşdırma */}
-            <Link to="/listings?category=packaging"
-              className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
-              {t('nav.packaging')}
-            </Link>
-
             {/* Necə işləyir */}
             <Link to="/how-it-works"
               className="text-sm font-medium text-gray-600 hover:text-navy transition-colors duration-150 whitespace-nowrap">
@@ -395,24 +377,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          {/* Yeyinti */}
-          <Link to="/listings?category=food_ingredients" onClick={() => setMenuOpen(false)}
-            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-            {t('nav.food')}
-          </Link>
-
-          {/* Biznes satışı */}
-          <Link to="/listings?category=business_sale" onClick={() => setMenuOpen(false)}
-            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-            {t('nav.business')}
-          </Link>
-
-          {/* Qablaşdırma */}
-          <Link to="/listings?category=packaging" onClick={() => setMenuOpen(false)}
-            className="block py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
-            {t('nav.packaging')}
-          </Link>
 
           {/* Necə işləyir */}
           <Link to="/how-it-works" onClick={() => setMenuOpen(false)}
