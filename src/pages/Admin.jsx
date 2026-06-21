@@ -358,36 +358,52 @@ function ModerationTab({ adminId, onApprove }) {
 
   async function handleRejectConfirm() {
     if (!rejectModal) return
-    setProcessing(rejectModal.id)
-    const { error } = await supabase.from('listings').update({ status: 'rejected' }).eq('id', rejectModal.id)
+
+    const modal = rejectModal
+    const reason = rejectReason
+
+    setProcessing(modal.id)
+
+    const { error } = await supabase
+      .from('listings')
+      .update({ status: 'rejected' })
+      .eq('id', modal.id)
+
     if (!error) {
-      await supabase.from('messages').insert({
-        sender_id: adminId, receiver_id: rejectModal.user_id,
-        listing_id: rejectModal.id,
-        content: `❌ "${rejectModal.title}" adlı elanınız rədd edildi.${rejectReason ? ` Səbəb: ${rejectReason}` : ''}`,
-        is_support: true,
-      })
+      setListings(ls => ls.filter(l => l.id !== modal.id))
+      setRejectModal(null)
+      setRejectReason('')
+      setProcessing(null)
 
-      const { data: userData } = await supabase
-        .from('profiles')
+      if (adminId) {
+        supabase.from('messages').insert({
+          sender_id: adminId,
+          receiver_id: modal.user_id,
+          listing_id: modal.id,
+          content: `❌ "${modal.title}" adlı elanınız rədd edildi.${reason ? ` Səbəb: ${reason}` : ''}`,
+          is_support: true,
+        })
+      }
+
+      supabase.from('profiles')
         .select('full_name')
-        .eq('id', rejectModal.user_id)
+        .eq('id', modal.user_id)
         .single()
-
-      await supabase.functions.invoke('send-rejection-email', {
-        body: {
-          user_id: rejectModal.user_id,
-          name: userData?.full_name,
-          title: rejectModal.title,
-          reason: rejectReason || null,
-        },
-      })
-
-      setListings(ls => ls.filter(l => l.id !== rejectModal.id))
+        .then(({ data: userData }) => {
+          supabase.functions.invoke('send-rejection-email', {
+            body: {
+              user_id: modal.user_id,
+              name: userData?.full_name,
+              title: modal.title,
+              reason: reason || null,
+            },
+          })
+        })
+    } else {
+      setProcessing(null)
+      setRejectModal(null)
+      setRejectReason('')
     }
-    setProcessing(null)
-    setRejectModal(null)
-    setRejectReason('')
   }
 
   if (loading) return <Spinner />
