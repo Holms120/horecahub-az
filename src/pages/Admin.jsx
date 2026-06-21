@@ -1741,7 +1741,9 @@ export default function Admin() {
         <div className={tab !== 'moderation' ? 'hidden' : ''}>
           <ModerationTab adminId={adminId} onApprove={() => setPendingBadge(n => Math.max(0, n - 1))} />
         </div>
-        {tab === 'listings'   && <ListingsTab   adminId={adminId} />}
+        <div className={tab !== 'listings' ? 'hidden' : ''}>
+          <ListingsTab adminId={adminId} />
+        </div>
         {tab === 'users'      && <UsersTab      adminId={adminId} />}
         {tab === 'support'    && <SupportTab    adminId={adminId} />}
         {tab === 'analytics'   && <AnalyticsTab />}
