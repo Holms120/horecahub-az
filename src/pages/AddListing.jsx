@@ -18,6 +18,7 @@ const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, W
 const NO_CONDITION_categories = [
   'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
   'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
+  'maintenance', 'construction', 'suppliers', 'business_sale',
 ]
 const EMPTY     = {
   category: '', subcategory: '', otherDescription: '',
@@ -679,7 +680,7 @@ export default function AddListing() {
               </div>
               {stepErrors.price && <p className="text-red-500 text-xs mt-1">{stepErrors.price}</p>}
             </div>
-            {!['staff', 'consulting', 'software', 'training', 'business_sale'].includes(form.category) && (
+            {!NO_CONDITION_categories.includes(form.category) && (
               <div>
                 <label className="block text-sm font-medium text-navy mb-3">{t('addListing.paymentType')}</label>
                 <div className="flex flex-col gap-2">

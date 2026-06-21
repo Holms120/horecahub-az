@@ -18,6 +18,7 @@ const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wi
 const NO_CONDITION_categories = [
   'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
   'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
+  'maintenance', 'construction', 'suppliers', 'business_sale',
 ]
 
 const MAX_FILES   = 5
@@ -487,7 +488,7 @@ export default function EditListing() {
             )}
           </div>
 
-          {!['staff', 'consulting', 'software', 'training'].includes(form.category) && (
+          {!NO_CONDITION_categories.includes(form.category) && (
             <div>
               <label className="block text-sm font-medium text-navy mb-3">{t('addListing.paymentType')}</label>
               <div className="flex flex-col gap-2">
