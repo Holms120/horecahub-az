@@ -737,7 +737,7 @@ function UsersTab({ adminId }) {
       setLoading(true)
       try {
         const { data: profileData, error: err } = await supabase
-          .from('profiles')
+          .from('admin_users')
           .select('id, full_name, company_name, email, phone, city, account_type, is_blocked, created_at')
           .order('created_at', { ascending: false })
         if (err) { setError('Supabase xətası: ' + err.message); setLoading(false); return }
