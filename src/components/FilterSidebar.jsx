@@ -99,7 +99,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
               />
               <span className="text-sm text-gray-700">{t('filter.all')}</span>
             </label>
-            {categories.filter(c => !['staff', 'suppliers'].includes(c.id)).map(cat => (
+            {categories.filter(c => !['staff', 'suppliers'].includes(c.id) && categoryCounts[c.id] > 0).map(cat => (
               <label key={cat.id} className="flex items-center justify-between cursor-pointer group">
                 <div className="flex items-center gap-2">
                   <input
