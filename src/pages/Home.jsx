@@ -6,7 +6,8 @@ import {
   LayoutGrid, Wine, Users, Truck, ShieldCheck, MessageCircle,
   Target, ArrowRight, Plus, Briefcase, Monitor, GraduationCap,
   Package, Store, ShoppingBasket,
-  Shirt, Wrench, Printer, HardHat, Scale
+  Shirt, Wrench, Printer, HardHat, Scale,
+  Phone, Zap, Lock
 } from 'lucide-react'
 import { useCategories } from '../hooks/useCategories'
 import { supabase } from '../supabaseClient'
@@ -116,7 +117,7 @@ export default function Home() {
           </p>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-xl p-2 flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto">
+          <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-xl p-2 flex flex-row gap-2 max-w-2xl mx-auto">
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
@@ -159,6 +160,43 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── MINI TRUST INDICATORS ── */}
+      <section className="py-6 bg-white border-b border-gray-100">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { Icon: ShieldCheck, color: 'text-green-600', title: t('home.trust1_title'), desc: t('home.trust1_desc') },
+              { Icon: Phone,       color: 'text-blue-600',  title: t('home.trust2_title'), desc: t('home.trust2_desc') },
+              { Icon: Zap,         color: 'text-yellow-500',title: t('home.trust3_title'), desc: t('home.trust3_desc') },
+              { Icon: Lock,        color: 'text-purple-600',title: t('home.trust4_title'), desc: t('home.trust4_desc') },
+            ].map(({ Icon, color, title, desc }) => (
+              <div key={title} className="flex items-start gap-3">
+                <Icon size={20} className={`flex-shrink-0 mt-0.5 ${color}`} />
+                <div>
+                  <p className="text-sm font-semibold text-navy">{title}</p>
+                  <p className="text-xs text-gray-500 leading-snug">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── INLINE FREE CTA ── */}
+      <section className="py-10 bg-blue-50 border-b border-blue-100">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-navy mb-2">{t('home.cta_title')}</h2>
+          <p className="text-sm text-gray-500 mb-5">{t('home.cta_desc')}</p>
+          <button
+            onClick={() => navigate('/sell')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            <Plus size={16} />
+            {t('home.cta_btn')}
+          </button>
+        </div>
+      </section>
+
       {/* ── categories ── */}
       <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -186,9 +224,7 @@ export default function Home() {
                       <Icon className="w-full h-full" />
                     </div>
                   )}
-                  <span className="text-[10px] sm:text-xs font-semibold text-center leading-tight text-navy">
-                    {t(cat.key) || cat.label}
-                  </span>
+                  <p className="text-[10px] sm:text-xs text-center text-gray-600 mt-1 leading-tight line-clamp-2">{t(cat.key) || cat.label}</p>
                 </button>
               )
             })}

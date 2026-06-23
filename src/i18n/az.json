@@ -48,7 +48,18 @@
     "nicheDesc": "Yalnız hotel, restoran və kafe sektoru üçün. Ümumi bazarların əksinə.",
     "ctaBanner": "Avadanlığınızı satmaq istəyirsiniz?",
     "ctaBannerSub": "Pulsuz elan yerləşdirin. 5 dəqiqəyə hazır.",
-    "ctaBannerBtn": "Pulsuz elan yerləşdir"
+    "ctaBannerBtn": "Pulsuz elan yerləşdir",
+    "trust1_title": "Doğrulanmış elanlar",
+    "trust1_desc": "Hər elan admin tərəfindən yoxlanılır",
+    "trust2_title": "Birbaşa əlaqə",
+    "trust2_desc": "Vasitəçisiz, telefon ilə birbaşa",
+    "trust3_title": "Sürətli cavab",
+    "trust3_desc": "Satıcılar aktiv, sürətli danışır",
+    "trust4_title": "Təhlükəsiz platforma",
+    "trust4_desc": "Məlumatlarınız SSL ilə qorunur",
+    "cta_title": "Elanı pulsuz yerləşdir",
+    "cta_desc": "5 dəqiqəyə aktiv. Qeydiyyat pulsuzdur.",
+    "cta_btn": "Elan yerləşdir"
   },
   "listings": {
     "title": "Elanlar — HorecaHub",

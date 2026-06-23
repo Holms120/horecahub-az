@@ -48,7 +48,18 @@
     "nicheDesc": "Only for hotels, restaurants and cafes. Unlike general marketplaces.",
     "ctaBanner": "Want to sell equipment?",
     "ctaBannerSub": "Post a free listing. Ready in 5 minutes.",
-    "ctaBannerBtn": "Post Free Listing"
+    "ctaBannerBtn": "Post Free Listing",
+    "trust1_title": "Verified listings",
+    "trust1_desc": "Every listing is reviewed by an admin",
+    "trust2_title": "Direct contact",
+    "trust2_desc": "No middlemen, direct by phone",
+    "trust3_title": "Fast response",
+    "trust3_desc": "Sellers are active and respond quickly",
+    "trust4_title": "Secure platform",
+    "trust4_desc": "Your data is protected with SSL",
+    "cta_title": "Post a listing for free",
+    "cta_desc": "Live in 5 minutes. Registration is free.",
+    "cta_btn": "Post listing"
   },
   "listings": {
     "title": "Listings — HorecaHub",

@@ -286,7 +286,11 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="relative md:hidden ml-auto">
+          <div className="flex items-center gap-2 md:hidden ml-auto">
+            <Link to="/sell" className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg whitespace-nowrap">
+              + Elan
+            </Link>
+            <div className="relative">
             <button
               className="p-2 rounded-lg text-gray-500 hover:text-navy hover:bg-gray-50 transition-colors"
               onClick={() => setMenuOpen(v => !v)}
@@ -299,6 +303,7 @@ export default function Navbar() {
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
+            </div>
           </div>
         </div>
       </div>
