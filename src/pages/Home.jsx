@@ -50,6 +50,18 @@ export default function Home() {
   const [stats, setStats] = useState({ listings: 0, sellers: 0 })
   const navigate = useNavigate()
   const { categories } = useCategories()
+  const [activeCategoryIds, setActiveCategoryIds] = useState([])
+
+  useEffect(() => {
+    supabase
+      .from('listings')
+      .select('category')
+      .eq('status', 'active')
+      .then(({ data }) => {
+        const unique = [...new Set((data || []).map(l => l.category))]
+        setActiveCategoryIds(unique)
+      })
+  }, [])
 
   const trustItems = [
     { Icon: ShieldCheck, color: 'bg-green-50 text-green-600', title: t('home.verified'), desc: t('home.verifiedDesc') },
@@ -124,7 +136,7 @@ export default function Home() {
               className="sm:w-44 flex-shrink-0 px-3 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
             >
               <option value="">{t('hero.allCategories')}</option>
-              {categories.filter(c => !['staff', 'suppliers'].includes(c.id)).map(c => (
+              {categories.filter(c => !['staff', 'suppliers'].includes(c.id) && activeCategoryIds.includes(c.id)).map(c => (
                 <option key={c.id} value={c.id}>{t(c.key) || c.label}</option>
               ))}
             </select>
