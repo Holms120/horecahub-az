@@ -328,6 +328,29 @@ function ModerationTab({ adminId, onApprove }) {
 
   useEffect(() => { load() }, [])
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('moderation-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'listings',
+        filter: 'status=eq.pending'
+      }, async (payload) => {
+        const { data } = await supabase
+          .from('listings')
+          .select('id, title, category, city, images, user_id, created_at, profiles(id, full_name, company_name, phone)')
+          .eq('id', payload.new.id)
+          .single()
+        if (data) {
+          setListings(prev => [data, ...prev])
+        }
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
+
   async function handleApprove(listing) {
     setProcessing(listing.id)
     const { error } = await supabase

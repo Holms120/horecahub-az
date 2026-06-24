@@ -274,18 +274,20 @@ export default function AddListing() {
 
   async function handleFeedbackSubmit() {
     if (feedbackData.message.trim()) {
+      const { data: { session } } = await supabase.auth.getSession()
+      const userId = session?.user?.id || null
       await supabase.from('feedback').insert({
-        user_id: user?.id || null,
+        user_id: userId,
         type: feedbackData.type,
         message: feedbackData.message.trim(),
         context: 'listing_create',
       })
     }
-    navigate('/profile')
+    navigate('/')
   }
 
   function handleFeedbackSkip() {
-    navigate('/profile')
+    navigate('/')
   }
 
   if (submitted) {
