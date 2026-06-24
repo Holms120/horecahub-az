@@ -395,7 +395,8 @@ export default function Messages() {
   async function deleteConversation(conv) {
     setDeletingConv(true)
     let q = supabase.from('messages').delete()
-      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .eq('sender_id', user.id)
+      .eq('receiver_id', conv.otherId)
     if (conv.listingId === null) {
       q = q.is('listing_id', null)
     } else {
