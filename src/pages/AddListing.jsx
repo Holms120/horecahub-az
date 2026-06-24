@@ -283,11 +283,11 @@ export default function AddListing() {
         context: 'listing_create',
       })
     }
-    navigate('/')
+    window.location.href = '/'
   }
 
   function handleFeedbackSkip() {
-    navigate('/')
+    window.location.href = '/'
   }
 
   if (submitted) {
