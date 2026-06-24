@@ -218,6 +218,7 @@ export default function AddListing() {
   }
 
   async function handleSubmit() {
+    console.log('Submit started')
     if (!user) {
       navigate('/login', { state: { from: '/sell' } })
       return
@@ -260,11 +261,14 @@ export default function AddListing() {
       status:       'pending',
     })
 
+    console.log('Insert result:', error)
     if (error) {
       setSubmitError(error.message)
       setSubmitting(false)
     } else {
+      setSubmitting(false)
       setFeedbackStep(true)
+      console.log('feedbackStep set to true')
     }
   }
 
