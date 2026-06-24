@@ -1633,20 +1633,20 @@ function CategoriesTab() {
 }
 
 /* ─── FeedbackTab ───────────────────────────────────────── */
-function FeedbackTab() {
+function FeedbackTab({ onView }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [typeFilter, setTypeFilter] = useState('all')
 
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('feedback')
         .select('id, user_id, type, message, context, created_at')
         .order('created_at', { ascending: false })
-      console.log('Feedback data:', data, 'Error:', error)
       setItems(data || [])
       setLoading(false)
+      onView?.()
     }
     load()
   }, [])
@@ -1719,8 +1719,9 @@ export default function Admin() {
   const [isAdmin, setIsAdmin]           = useState(null)
   const [adminId, setAdminId]           = useState(null)
   const [tab, setTab]                   = useState('dashboard')
-  const [supportBadge, setSupportBadge] = useState(0)
-  const [pendingBadge, setPendingBadge] = useState(0)
+  const [supportBadge, setSupportBadge]   = useState(0)
+  const [pendingBadge, setPendingBadge]   = useState(0)
+  const [feedbackBadge, setFeedbackBadge] = useState(0)
   const [realtimeEvents, setRealtimeEvents] = useState([])
 
   useEffect(() => {
@@ -1756,6 +1757,9 @@ export default function Admin() {
     supabase.from('listings')
       .select('*', { count: 'exact', head: true }).eq('status', 'pending')
       .then(({ count }) => setPendingBadge(count || 0))
+    supabase.from('feedback')
+      .select('*', { count: 'exact', head: true })
+      .then(({ count }) => setFeedbackBadge(count || 0))
   }, [adminId])
 
   useEffect(() => {
@@ -1784,6 +1788,9 @@ export default function Admin() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, payload => {
         addEvent('user', `Yeni qeydiyyat: ${payload.new?.full_name || payload.new?.email || 'istifadəçi'}`)
       })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'feedback' }, () => {
+        setFeedbackBadge(n => n + 1)
+      })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [adminId])
@@ -1806,7 +1813,8 @@ export default function Admin() {
             const Icon = t.icon
             const badge = t.id === 'support'    ? supportBadge :
                           t.id === 'moderation' ? pendingBadge :
-                          t.id === 'listings'   ? pendingBadge : 0
+                          t.id === 'listings'   ? pendingBadge :
+                          t.id === 'feedback'   ? feedbackBadge : 0
             const badgeColor = t.id === 'moderation' || t.id === 'listings' ? 'bg-amber-500' : 'bg-red-500'
             return (
               <button key={t.id} onClick={() => setTab(t.id)}
@@ -1843,7 +1851,7 @@ export default function Admin() {
         {tab === 'support'    && <SupportTab    adminId={adminId} />}
         {tab === 'analytics'   && <AnalyticsTab />}
         {tab === 'categories'  && <CategoriesTab />}
-        {tab === 'feedback'    && <FeedbackTab />}
+        {tab === 'feedback'    && <FeedbackTab onView={() => setFeedbackBadge(0)} />}
         {tab === 'settings'    && <SettingsTab />}
       </main>
     </div>
