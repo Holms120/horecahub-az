@@ -1638,7 +1638,13 @@ function FeedbackTab({ onView }) {
   const [loading, setLoading] = useState(true)
   const [typeFilter, setTypeFilter] = useState('all')
 
-  useEffect(() => { onView?.() }, [])
+  useEffect(() => {
+    async function markAllRead() {
+      await supabase.from('feedback').update({ is_read: true }).eq('is_read', false)
+      onView?.()
+    }
+    markAllRead()
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -1763,6 +1769,7 @@ export default function Admin() {
       .then(({ count }) => setPendingBadge(count || 0))
     supabase.from('feedback')
       .select('*', { count: 'exact', head: true })
+      .eq('is_read', false)
       .then(({ count }) => setFeedbackBadge(count || 0))
   }, [adminId])
 
