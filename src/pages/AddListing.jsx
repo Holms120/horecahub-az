@@ -264,7 +264,6 @@ export default function AddListing() {
       setSubmitError(error.message)
       setSubmitting(false)
     } else {
-      setSubmitted(true)
       setFeedbackStep(true)
     }
   }

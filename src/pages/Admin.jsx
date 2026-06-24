@@ -442,7 +442,9 @@ function ModerationTab({ adminId, onApprove }) {
                 </div>
                 <div className="p-4 flex-1 flex flex-col gap-3">
                   <div>
-                    <p className="font-semibold text-[#0A2342] line-clamp-2 leading-snug">{l.title || '(başlıqsız)'}</p>
+                    <Link to={`/listings/${l.id}`} target="_blank" className="font-semibold text-[#0A2342] hover:text-blue-600 line-clamp-2 leading-snug block">
+                      {l.title || '(başlıqsız)'}
+                    </Link>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{l.category}</span>
                       {l.city && <span className="text-xs text-gray-400">📍 {l.city}</span>}
