@@ -72,6 +72,8 @@ export default function AddListing() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [feedbackStep, setFeedbackStep] = useState(false)
+  const [feedbackData, setFeedbackData] = useState({ type: 'suggestion', message: '' })
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [userProfile, setUserProfile] = useState(null)
@@ -263,7 +265,24 @@ export default function AddListing() {
       setSubmitting(false)
     } else {
       setSubmitted(true)
+      setFeedbackStep(true)
     }
+  }
+
+  async function handleFeedbackSubmit() {
+    if (feedbackData.message.trim()) {
+      await supabase.from('feedback').insert({
+        user_id: user?.id || null,
+        type: feedbackData.type,
+        message: feedbackData.message.trim(),
+        context: 'listing_create',
+      })
+    }
+    navigate('/profile')
+  }
+
+  function handleFeedbackSkip() {
+    navigate('/profile')
   }
 
   if (submitted) {
@@ -782,6 +801,54 @@ export default function AddListing() {
             </button>
         }
       </div>
+
+      {feedbackStep && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h3 className="font-bold text-[#0A2342] mb-2">Elanınız göndərildi! 🎉</h3>
+            <p className="text-sm text-gray-500 mb-4">Admin təsdiqindən sonra saytda görünəcək. Bizimlə fikrinizi bölüşün:</p>
+
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setFeedbackData(f => ({ ...f, type: 'suggestion' }))}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${feedbackData.type === 'suggestion' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 text-gray-600'}`}
+              >
+                💡 Təklif
+              </button>
+              <button
+                onClick={() => setFeedbackData(f => ({ ...f, type: 'problem' }))}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold border transition-colors ${feedbackData.type === 'problem' ? 'bg-red-500 text-white border-red-500' : 'border-gray-200 text-gray-600'}`}
+              >
+                ⚠️ Problem
+              </button>
+            </div>
+
+            <textarea
+              value={feedbackData.message}
+              onChange={e => setFeedbackData(f => ({ ...f, message: e.target.value }))}
+              placeholder="Fikirlerinizi yazın... (isteğe bağlı)"
+              rows={3}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 resize-none mb-4"
+            />
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleFeedbackSkip()}
+                className="flex-1 py-2 border border-gray-200 rounded-xl text-sm text-gray-500 hover:bg-gray-50"
+              >
+                Keç
+              </button>
+              <button
+                onClick={() => handleFeedbackSubmit()}
+                disabled={!feedbackData.message.trim()}
+                className="flex-1 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
+              >
+                Göndər
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

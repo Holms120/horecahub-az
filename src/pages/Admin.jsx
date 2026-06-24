@@ -5,7 +5,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle, Tag,
+  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -1607,6 +1607,74 @@ function CategoriesTab() {
   )
 }
 
+/* ─── FeedbackTab ───────────────────────────────────────── */
+function FeedbackTab() {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [typeFilter, setTypeFilter] = useState('all')
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from('feedback')
+        .select('*, profiles(full_name, company_name)')
+        .order('created_at', { ascending: false })
+      setItems(data || [])
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const filtered = typeFilter === 'all' ? items : items.filter(f => f.type === typeFilter)
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-[#0A2342]">
+          Rəylər
+          {items.length > 0 && <span className="ml-2 inline-flex items-center justify-center w-6 h-6 bg-blue-500 text-white text-xs font-bold rounded-full">{items.length}</span>}
+        </h2>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        {[['all','Hamısı'],['suggestion','Təkliflər'],['problem','Problemlər']].map(([v,l]) => (
+          <button key={v} onClick={() => setTypeFilter(v)}
+            className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${typeFilter === v ? 'bg-[#0A2342] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+            {l}
+          </button>
+        ))}
+      </div>
+
+      {loading ? <Spinner /> : filtered.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
+          <MessageCircle size={40} className="text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500">Hələ rəy yoxdur</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(f => (
+            <div key={f.id} className="bg-white border border-gray-200 rounded-2xl p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${f.type === 'suggestion' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-600'}`}>
+                    {f.type === 'suggestion' ? '💡 Təklif' : '⚠️ Problem'}
+                  </span>
+                  <span className="text-xs text-gray-400">{f.context}</span>
+                </div>
+                <span className="text-xs text-gray-400 whitespace-nowrap">{shortDate(f.created_at)}</span>
+              </div>
+              <p className="text-sm text-gray-700 mt-2 leading-relaxed">{f.message}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {f.profiles?.full_name || f.profiles?.company_name || 'Anonim'}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ─── Main Admin ────────────────────────────────────────── */
 const TABS = [
   { id: 'dashboard',  label: 'Ümumi',        icon: LayoutDashboard },
@@ -1616,6 +1684,7 @@ const TABS = [
   { id: 'support',    label: 'Support',       icon: MessageSquare },
   { id: 'analytics',   label: 'Analitika',      icon: BarChart2 },
   { id: 'categories', label: 'Kateqoriyalar', icon: Tag },
+  { id: 'feedback',   label: 'Rəylər',        icon: MessageCircle },
   { id: 'settings',   label: 'Ayarlar',       icon: Settings },
 ]
 
@@ -1748,6 +1817,7 @@ export default function Admin() {
         {tab === 'support'    && <SupportTab    adminId={adminId} />}
         {tab === 'analytics'   && <AnalyticsTab />}
         {tab === 'categories'  && <CategoriesTab />}
+        {tab === 'feedback'    && <FeedbackTab />}
         {tab === 'settings'    && <SettingsTab />}
       </main>
     </div>
