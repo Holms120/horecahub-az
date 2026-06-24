@@ -1648,13 +1648,11 @@ function FeedbackTab({ onView }) {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('feedback')
-        .select(`
-          id, user_id, type, message, context, created_at,
-          profiles:user_id(full_name, company_name)
-        `)
+        .select('id, user_id, type, message, context, created_at, profiles:user_id(full_name, company_name)')
         .order('created_at', { ascending: false })
+      console.log('Feedback query result:', data, 'Error:', error)
       setItems(data || [])
       setLoading(false)
     }
