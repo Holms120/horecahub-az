@@ -1663,8 +1663,6 @@ function FeedbackTab({ onView }) {
         .select('id, user_id, type, message, context, created_at, is_read')
         .order('created_at', { ascending: false })
 
-      console.log('Feedback:', JSON.stringify(data), JSON.stringify(error))
-
       if (error) { setLoading(false); return }
 
       if (data && data.length > 0) {
