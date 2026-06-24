@@ -12,8 +12,7 @@ import i18n from '../i18n/index.js'
 
 function sellerName(p) {
   if (!p) return i18n.t('messages.unknownUser')
-  return p.full_name || p.company_name ||
-    (p.email ? p.email.split('@')[0] : i18n.t('messages.unknownUser'))
+  return p.full_name || p.company_name || i18n.t('messages.unknownUser')
 }
 
 function dayLabel(iso) {
@@ -122,7 +121,7 @@ export default function Messages() {
       const ids = [...new Set(convList.map(c => c.otherId))]
       if (ids.length) {
         const { data: ps } = await supabase
-          .from('profiles').select('id, full_name, company_name, email, is_admin').in('id', ids)
+          .from('profiles').select('id, full_name, company_name').in('id', ids)
         if (ps) {
           const map = {}; ps.forEach(p => { map[p.id] = p })
           setProfiles(map)
@@ -368,7 +367,7 @@ export default function Messages() {
 
   async function deleteMessage(msgId) {
     setDeletingMsgId(msgId)
-    const { error } = await supabase.from('messages').delete().eq('id', msgId)
+    const { error } = await supabase.from('messages').delete().eq('id', msgId).eq('sender_id', user.id)
     if (!error) {
       const newMsgs = messages.filter(m => m.id !== msgId)
       setMessages(newMsgs)

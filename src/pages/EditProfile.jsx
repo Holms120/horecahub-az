@@ -78,6 +78,10 @@ export default function EditProfile() {
   function handleAvatarChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+    const MAX_MB = 5
+    if (!ALLOWED_TYPES.includes(file.type)) { alert('Yalnız JPG, PNG, WEBP formatlar qəbul edilir'); return }
+    if (file.size > MAX_MB * 1024 * 1024) { alert(`Maksimum fayl ölçüsü ${MAX_MB}MB-dır`); return }
     if (avatarPreview && avatarPreview.startsWith('blob:')) URL.revokeObjectURL(avatarPreview)
     setAvatarFile(file)
     setAvatarPreview(URL.createObjectURL(file))

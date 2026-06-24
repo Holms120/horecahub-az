@@ -21,9 +21,10 @@ const NO_CONDITION_categories = [
   'maintenance', 'construction', 'suppliers', 'business_sale',
 ]
 
-const MAX_FILES   = 5
-const MAX_MB      = 5
-const ALLOWED     = ['jpg', 'jpeg', 'png', 'webp']
+const MAX_FILES     = 5
+const MAX_MB        = 5
+const ALLOWED       = ['jpg', 'jpeg', 'png', 'webp']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const strip       = v => (v || '').replace(/<[^>]*>/g, '').trim()
 
 const EMPTY_FORM = {
@@ -112,7 +113,7 @@ export default function EditListing() {
     for (const file of incoming) {
       if (valid.length >= slots) break
       const ext = file.name.split('.').pop().toLowerCase()
-      if (!ALLOWED.includes(ext)) {
+      if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED.includes(ext)) {
         firstError = t('addListing.errFormat')
         continue
       }
@@ -179,7 +180,7 @@ export default function EditListing() {
         description:  strip(form.description),
         category:          form.category,
         subcategory:       form.subcategory || null,
-        other_description: form.subcategory?.endsWith('_other') && form.otherDescription ? form.otherDescription.trim() : null,
+        other_description: form.subcategory?.endsWith('_other') && form.otherDescription ? strip(form.otherDescription) : null,
         condition:    form.condition === 'Yeni' ? 'new' : 'used',
         city:         form.city,
         price:        Number(form.price),

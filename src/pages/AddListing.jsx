@@ -54,9 +54,10 @@ function TagInput({ tags, onChange, skillsPlaceholder }) {
     </div>
   )
 }
-const MAX_FILES = 5
-const MAX_MB    = 5
-const ALLOWED   = ['jpg', 'jpeg', 'png', 'webp']
+const MAX_FILES     = 5
+const MAX_MB        = 5
+const ALLOWED       = ['jpg', 'jpeg', 'png', 'webp']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 const strip = v => (v || '').replace(/<[^>]*>/g, '').trim()
 
@@ -143,7 +144,7 @@ export default function AddListing() {
     for (const file of incoming) {
       if (valid.length >= slots) break
       const ext = file.name.split('.').pop().toLowerCase()
-      if (!ALLOWED.includes(ext)) {
+      if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED.includes(ext)) {
         firstError = t('addListing.errFormat')
         continue
       }
@@ -243,14 +244,14 @@ export default function AddListing() {
       payment_type: form.paymentType,
       category:          form.category,
       subcategory:       form.subcategory || null,
-      other_description: form.subcategory?.endsWith('_other') && form.otherDescription ? form.otherDescription.trim() : null,
+      other_description: form.subcategory?.endsWith('_other') && form.otherDescription ? strip(form.otherDescription) : null,
       listing_type:      form.category === 'staff' ? form.listingType : 'item',
       experience_years:  form.category === 'staff' && form.experienceYears ? form.experienceYears : null,
       work_type:         form.category === 'staff' && form.workType ? form.workType : null,
       skills:            form.category === 'staff' && form.skills.length > 0 ? form.skills : null,
-      bio:               form.category === 'staff' && form.listingType === 'cv' ? form.bio.trim() || null : null,
-      certifications:    form.category === 'staff' && form.listingType === 'cv' ? form.certifications.trim() || null : null,
-      requirements:      form.category === 'staff' && form.listingType === 'vacancy' ? form.requirements.trim() || null : null,
+      bio:               form.category === 'staff' && form.listingType === 'cv' ? strip(form.bio) || null : null,
+      certifications:    form.category === 'staff' && form.listingType === 'cv' ? strip(form.certifications) || null : null,
+      requirements:      form.category === 'staff' && form.listingType === 'vacancy' ? strip(form.requirements) || null : null,
       condition:    form.condition === 'Yeni' ? 'new' : 'used',
       city:         form.city,
       images:       imageUrls,

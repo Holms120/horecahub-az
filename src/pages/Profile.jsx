@@ -44,7 +44,7 @@ export default function Profile() {
     async function load() {
       setLoading(true)
       const [pRes, lRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', id).single(),
+        supabase.from('profiles').select('id, full_name, company_name, phone, city, account_type, logo_url, description, created_at, supplier_categories, phone2').eq('id', id).single(),
         supabase
           .from('listings')
           .select('*, profiles!left(id, full_name, company_name, account_type, logo_url, phone)')
