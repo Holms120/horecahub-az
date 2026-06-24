@@ -1650,10 +1650,27 @@ function FeedbackTab({ onView }) {
     async function load() {
       const { data, error } = await supabase
         .from('feedback')
-        .select('id, user_id, type, message, context, created_at, profiles:user_id(full_name, company_name)')
+        .select('id, user_id, type, message, context, created_at, is_read')
         .order('created_at', { ascending: false })
-      console.log('Feedback query result:', data, 'Error:', error)
-      setItems(data || [])
+
+      console.log('Feedback:', JSON.stringify(data), JSON.stringify(error))
+
+      if (error) { setLoading(false); return }
+
+      if (data && data.length > 0) {
+        const userIds = [...new Set(data.filter(f => f.user_id).map(f => f.user_id))]
+        let profileMap = {}
+        if (userIds.length > 0) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('id, full_name, company_name')
+            .in('id', userIds)
+          ;(profileData || []).forEach(p => { profileMap[p.id] = p })
+        }
+        setItems(data.map(f => ({ ...f, profiles: profileMap[f.user_id] || null })))
+      } else {
+        setItems([])
+      }
       setLoading(false)
     }
     load()
