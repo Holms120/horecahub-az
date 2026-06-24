@@ -1638,15 +1638,19 @@ function FeedbackTab({ onView }) {
   const [loading, setLoading] = useState(true)
   const [typeFilter, setTypeFilter] = useState('all')
 
+  useEffect(() => { onView?.() }, [])
+
   useEffect(() => {
     async function load() {
       const { data } = await supabase
         .from('feedback')
-        .select('id, user_id, type, message, context, created_at')
+        .select(`
+          id, user_id, type, message, context, created_at,
+          profiles:user_id(full_name, company_name)
+        `)
         .order('created_at', { ascending: false })
       setItems(data || [])
       setLoading(false)
-      onView?.()
     }
     load()
   }, [])
@@ -1691,7 +1695,7 @@ function FeedbackTab({ onView }) {
               </div>
               <p className="text-sm text-gray-700 mt-2 leading-relaxed">{f.message}</p>
               <p className="text-xs text-gray-400 mt-1">
-                {'Anonim'}
+                {f.profiles?.full_name || f.profiles?.company_name || 'Anonim'}
               </p>
             </div>
           ))}
