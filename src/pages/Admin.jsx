@@ -577,7 +577,13 @@ function ListingsTab({ adminId }) {
 
   async function changeStatus(id, next) {
     const { error } = await supabase.from('listings').update({ status: next }).eq('id', id)
-    if (!error) setListings(ls => ls.map(l => l.id === id ? { ...l, status: next } : l))
+    if (!error) {
+      if (next === 'deleted') {
+        setListings(ls => ls.filter(l => l.id !== id))
+      } else {
+        setListings(ls => ls.map(l => l.id === id ? { ...l, status: next } : l))
+      }
+    }
   }
 
   function handleExport() {
@@ -1712,7 +1718,18 @@ function FeedbackTab({ onView }) {
                   </span>
                   <span className="text-xs text-gray-400">{f.context}</span>
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">{shortDate(f.created_at)}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400 whitespace-nowrap">{shortDate(f.created_at)}</span>
+                  <button
+                    onClick={async () => {
+                      await supabase.from('feedback').delete().eq('id', f.id)
+                      setItems(prev => prev.filter(item => item.id !== f.id))
+                    }}
+                    className="text-xs text-red-400 hover:text-red-600 ml-auto"
+                  >
+                    Sil
+                  </button>
+                </div>
               </div>
               <p className="text-sm text-gray-700 mt-2 leading-relaxed">{f.message}</p>
               <p className="text-xs text-gray-400 mt-1">
