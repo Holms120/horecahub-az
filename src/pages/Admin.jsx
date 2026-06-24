@@ -1640,10 +1640,11 @@ function FeedbackTab() {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('feedback')
-        .select('*, profiles(full_name, company_name)')
+        .select('id, user_id, type, message, context, created_at')
         .order('created_at', { ascending: false })
+      console.log('Feedback data:', data, 'Error:', error)
       setItems(data || [])
       setLoading(false)
     }
@@ -1690,7 +1691,7 @@ function FeedbackTab() {
               </div>
               <p className="text-sm text-gray-700 mt-2 leading-relaxed">{f.message}</p>
               <p className="text-xs text-gray-400 mt-1">
-                {f.profiles?.full_name || f.profiles?.company_name || 'Anonim'}
+                {'Anonim'}
               </p>
             </div>
           ))}
