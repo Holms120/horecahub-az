@@ -551,6 +551,7 @@ function ListingsTab({ adminId }) {
         const { data, error: err } = await supabase
           .from('listings')
           .select('id, title, category, status, city, created_at, user_id, images, description, price, profiles!left(id, full_name, company_name)')
+          .not('status', 'eq', 'deleted')
           .order('created_at', { ascending: false })
           .limit(300)
         if (err) throw err
@@ -576,6 +577,9 @@ function ListingsTab({ adminId }) {
   }, [])
 
   async function changeStatus(id, next) {
+    if (next === 'deleted') {
+      if (!window.confirm('Bu elanı silmək istədiyinizə əminsiniz?')) return
+    }
     const { error } = await supabase.from('listings').update({ status: next }).eq('id', id)
     if (!error) {
       if (next === 'deleted') {
