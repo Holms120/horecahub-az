@@ -11,6 +11,22 @@ const POSTS = [
     readTime: '5 dəqiqə',
     category: 'Bazar analizi',
     image: null,
+  },
+  {
+    id: 'bakida-kafe-acmaq-real-xercler-2025',
+    title: 'Bakıda kafe açmaq — real xərclər 2025',
+    excerpt: 'Coffee shop üçün 30,000–60,000 AZN, orta kafe üçün 80,000–150,000 AZN. Xərclərin tam bölgüsü, hüquqi addımlar, ən çox edilən səhvlər.',
+    date: '2025-06-25',
+    readTime: '6 dəqiqə',
+    category: 'Praktiki bələdçi',
+  },
+  {
+    id: 'restoran-meneceri-niye-tapilmir',
+    title: 'Restoran meneceri niyə tapılmır?',
+    excerpt: 'Azərbaycanda hər restoran sahibinin ən böyük problemi. Kadr böhranının struktural səbəbləri və praktiki həll yolları.',
+    date: '2025-06-25',
+    readTime: '4 dəqiqə',
+    category: 'Kadr məsələləri',
   }
 ]
 

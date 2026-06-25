@@ -63,6 +63,108 @@ const POST_CONTENT = {
       <p>Azərbaycanın HoReCa sektoru ildə 13-14% böyüyür. 25,000+ müəssisə avadanlıq alır, kadr axtarır, xammal sifariş edir. Lakin bu alış-verişin böyük hissəsi hələ də şəxsi əlaqələr və WhatsApp vasitəsilə həyata keçirilir.</p>
       <p>HorecaHub.az bu boşluğu doldurmaq üçün yaradılıb — Azərbaycanda HoReCa sektoruna xüsusi ilk rəqəmsal marketplace.</p>
     `
+  },
+  'bakida-kafe-acmaq-real-xercler-2025': {
+    title: 'Bakıda kafe açmaq — real xərclər 2025',
+    date: '25 İyun 2025',
+    readTime: '6 dəqiqə',
+    category: 'Praktiki bələdçi',
+    content: `
+    <p>Bakıda hər gün yeni kafe açılır. Amma hər gün kafe bağlanır da. Fərq nədədir? Çox vaxt cavab sadədir: büdcə planlaması yanlış olub. Bu məqalədə biz real rəqəmləri paylaşırıq — nə qədər pul lazımdır, hara xərclənir, nə zaman geri qayıdır.</p>
+
+    <h2>Format üzrə ilkin investisiya</h2>
+    <div class="stats-grid">
+      <div class="stat"><span class="label">Kiçik coffee shop (30-50 m²)</span><span class="value">30,000–60,000 AZN</span></div>
+      <div class="stat"><span class="label">Orta kafe (80-120 m²)</span><span class="value">80,000–150,000 AZN</span></div>
+      <div class="stat"><span class="label">Premium restoran</span><span class="value">200,000+ AZN</span></div>
+    </div>
+    <p>Bu rəqəmlərə icarə depoziti, təmir, avadanlıq, mebel, brendinq, ilkin stok və ilk 2-3 ayın əməliyyat xərcləri daxildir.</p>
+
+    <h2>Xərclərin bölgüsü</h2>
+    <div class="stats-grid">
+      <div class="stat"><span class="label">İcarə depoziti + ilk ay</span><span class="value">15–20%</span></div>
+      <div class="stat"><span class="label">Təmir və dizayn</span><span class="value">20–30%</span></div>
+      <div class="stat"><span class="label">Mətbəx avadanlığı</span><span class="value">15–25%</span></div>
+      <div class="stat"><span class="label">Zal mebeli</span><span class="value">10–15%</span></div>
+      <div class="stat"><span class="label">İlk 2-3 ay əmək haqqı</span><span class="value">10–15%</span></div>
+      <div class="stat"><span class="label">Gözlənilməz xərclər</span><span class="value">10–15%</span></div>
+    </div>
+
+    <h2>İcarə qiymətləri — ən böyük dəyişən</h2>
+    <p>Bakıda icarə qiyməti lokasiyadan asılı olaraq dramatik şəkildə dəyişir. Nəsimi və Səbail — ən bahalı rayonlardır, Xətai və Nərimanov isə daha əlçatanlı alternativlər təqdim edir.</p>
+    <p>Diqqət: Azərbaycanda icarə müqavilələri adətən sabit məbləğlə bağlanır — dövriyyəyə əsaslanan model yoxdur. Bu o deməkdir ki, satışınız az olsa belə, tam icarəni ödəməlisiz.</p>
+
+    <h2>Hüquqi addımlar</h2>
+    <ul>
+      <li>Fərdi sahibkar və ya MMC kimi dövlət qeydiyyatı (ASAN Xidmət)</li>
+      <li>VÖEN alınması və vergi rejimi seçimi — illik dövriyyəsi 200,000 AZN-ə qədər olanlar üçün sadələşdirilmiş vergi (2%) optimal</li>
+      <li>Online kassa aparatı və POS terminal qeydiyyatı</li>
+      <li>AQTA (Qida Təhlükəsizliyi Agentliyi) sanitariya tələbləri</li>
+      <li>Yanğın təhlükəsizliyi icazəsi</li>
+    </ul>
+    <p>Alkoqol satmaq üçün ayrıca lisenziya tələb olunmur — amma reklamına ciddi məhdudiyyətlər var, 18 yaş tələbinə riayət məcburidir.</p>
+
+    <h2>Gəlirlilik — real gözlənti</h2>
+    <div class="stats-grid">
+      <div class="stat"><span class="label">Sağlam net margin</span><span class="value">15%+</span></div>
+      <div class="stat"><span class="label">Azərbaycanda ortalama</span><span class="value">5–12%</span></div>
+      <div class="stat"><span class="label">ROI müddəti</span><span class="value">12–24 ay</span></div>
+    </div>
+    <p>Qida maya dəyəri: ət yeməklərində ~40%, qəlyənaltı və içkilərdə ~20%. Qəlyənaltı hər restoran üçün ən gəlirli kateqoriyadır.</p>
+
+    <h2>Ən çox edilən səhvlər</h2>
+    <ul>
+      <li>Ehtiyat kapitalı saxlamamaq — ilk 6 ay "öyrənmə dövrü"dür</li>
+      <li>Yanlış lokasiya seçimi — trafik olmayan yerdə açılmaq</li>
+      <li>Marketinq planı olmadan başlamaq</li>
+      <li>Açılışdan sonra keyfiyyəti düşürmək — yeni müştəri qazanmaqdan köhnəni saxlamaq daha çətindir</li>
+      <li>Heyəti lazımi şəkildə təlimləndirməmək</li>
+    </ul>
+
+    <h2>HorecaHub-dan necə istifadə edə bilərsiniz?</h2>
+    <p>Kafe açarkən avadanlıq, mebel, xidmət, kadr — hamısı lazımdır. HorecaHub.az-da Azərbaycanın HoReCa təchizatçıları bir yerdədir. Vasitəçisiz, birbaşa əlaqə.</p>
+  `
+  },
+  'restoran-meneceri-niye-tapilmir': {
+    title: 'Restoran meneceri niyə tapılmır?',
+    date: '25 İyun 2025',
+    readTime: '4 dəqiqə',
+    category: 'Kadr məsələləri',
+    content: `
+    <p>Azərbaycanda hər restoran sahibinin ağzından eyni şikayəti eşitmək mümkündür: "Yaxşı menecer tapа bilmirəm." Bu təsadüf deyil. Kadr böhranının struktural səbəbləri var.</p>
+
+    <h2>Rəqəmlər nə deyir?</h2>
+    <div class="stats-grid">
+      <div class="stat"><span class="label">Restoran meneceri orta maaşı</span><span class="value">1,650 AZN</span></div>
+      <div class="stat"><span class="label">Bazar aralığı</span><span class="value">1,100–2,200 AZN</span></div>
+      <div class="stat"><span class="label">Tələb olunan təcrübə</span><span class="value">3+ il</span></div>
+      <div class="stat"><span class="label">Sektorda orta maaş</span><span class="value">745–783 AZN</span></div>
+    </div>
+    <p>İctimai iaşə sektoru Azərbaycanda ən aşağı əmək haqqı verən sahələr sırasındadır. Bu, istedadlı insanları digər sahələrə itəliyir.</p>
+
+    <h2>Problemin kökü</h2>
+    <p><strong>1. Peşəkar təhsil sistemi yoxdur.</strong> Azərbaycanda hospitality management üzrə güclü ali təhsil proqramı yoxdur. Menecerlər ya özü-özünü yetişdirir, ya xaricdə oxuyur, ya da digər sahələrdən gəlir.</p>
+    <p><strong>2. Sektorda prestij aşağıdır.</strong> Restoran işi "müvəqqəti iş" kimi görülür, karyera perspektivi az bilinir. İstedadlı gənclər bank, IT, neft sektoru seçir.</p>
+    <p><strong>3. İş şəraiti çətindir.</strong> Həftəsonu, bayram, gecə növbəsi — ailə həyatı ilə uzlaşdırmaq çətin olur. Eyni maaşla ofis işi daha cəlbedici görünür.</p>
+    <p><strong>4. Tələb sürətlə artır.</strong> Bakıda son 5 ildə restoran sayı 2 dəfə artdı. Amma keyfiyyətli menecer bazarı eyni sürətlə böyümədi.</p>
+
+    <h2>Sahibkarlar nə edir?</h2>
+    <ul>
+      <li>Ofisiantı menecer qaldırır — sürətli, amma riskli</li>
+      <li>Xarici mütəxəssis gətirir — xərci yüksəkdir, iş icazəsi lazımdır</li>
+      <li>Özü hər şeyi idarə edir — tükənmə riski yüksəkdir</li>
+      <li>Tanışlıq yolu ilə tapır — çox vaxt peşəkar meyarlara görə deyil</li>
+    </ul>
+
+    <h2>Həll yolları</h2>
+    <p><strong>Daxili yetişdirmə:</strong> Potensialı olan işçiləri erkən müəyyən edin, strukturlu inkişaf yolu hazırlayın. Bu ən davamlı həlldir.</p>
+    <p><strong>Rəqabətqabiliyyətli maaş:</strong> 1,500–2,000 AZN aralığı istedadları saxlayır. Yaxşı meneceri itirmək daha bahalıya başa gəlir.</p>
+    <p><strong>Şəffaf karyera yolu:</strong> Ofisiantdan menecerə, menecerdən direktora — bu yolun mövcudluğunu işçilərinizə göstərin.</p>
+    <p><strong>Şərait və mədəniyyət:</strong> Pul hər şey deyil. İş mühiti, hörmət, münasibət — bunlar da saxlayır.</p>
+
+    <h2>HorecaHub-da kadr bölməsi</h2>
+    <p>HorecaHub.az-da "Kadrlar" kateqoriyası tam bu məsələ üçündür — istər iş axtaran peşəkarlar, istər işçi axtaran işəgötürənlər üçün Azərbaycanın ilk ixtisaslaşmış HoReCa kadr platforması.</p>
+  `
   }
 }
 
