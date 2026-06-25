@@ -22,6 +22,8 @@ const Contact      = lazy(() => import('./pages/Contact'))
 const ComingSoon   = lazy(() => import('./pages/ComingSoon'))
 const NotFound     = lazy(() => import('./pages/NotFound'))
 const Admin        = lazy(() => import('./pages/Admin'))
+const Blog         = lazy(() => import('./pages/Blog'))
+const BlogPost     = lazy(() => import('./pages/BlogPost'))
 
 function PageSpinner() {
   return (
@@ -64,7 +66,8 @@ function Layout() {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/about"        element={<About />} />
             <Route path="/contact"      element={<Contact />} />
-            <Route path="/blog"         element={<ComingSoon />} />
+            <Route path="/blog"         element={<Blog />} />
+            <Route path="/blog/:id"     element={<BlogPost />} />
             <Route path="/careers"      element={<ComingSoon />} />
             <Route path="/partners"     element={<ComingSoon />} />
             <Route path="/faq"          element={<Navigate to="/how-it-works" replace />} />
