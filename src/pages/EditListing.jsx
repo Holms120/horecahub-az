@@ -269,7 +269,7 @@ export default function EditListing() {
           {form.category && subcategories[form.category]?.length > 0 && (
             <div className="mt-5 pt-5 border-t border-gray-100">
               <h3 className="text-sm font-semibold text-navy mb-3">{t('addListing.subcategory')}</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {subcategories[form.category].map(sub => (
                   <button
                     key={sub.id}

@@ -670,7 +670,9 @@
     "legal_service": "Hüquqi xidmət",
     "licensing": "Lisenziya və icazələr",
     "hr_service": "HR və əmək müqavilələri",
-    "legal_other": "Digər maliyyə/hüquq xidmətləri"
+    "legal_other": "Digər maliyyə/hüquq xidmətləri",
+    "filter_water": "Su filtr avadanlığı",
+    "terrace_outdoor": "Terras və xarici dizayn"
   },
   "cat": {
     "kitchen": "Mətbəx avadanlığı",

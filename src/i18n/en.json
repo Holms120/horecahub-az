@@ -670,7 +670,9 @@
     "legal_service": "Legal services",
     "licensing": "Licensing & permits",
     "hr_service": "HR & employment contracts",
-    "legal_other": "Other financial/legal services"
+    "legal_other": "Other financial/legal services",
+    "filter_water": "Water filtration equipment",
+    "terrace_outdoor": "Terrace & outdoor design"
   },
   "cat": {
     "kitchen": "Kitchen equipment",
