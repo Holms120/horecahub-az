@@ -5,7 +5,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle,
+  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -1767,6 +1767,7 @@ export default function Admin() {
   const [pendingBadge, setPendingBadge]   = useState(0)
   const [feedbackBadge, setFeedbackBadge] = useState(0)
   const [realtimeEvents, setRealtimeEvents] = useState([])
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -1847,58 +1848,112 @@ export default function Admin() {
   )
   if (!isAdmin) return <Navigate to="/" replace />
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <aside className="w-56 flex-shrink-0 bg-[#0A2342] text-white flex flex-col">
-        <div className="px-5 py-5 border-b border-white/10">
-          <Link to="/" className="text-white font-bold text-lg tracking-tight">HorecaHub</Link>
-          <p className="text-white/40 text-xs mt-0.5">Admin panel</p>
-        </div>
-        <nav className="flex-1 py-4 space-y-1 px-3">
-          {TABS.map(t => {
-            const Icon = t.icon
-            const badge = t.id === 'support'    ? supportBadge :
-                          t.id === 'moderation' ? pendingBadge :
-                          t.id === 'listings'   ? pendingBadge :
-                          t.id === 'feedback'   ? feedbackBadge : 0
-            const badgeColor = t.id === 'moderation' || t.id === 'listings' ? 'bg-amber-500' : 'bg-red-500'
-            return (
-              <button key={t.id} onClick={() => setTab(t.id)}
-                className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  tab === t.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-                }`}>
-                <Icon size={16} />
-                {t.label}
-                {badge > 0 && (
-                  <span className={`ml-auto w-5 h-5 ${badgeColor} text-white text-[10px] font-bold rounded-full flex items-center justify-center`}>{badge}</span>
-                )}
-              </button>
-            )
-          })}
-        </nav>
-        <div className="px-3 py-4 border-t border-white/10">
-          <button onClick={() => signOut()}
-            className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">
-            <LogOut size={16} /> Çıxış
-          </button>
-        </div>
-      </aside>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Mobile top bar */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0A2342] text-white sticky top-0 z-40">
+        <span className="font-bold text-sm">HorecaHub Admin</span>
+        <button onClick={() => setMobileSidebarOpen(true)} className="p-1">
+          <Menu size={22} />
+        </button>
+      </div>
 
-      <main className="flex-1 overflow-auto p-8">
-        {tab === 'dashboard'  && <DashboardTab  realtimeEvents={realtimeEvents} />}
-        {/* ModerationTab stays mounted to prevent re-fetch on tab switch */}
-        <div className={tab !== 'moderation' ? 'hidden' : ''}>
-          <ModerationTab adminId={adminId} onApprove={() => setPendingBadge(n => Math.max(0, n - 1))} />
+      {/* Mobile sidebar overlay */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileSidebarOpen(false)} />
+          <div className="absolute left-0 top-0 h-full w-72 bg-[#0A2342] overflow-y-auto flex flex-col">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
+              <span className="text-white font-bold">Admin Panel</span>
+              <button onClick={() => setMobileSidebarOpen(false)} className="text-white/70 hover:text-white">
+                <X size={20} />
+              </button>
+            </div>
+            <nav className="flex-1 py-4 space-y-1 px-3">
+              {TABS.map(t => {
+                const Icon = t.icon
+                const badge = t.id === 'support'    ? supportBadge :
+                              t.id === 'moderation' ? pendingBadge :
+                              t.id === 'listings'   ? pendingBadge :
+                              t.id === 'feedback'   ? feedbackBadge : 0
+                const badgeColor = t.id === 'moderation' || t.id === 'listings' ? 'bg-amber-500' : 'bg-red-500'
+                return (
+                  <button key={t.id} onClick={() => { setTab(t.id); setMobileSidebarOpen(false) }}
+                    className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      tab === t.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+                    }`}>
+                    <Icon size={16} />
+                    {t.label}
+                    {badge > 0 && (
+                      <span className={`ml-auto w-5 h-5 ${badgeColor} text-white text-[10px] font-bold rounded-full flex items-center justify-center`}>{badge}</span>
+                    )}
+                  </button>
+                )
+              })}
+            </nav>
+            <div className="px-3 py-4 border-t border-white/10">
+              <button onClick={() => signOut()}
+                className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">
+                <LogOut size={16} /> Çıxış
+              </button>
+            </div>
+          </div>
         </div>
-        <div className={tab !== 'listings' ? 'hidden' : ''}>
-          <ListingsTab adminId={adminId} />
-        </div>
-        {tab === 'users'      && <UsersTab      adminId={adminId} />}
-        {tab === 'support'    && <SupportTab    adminId={adminId} />}
-        {tab === 'analytics'   && <AnalyticsTab />}
-        {tab === 'categories'  && <CategoriesTab />}
-        {tab === 'feedback'    && <FeedbackTab onView={() => setFeedbackBadge(0)} />}
-        {tab === 'settings'    && <SettingsTab />}
-      </main>
+      )}
+
+      <div className="flex flex-1">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:flex w-56 flex-shrink-0 bg-[#0A2342] text-white flex-col">
+          <div className="px-5 py-5 border-b border-white/10">
+            <Link to="/" className="text-white font-bold text-lg tracking-tight">HorecaHub</Link>
+            <p className="text-white/40 text-xs mt-0.5">Admin panel</p>
+          </div>
+          <nav className="flex-1 py-4 space-y-1 px-3">
+            {TABS.map(t => {
+              const Icon = t.icon
+              const badge = t.id === 'support'    ? supportBadge :
+                            t.id === 'moderation' ? pendingBadge :
+                            t.id === 'listings'   ? pendingBadge :
+                            t.id === 'feedback'   ? feedbackBadge : 0
+              const badgeColor = t.id === 'moderation' || t.id === 'listings' ? 'bg-amber-500' : 'bg-red-500'
+              return (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    tab === t.id ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+                  }`}>
+                  <Icon size={16} />
+                  {t.label}
+                  {badge > 0 && (
+                    <span className={`ml-auto w-5 h-5 ${badgeColor} text-white text-[10px] font-bold rounded-full flex items-center justify-center`}>{badge}</span>
+                  )}
+                </button>
+              )
+            })}
+          </nav>
+          <div className="px-3 py-4 border-t border-white/10">
+            <button onClick={() => signOut()}
+              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">
+              <LogOut size={16} /> Çıxış
+            </button>
+          </div>
+        </aside>
+
+        <main className="flex-1 overflow-auto p-4 lg:p-8">
+          {tab === 'dashboard'  && <DashboardTab  realtimeEvents={realtimeEvents} />}
+          {/* ModerationTab stays mounted to prevent re-fetch on tab switch */}
+          <div className={tab !== 'moderation' ? 'hidden' : ''}>
+            <ModerationTab adminId={adminId} onApprove={() => setPendingBadge(n => Math.max(0, n - 1))} />
+          </div>
+          <div className={tab !== 'listings' ? 'hidden' : ''}>
+            <ListingsTab adminId={adminId} />
+          </div>
+          {tab === 'users'      && <UsersTab      adminId={adminId} />}
+          {tab === 'support'    && <SupportTab    adminId={adminId} />}
+          {tab === 'analytics'   && <AnalyticsTab />}
+          {tab === 'categories'  && <CategoriesTab />}
+          {tab === 'feedback'    && <FeedbackTab onView={() => setFeedbackBadge(0)} />}
+          {tab === 'settings'    && <SettingsTab />}
+        </main>
+      </div>
     </div>
   )
 }
