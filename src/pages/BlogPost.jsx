@@ -214,7 +214,7 @@ const POST_CONTENT = {
 
     <h2>İcarə qiymətləri — ən böyük dəyişən</h2>
     <p>Bakıda icarə qiyməti lokasiyadan asılı olaraq dramatik şəkildə dəyişir. Nəsimi və Səbail — ən bahalı rayonlardır, Xətai və Nərimanov isə daha əlçatanlı alternativlər təqdim edir.</p>
-    <p>Diqqət: Azərbaycanda icarə müqavilələri adətən sabit məbləğlə bağlanır — dövriyyəyə əsaslanan model yoxdur. Bu o deməkdir ki, satışınız az olsa belə, tam icarəni ödəməlisiz.</p>
+    <p>Diqqət: Azərbaycanda icarə müqavilələri adətən sabit məbləğlə bağlanır — dövriyyəyə əsaslanan model yoxdur. Bu o deməkdir ki, satışınız az olsa belə, tam icarəni ödəməlisiniz.</p>
 
     <h2>Hüquqi addımlar</h2>
     <ul>
@@ -232,7 +232,7 @@ const POST_CONTENT = {
       <div class="stat"><span class="label">Azərbaycanda ortalama</span><span class="value">5–12%</span></div>
       <div class="stat"><span class="label">ROI müddəti</span><span class="value">12–24 ay</span></div>
     </div>
-    <p>Qida maya dəyəri: ət yeməklərində ~40%, qəlyənaltı və içkilərdə ~20%. Qəlyənaltı hər restoran üçün ən gəlirli kateqoriyadır.</p>
+    <p>Qida maya dəyəri: ət yeməklərində ~40%, qəlyanaltı və içkilərdə ~20%. Qəlyənaltı hər restoran üçün ən gəlirli kateqoriyadır.</p>
 
     <h2>Ən çox edilən səhvlər</h2>
     <ul>
@@ -369,7 +369,7 @@ const POST_CONTENT = {
     category: { az: 'Kadr məsələləri', ru: 'Кадровые вопросы', en: 'HR & Staffing' },
     content: {
       az: `
-    <p>Azərbaycanda hər restoran sahibinin ağzından eyni şikayəti eşitmək mümkündür: "Yaxşı menecer tapа bilmirəm." Bu təsadüf deyil. Kadr böhranının struktural səbəbləri var.</p>
+    <p>Azərbaycanda hər restoran sahibinin ağzından eyni şikayəti eşitmək mümkündür: "Yaxşı menecer tapa bilmirəm." Bu təsadüf deyil. Kadr böhranının struktural səbəbləri var.</p>
 
     <h2>Rəqəmlər nə deyir?</h2>
     <div class="stats-grid">
@@ -378,10 +378,10 @@ const POST_CONTENT = {
       <div class="stat"><span class="label">Tələb olunan təcrübə</span><span class="value">3+ il</span></div>
       <div class="stat"><span class="label">Sektorda orta maaş</span><span class="value">745–783 AZN</span></div>
     </div>
-    <p>İctimai iaşə sektoru Azərbaycanda ən aşağı əmək haqqı verən sahələr sırasındadır. Bu, istedadlı insanları digər sahələrə itəliyir.</p>
+    <p>İctimai iaşə sektoru Azərbaycanda ən aşağı əmək haqqı verən sahələr sırasındadır. Bu, istedadlı insanları digər sahələrə itələyir.</p>
 
     <h2>Problemin kökü</h2>
-    <p><strong>1. Peşəkar təhsil sistemi yoxdur.</strong> Azərbaycanda hospitality management üzrə güclü ali təhsil proqramı yoxdur. Menecerlər ya özü-özünü yetişdirir, ya xaricdə oxuyur, ya da digər sahələrdən gəlir.</p>
+    <p><strong>1. Peşəkar təhsil sistemi yoxdur.</strong> Azərbaycanda hospitality management üzrə güclü ali təhsil proqramı yoxdur. Menecerlər ya öz-özünü yetişdirir, ya xaricdə oxuyur, ya da digər sahələrdən gəlir.</p>
     <p><strong>2. Sektorda prestij aşağıdır.</strong> Restoran işi "müvəqqəti iş" kimi görülür, karyera perspektivi az bilinir. İstedadlı gənclər bank, IT, neft sektoru seçir.</p>
     <p><strong>3. İş şəraiti çətindir.</strong> Həftəsonu, bayram, gecə növbəsi — ailə həyatı ilə uzlaşdırmaq çətin olur. Eyni maaşla ofis işi daha cəlbedici görünür.</p>
     <p><strong>4. Tələb sürətlə artır.</strong> Bakıda son 5 ildə restoran sayı 2 dəfə artdı. Amma keyfiyyətli menecer bazarı eyni sürətlə böyümədi.</p>
