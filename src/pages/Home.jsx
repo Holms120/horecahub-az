@@ -7,7 +7,7 @@ import {
   Target, ArrowRight, Plus, Briefcase, Monitor, GraduationCap,
   Package, Store, ShoppingBasket,
   Shirt, Wrench, Printer, HardHat, Scale,
-  Phone, Zap, Lock
+  Phone, Zap, Lock, GlassWater
 } from 'lucide-react'
 import { useCategories } from '../hooks/useCategories'
 import { supabase } from '../supabaseClient'
@@ -19,7 +19,7 @@ const ICON_MAP = {
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, ShieldCheck, Briefcase, Monitor, GraduationCap,
   Package, Store, ShoppingBasket,
-  Shirt, Wrench, Printer, HardHat, Scale,
+  Shirt, Wrench, Printer, HardHat, Scale, GlassWater,
 }
 
 const CAT_COLORS = {
@@ -39,6 +39,7 @@ const CAT_COLORS = {
   print_ads:        'bg-indigo-50 text-indigo-600 border-indigo-100',
   construction:     'bg-yellow-50 text-yellow-600 border-yellow-100',
   legal_finance:    'bg-teal-50 text-teal-600 border-teal-100',
+  soft_beverages:   'bg-sky-50 text-sky-500 border-sky-100',
 }
 
 export default function Home() {

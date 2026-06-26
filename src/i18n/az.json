@@ -672,7 +672,12 @@
     "hr_service": "HR və əmək müqavilələri",
     "legal_other": "Digər maliyyə/hüquq xidmətləri",
     "filter_water": "Su filtr avadanlığı",
-    "terrace_outdoor": "Terras və xarici dizayn"
+    "terrace_outdoor": "Terras və xarici dizayn",
+    "sparkling_wine": "Oynaq çaxır",
+    "vodka": "Araq",
+    "cognac": "Konyak",
+    "whisky": "Viski",
+    "premium_spirits": "Elit içkilər"
   },
   "cat": {
     "kitchen": "Mətbəx avadanlığı",
@@ -695,7 +700,8 @@
     "maintenance": "Texniki xidmət və təmir",
     "print_ads": "Reklam və çap",
     "construction": "İnşaat və dizayn",
-    "legal_finance": "Mühasibat və hüquq"
+    "legal_finance": "Mühasibat və hüquq",
+    "soft_beverages": "Alkoqolsuz içkilər"
   },
   "contact": {
     "title": "Bizimlə əlaqə",

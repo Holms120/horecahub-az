@@ -672,7 +672,12 @@
     "hr_service": "HR & employment contracts",
     "legal_other": "Other financial/legal services",
     "filter_water": "Water filtration equipment",
-    "terrace_outdoor": "Terrace & outdoor design"
+    "terrace_outdoor": "Terrace & outdoor design",
+    "sparkling_wine": "Sparkling wine",
+    "vodka": "Vodka",
+    "cognac": "Cognac",
+    "whisky": "Whisky",
+    "premium_spirits": "Premium spirits"
   },
   "cat": {
     "kitchen": "Kitchen equipment",
@@ -695,7 +700,8 @@
     "maintenance": "Maintenance & Repair",
     "print_ads": "Advertising & Print",
     "construction": "Construction & Design",
-    "legal_finance": "Accounting & Legal"
+    "legal_finance": "Accounting & Legal",
+    "soft_beverages": "Non-alcoholic beverages"
   },
   "contact": {
     "title": "Contact us",
