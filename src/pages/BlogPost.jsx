@@ -9,7 +9,7 @@ const POST_CONTENT = {
       ru: 'Рынок HoReCa в Азербайджане: цифры и тенденции 2025 года',
       en: 'Azerbaijan HoReCa Market: 2025 Figures and Trends',
     },
-    date: { az: '25 İyun 2025', ru: '25 июня 2025', en: 'June 25, 2025' },
+    date: { az: '25 İyun 2026', ru: '25 июня 2026', en: 'June 25, 2026' },
     readTime: { az: '5 dəqiqə', ru: '5 минут', en: '5 min read' },
     category: { az: 'Bazar analizi', ru: 'Анализ рынка', en: 'Market Analysis' },
     content: {
@@ -187,7 +187,7 @@ const POST_CONTENT = {
       ru: 'Открыть кафе в Баку — реальные расходы 2025',
       en: 'Opening a Café in Baku — Real Costs 2025',
     },
-    date: { az: '25 İyun 2025', ru: '25 июня 2025', en: 'June 25, 2025' },
+    date: { az: '25 İyun 2026', ru: '25 июня 2026', en: 'June 25, 2026' },
     readTime: { az: '6 dəqiqə', ru: '6 минут', en: '6 min read' },
     category: { az: 'Praktiki bələdçi', ru: 'Практическое руководство', en: 'Practical Guide' },
     content: {
@@ -364,7 +364,7 @@ const POST_CONTENT = {
       ru: 'Почему не найти менеджера ресторана?',
       en: 'Why Is It So Hard to Find a Restaurant Manager?',
     },
-    date: { az: '25 İyun 2025', ru: '25 июня 2025', en: 'June 25, 2025' },
+    date: { az: '25 İyun 2026', ru: '25 июня 2026', en: 'June 25, 2026' },
     readTime: { az: '4 dəqiqə', ru: '4 минуты', en: '4 min read' },
     category: { az: 'Kadr məsələləri', ru: 'Кадровые вопросы', en: 'HR & Staffing' },
     content: {

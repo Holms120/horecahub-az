@@ -16,9 +16,9 @@ const POSTS = [
       en: 'Food service turnover approaches 2 billion manats, the sector grows 13% per year. The full market picture — figures, trends, opportunities.',
     },
     date: {
-      az: '25 İyun 2025',
-      ru: '25 июня 2025',
-      en: 'June 25, 2025',
+      az: '25 İyun 2026',
+      ru: '25 июня 2026',
+      en: 'June 25, 2026',
     },
     readTime: {
       az: '5 dəqiqə',
@@ -44,9 +44,9 @@ const POSTS = [
       en: 'Coffee shop: 30,000–60,000 AZN, medium café: 80,000–150,000 AZN. Full cost breakdown, legal steps, and the most common mistakes.',
     },
     date: {
-      az: '25 İyun 2025',
-      ru: '25 июня 2025',
-      en: 'June 25, 2025',
+      az: '25 İyun 2026',
+      ru: '25 июня 2026',
+      en: 'June 25, 2026',
     },
     readTime: {
       az: '6 dəqiqə',
@@ -72,9 +72,9 @@ const POSTS = [
       en: "Every restaurant owner's biggest problem in Azerbaijan. The structural causes of the staffing crisis and practical solutions.",
     },
     date: {
-      az: '25 İyun 2025',
-      ru: '25 июня 2025',
-      en: 'June 25, 2025',
+      az: '25 İyun 2026',
+      ru: '25 июня 2026',
+      en: 'June 25, 2026',
     },
     readTime: {
       az: '4 dəqiqə',
