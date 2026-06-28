@@ -227,18 +227,18 @@ export default function Home() {
             const filtered = categories
             const visibleCategories = showAllCats ? filtered : filtered.slice(0, 18)
             return (
-          <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-            {visibleCategories.map((cat, i) => {
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+            {visibleCategories.map((cat) => {
               const Icon = ICON_MAP[cat.icon]
               const color = CAT_COLORS[cat.id] || 'bg-gray-50 text-gray-600 border-gray-100'
               return (
                 <button
                   key={cat.id}
                   onClick={() => navigate(`/listings?category=${cat.id}`)}
-                  className={`${i >= 8 ? 'hidden sm:flex' : 'flex'} flex-col items-center gap-1 sm:gap-2 p-2 sm:p-4 rounded-xl border hover:border-blue-400 hover:shadow-sm transition-all duration-150 ${color}`}
+                  className={`flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl border hover:border-blue-400 hover:shadow-sm transition-all duration-150 ${color}`}
                 >
                   {Icon && (
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 flex items-center justify-center">
+                    <div className="w-6 h-6 flex-shrink-0 flex items-center justify-center">
                       <Icon className="w-full h-full" />
                     </div>
                   )}
