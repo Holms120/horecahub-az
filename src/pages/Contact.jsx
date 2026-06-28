@@ -69,6 +69,23 @@ export default function Contact() {
         content: 'Salam! Sizinlə əlaqə saxlamaq istəyirəm.',
         is_support: true,
       })
+      try {
+        await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            title: '💬 Yeni support mesajı',
+            category: 'Support',
+            city: '',
+            user_name: user?.user_metadata?.full_name || user?.email || 'Anonim',
+          }),
+        })
+      } catch (e) {
+        console.warn('Telegram notification failed:', e)
+      }
     }
     setLoadingSupport(false)
     navigate('/messages')

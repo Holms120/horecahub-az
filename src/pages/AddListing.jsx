@@ -431,6 +431,23 @@ export default function AddListing() {
         message: feedbackData.message.trim(),
         context: 'listing_create',
       })
+      try {
+        await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            title: `📝 Yeni feedback: ${feedbackData.type === 'suggestion' ? 'Təklif' : 'Problem'}`,
+            category: 'Feedback',
+            city: '',
+            user_name: 'İstifadəçi',
+          }),
+        })
+      } catch (e) {
+        console.warn('Telegram notification failed:', e)
+      }
     }
     window.location.href = '/'
   }

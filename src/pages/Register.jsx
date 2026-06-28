@@ -107,6 +107,24 @@ export default function Register() {
       return
     }
 
+    try {
+      await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          title: '🆕 Yeni qeydiyyat',
+          category: form.accountType === 'supplier' ? 'Təchizatçı' : 'Fərdi',
+          city: form.city || '',
+          user_name: form.fullName || form.email,
+        }),
+      })
+    } catch (e) {
+      console.warn('Telegram notification failed:', e)
+    }
+
     if (!signUpData.session) {
       setConfirmed(true)
     } else {

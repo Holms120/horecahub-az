@@ -227,8 +227,10 @@ serve(async (req: Request) => {
   }
 
   // Require Authorization header — must be called by Supabase Auth Hook (hook secret)
+  const hookSecret = Deno.env.get('SEND_CONFIRMATION_HOOK_SECRET')
   const authHeader = req.headers.get('Authorization')
-  if (!authHeader) {
+
+  if (!authHeader || (hookSecret && authHeader !== `Bearer ${hookSecret}`)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       headers: { ...CORS, 'Content-Type': 'application/json' },
       status: 401,

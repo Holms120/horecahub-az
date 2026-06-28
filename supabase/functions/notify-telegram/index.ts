@@ -20,12 +20,12 @@ serve(async (req) => {
   try {
     const { title, category, city, user_name } = await req.json()
 
-    const message = `🆕 *Yeni elan gəldi!*\n\n` +
-      `📌 *Başlıq:* ${title}\n` +
-      `📂 *Kateqoriya:* ${category}\n` +
-      `📍 *Şəhər:* ${city}\n` +
-      `👤 *İstifadəçi:* ${user_name}\n\n` +
-      `✅ [Admin paneldə təsdiqlə](https://horecahub.az/admin)`
+    const parts = [`🔔 *${title}*`]
+    if (category) parts.push(`📂 *Kateqoriya:* ${category}`)
+    if (city) parts.push(`📍 *Şəhər:* ${city}`)
+    if (user_name) parts.push(`👤 *İstifadəçi:* ${user_name}`)
+    parts.push(`\n✅ [Admin panelə gir](https://horecahub.az/admin)`)
+    const message = parts.join('\n')
 
     const response = await fetch(
       `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
