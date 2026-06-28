@@ -72,7 +72,6 @@ export default function Contact() {
     }
 
     try {
-      console.log('Sending telegram...')
       await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
         method: 'POST',
         headers: {
@@ -86,7 +85,6 @@ export default function Contact() {
           user_name: user?.user_metadata?.full_name || user?.email || 'Anonim',
         }),
       })
-      console.log('Telegram sent')
     } catch (e) {
       console.warn('Telegram notification failed:', e)
     }
