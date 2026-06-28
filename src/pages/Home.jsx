@@ -223,11 +223,12 @@ export default function Home() {
               {showAllCats ? 'Azalt ←' : t('home.viewAll') + ' →'}
             </button>
           </div>
+          {(() => {
+            const filtered = categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id))
+            const visibleCategories = showAllCats ? filtered : filtered.slice(0, 18)
+            return (
           <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-            {(showAllCats
-              ? categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id))
-              : categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).slice(0, 18)
-            ).map((cat, i) => {
+            {visibleCategories.map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
               const color = CAT_COLORS[cat.id] || 'bg-gray-50 text-gray-600 border-gray-100'
               return (
@@ -246,6 +247,8 @@ export default function Home() {
               )
             })}
           </div>
+            )
+          })()}
         </div>
       </section>
 
