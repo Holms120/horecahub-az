@@ -5,7 +5,7 @@ import {
   CheckCircle2, Loader2,
   ChefHat, Coffee, Thermometer, UtensilsCrossed,
   LayoutGrid, Wine, Users, Truck, ShoppingBasket,
-  Shirt, Wrench, Printer, HardHat, Scale
+  Shirt, Wrench, Printer, HardHat, Scale, GlassWater
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
@@ -13,7 +13,7 @@ import { CITIES } from '../data/mockData'
 import { useCategories } from '../hooks/useCategories'
 import { useTranslation } from 'react-i18next'
 
-const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale }
+const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale, GlassWater }
 
 const NO_CONDITION_categories = [
   'food_ingredients', 'hygiene', 'alcohol', 'soft_beverages', 'packaging', 'textile',
