@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next'
 const ICON_MAP = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale }
 
 const NO_CONDITION_categories = [
-  'food_ingredients', 'hygiene', 'alcohol', 'packaging', 'textile',
+  'food_ingredients', 'hygiene', 'alcohol', 'soft_beverages', 'packaging', 'textile',
   'print_ads', 'legal_finance', 'consulting', 'software', 'training', 'staff',
   'maintenance', 'construction', 'suppliers', 'business_sale',
 ]
