@@ -52,6 +52,7 @@ export default function Home() {
   const navigate = useNavigate()
   const { categories } = useCategories()
   const [activeCategoryIds, setActiveCategoryIds] = useState([])
+  const [showAllCats, setShowAllCats] = useState(false)
 
   useEffect(() => {
     supabase
@@ -216,14 +217,17 @@ export default function Home() {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl md:text-2xl font-bold text-navy">{t('home.categoriesTitle')}</h2>
             <button
-              onClick={() => navigate('/listings')}
-              className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
+              onClick={() => setShowAllCats(v => !v)}
+              className="text-blue-600 text-sm font-semibold hover:underline"
             >
-              {t('home.viewAll')} <ArrowRight size={15} />
+              {showAllCats ? 'Azalt ←' : t('home.viewAll') + ' →'}
             </button>
           </div>
           <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
-            {categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).map((cat, i) => {
+            {(showAllCats
+              ? categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id))
+              : categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id)).slice(0, 12)
+            ).map((cat, i) => {
               const Icon = ICON_MAP[cat.icon]
               const color = CAT_COLORS[cat.id] || 'bg-gray-50 text-gray-600 border-gray-100'
               return (
