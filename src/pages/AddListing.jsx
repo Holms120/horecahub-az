@@ -396,6 +396,26 @@ export default function AddListing() {
       setSubmitError(error.message)
       setSubmitting(false)
     } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        const userName = session?.user?.user_metadata?.full_name || session?.user?.email || 'Anonim'
+
+        await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            title: form.title,
+            category: form.category,
+            city: form.city,
+            user_name: userName,
+          }),
+        })
+      } catch (e) {
+        console.warn('Telegram notification failed:', e)
+      }
       setSubmitting(false)
       setFeedbackStep(true)
     }

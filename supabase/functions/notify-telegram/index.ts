@@ -1,0 +1,44 @@
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+
+const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
+const TELEGRAM_CHAT_ID = Deno.env.get('TELEGRAM_CHAT_ID')
+
+serve(async (req) => {
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 })
+  }
+
+  try {
+    const { title, category, city, user_name, listing_id } = await req.json()
+
+    const message = `🆕 *Yeni elan gəldi!*\n\n` +
+      `📌 *Başlıq:* ${title}\n` +
+      `📂 *Kateqoriya:* ${category}\n` +
+      `📍 *Şəhər:* ${city}\n` +
+      `👤 *İstifadəçi:* ${user_name}\n\n` +
+      `✅ [Admin paneldə təsdiqlə](https://horecahub.az/admin)`
+
+    const response = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: 'Markdown',
+        }),
+      }
+    )
+
+    const result = await response.json()
+    return new Response(JSON.stringify(result), {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+})
