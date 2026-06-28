@@ -224,7 +224,7 @@ export default function Home() {
             </button>
           </div>
           {(() => {
-            const filtered = categories.filter(c => !['staff', 'suppliers', 'consulting', 'software', 'training'].includes(c.id))
+            const filtered = categories
             const visibleCategories = showAllCats ? filtered : filtered.slice(0, 18)
             return (
           <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
