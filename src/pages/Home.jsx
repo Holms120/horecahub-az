@@ -313,24 +313,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA BANNER ── */}
-      <section className="py-16 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            {t('home.ctaBanner')}
-          </h2>
-          <p className="text-blue-100 mb-8">
-            {t('home.ctaBannerSub')}
-          </p>
-          <button
-            onClick={() => navigate('/sell')}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-lg"
-          >
-            <Plus size={18} />
-            {t('home.ctaBannerBtn')}
-          </button>
-        </div>
-      </section>
     </div>
   )
 }
