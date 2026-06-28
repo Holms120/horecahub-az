@@ -225,7 +225,7 @@ export default function Home() {
           </div>
           {(() => {
             const filtered = categories
-            const visibleCategories = showAllCats ? filtered : filtered.slice(0, 18)
+            const visibleCategories = showAllCats ? filtered : filtered.slice(0, 9)
             return (
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
             {visibleCategories.map((cat) => {
