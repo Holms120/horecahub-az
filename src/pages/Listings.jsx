@@ -45,7 +45,7 @@ export default function Listings() {
 
     let q = supabase
       .from('listings')
-      .select('*, listing_type, experience_years, work_type, skills, bio, certifications, requirements, other_description, profiles!left(id, full_name, company_name, account_type, logo_url, phone, is_verified)', { count: 'exact' })
+      .select('*, listing_type, experience_years, work_type, skills, bio, certifications, requirements, other_description, profiles!left(id, full_name, company_name, account_type, logo_url, phone)', { count: 'exact' })
       .eq('status', 'active')
 
     if (query) q = q.ilike('title', `%${query}%`)
@@ -82,7 +82,7 @@ export default function Listings() {
     } else {
       let normalized = (data || []).map(normalizeListing)
       if (filters.verifiedOnly) {
-        normalized = normalized.filter(l => l.seller.isVerified)
+        normalized = normalized.filter(l => l.seller.accountType === 'supplier')
       }
       setListings(normalized)
       setTotalCount(count || 0)
