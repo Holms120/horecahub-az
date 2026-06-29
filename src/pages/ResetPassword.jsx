@@ -1,0 +1,69 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
+import { supabase } from '../supabaseClient'
+
+export default function ResetPassword() {
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const navigate = useNavigate()
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (password !== confirm) { setError('Şifrələr uyğun gəlmir'); return }
+    if (password.length < 6) { setError('Şifrə ən az 6 simvol olmalıdır'); return }
+    setLoading(true)
+    const { error: err } = await supabase.auth.updateUser({ password })
+    if (err) {
+      setError(err.message)
+    } else {
+      setSuccess(true)
+      setTimeout(() => navigate('/login'), 2000)
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <Helmet><title>Yeni şifrə — HorecaHub</title></Helmet>
+      <div className="w-full max-w-md bg-white rounded-2xl border border-gray-200 p-8">
+        <h1 className="text-2xl font-bold text-navy mb-6">Yeni şifrə təyin et</h1>
+        {success ? (
+          <p className="text-green-600 font-semibold text-center">Şifrə yeniləndi! Yönləndirilirsiniz...</p>
+        ) : (
+          <>
+            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="password"
+                placeholder="Yeni şifrə"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+              />
+              <input
+                type="password"
+                placeholder="Şifrəni təsdiq edin"
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-60"
+              >
+                {loading ? 'Yenilənir...' : 'Şifrəni yenilə'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

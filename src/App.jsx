@@ -24,7 +24,9 @@ const NotFound     = lazy(() => import('./pages/NotFound'))
 const Admin        = lazy(() => import('./pages/Admin'))
 const Blog         = lazy(() => import('./pages/Blog'))
 const BlogPost     = lazy(() => import('./pages/BlogPost'))
-const Suppliers    = lazy(() => import('./pages/Suppliers'))
+const Suppliers      = lazy(() => import('./pages/Suppliers'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword  = lazy(() => import('./pages/ResetPassword'))
 
 function PageSpinner() {
   return (
@@ -56,8 +58,10 @@ function Layout() {
             <Route path="/listings"     element={<Listings />} />
             <Route path="/listings/:id" element={<ListingDetail />} />
             <Route path="/sell"         element={<AddListing />} />
-            <Route path="/login"        element={<Login />} />
-            <Route path="/register"     element={<Register />} />
+            <Route path="/login"            element={<Login />} />
+            <Route path="/register"         element={<Register />} />
+            <Route path="/forgot-password"  element={<ForgotPassword />} />
+            <Route path="/reset-password"   element={<ResetPassword />} />
             <Route path="/profile/:id"  element={<Profile />} />
             <Route path="/messages"     element={<Messages />} />
             <Route path="/edit-profile"      element={<EditProfile />} />

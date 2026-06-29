@@ -79,6 +79,11 @@ export default function Login() {
                 </button>
               </div>
             </div>
+            <div className="text-right">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                Şifrəni unutmusunuz?
+              </Link>
+            </div>
             <button
               type="submit" disabled={loading}
               className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-60 transition-colors"
