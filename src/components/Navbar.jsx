@@ -65,7 +65,7 @@ export default function Navbar() {
   ]
 
   const SERVICES_ITEMS = [
-    { id: 'suppliers',     key: 'cat.suppliers', href: '/listings?seller_type=supplier' },
+    { id: 'suppliers',     key: 'cat.suppliers', href: '/suppliers' },
     { id: 'consulting',    key: 'cat.consulting'    },
     { id: 'software',      key: 'cat.software'      },
     { id: 'training',      key: 'cat.training'      },
