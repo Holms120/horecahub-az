@@ -11,4 +11,14 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false }
 })
 
+function syncCrispLocale(lang) {
+  if (window.$crisp) {
+    const crispLang = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'az'
+    window.$crisp.push(['config', 'locale', [crispLang]])
+  }
+}
+
+syncCrispLocale(i18n.language)
+i18n.on('languageChanged', syncCrispLocale)
+
 export default i18n
