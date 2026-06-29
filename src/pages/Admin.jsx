@@ -978,7 +978,7 @@ function SupportTab({ adminId }) {
       setLoading(true); setError(null)
       try {
         const { data: msgs, error: err } = await supabase
-          .from('messages').select('*').eq('is_support', true)
+          .from('messages').select('*').is('listing_id', null)
           .order('created_at', { ascending: true })
         if (err) { setError('Supabase xətası: ' + err.message); setLoading(false); return }
         if (!msgs?.length) { setConvs([]); setLoading(false); return }
@@ -1015,7 +1015,7 @@ function SupportTab({ adminId }) {
 
   async function markRead(userId) {
     await supabase.from('messages').update({ is_read: true })
-      .eq('is_support', true).eq('sender_id', userId).eq('receiver_id', adminId).eq('is_read', false)
+      .is('listing_id', null).eq('sender_id', userId).eq('receiver_id', adminId).eq('is_read', false)
     setConvs(cs => cs.map(c => c.userId === userId ? { ...c, unread: 0 } : c))
   }
 
@@ -1026,7 +1026,7 @@ function SupportTab({ adminId }) {
     setSending(true)
     const { error } = await supabase.from('messages').insert({
       sender_id: adminId, receiver_id: activeId,
-      listing_id: null, content: reply.trim(), is_support: true,
+      listing_id: null, content: reply.trim(),
     })
     if (!error) { setReply(''); await loadRef.current?.() }
     setSending(false)
