@@ -40,7 +40,7 @@ export default function ListingCard({ listing }) {
 
   const isOwner  = !!(user && userId && user.id === userId)
   const isStaff  = category === 'staff'
-  const ptKey    = paymentType || 'cash'
+  const ptArr    = Array.isArray(paymentType) ? paymentType : (paymentType ? [paymentType] : ['cash'])
 
   const displayPrice = isStaff
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
@@ -144,11 +144,11 @@ export default function ListingCard({ listing }) {
 
         <div className="flex items-center gap-2 mb-2">
           <p className="text-base font-bold text-blue-600">{displayPrice}</p>
-          {!isStaff && (
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PAYMENT_BADGE[ptKey] || PAYMENT_BADGE.cash}`}>
-              {PAYMENT_LABELS[ptKey] || t('listingCard.cash')}
+          {!isStaff && ptArr.map(pt => (
+            <span key={pt} className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PAYMENT_BADGE[pt] || PAYMENT_BADGE.cash}`}>
+              {PAYMENT_LABELS[pt] || pt}
             </span>
-          )}
+          ))}
         </div>
         <div className="flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1"><MapPin size={11} />{city}</span>

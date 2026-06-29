@@ -79,7 +79,7 @@ export default function Listings() {
       items = items.filter(l => l.price <= max)
     }
     if (filters.conditions.length)            items = items.filter(l => filters.conditions.includes(l.condition))
-    if (filters.paymentTypes?.length)          items = items.filter(l => filters.paymentTypes.includes(l.paymentType || 'cash'))
+    if (filters.paymentTypes?.length)          items = items.filter(l => { const pts = Array.isArray(l.paymentType) ? l.paymentType : [l.paymentType || 'cash']; return filters.paymentTypes.some(fp => pts.includes(fp)) })
     if (filters.subcategories?.length)         items = items.filter(l => filters.subcategories.includes(l.subcategory))
     if (filters.city)                         items = items.filter(l => l.city === filters.city)
     if (filters.verifiedOnly)                 items = items.filter(l => l.seller.isVerified)

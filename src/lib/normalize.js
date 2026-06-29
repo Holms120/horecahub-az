@@ -55,7 +55,7 @@ export function normalizeListing(row) {
     images,
     description: row.description || '',
     isFeatured: false,
-    paymentType: row.payment_type || 'cash',
+    paymentType: Array.isArray(row.payment_type) ? row.payment_type : (row.payment_type ? [row.payment_type] : ['cash']),
     userId: row.user_id || '',
     status: row.status || 'active',
     seller: {

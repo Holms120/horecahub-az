@@ -22,7 +22,7 @@ const NO_CONDITION_categories = [
 ]
 const EMPTY     = {
   category: '', subcategory: '', otherDescription: '',
-  title: '', description: '', condition: 'Yeni', city: '', price: '', paymentType: 'cash',
+  title: '', description: '', condition: 'Yeni', city: '', price: '', paymentTypes: ['cash'],
   // Staff-specific
   listingType: 'cv', experienceYears: '', workType: 'full',
   skills: [], bio: '', certifications: '', requirements: '', companyNameVacancy: '',
@@ -375,7 +375,7 @@ export default function AddListing() {
       title:        strip(form.title),
       description:  strip(form.description),
       price:        Number(form.price),
-      payment_type: form.paymentType,
+      payment_type: form.paymentTypes,
       category:          form.category,
       subcategory:       form.subcategory || null,
       other_description: form.subcategory?.endsWith('_other') && form.otherDescription ? strip(form.otherDescription) : null,
@@ -879,20 +879,18 @@ export default function AddListing() {
                     <label
                       key={value}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
-                        form.paymentType === value
+                        form.paymentTypes.includes(value)
                           ? 'border-blue-600 bg-blue-50'
                           : 'border-gray-200 hover:border-blue-300'
                       }`}
                     >
                       <input
-                        type="radio"
-                        name="paymentType"
-                        value={value}
-                        checked={form.paymentType === value}
-                        onChange={() => set('paymentType', value)}
-                        className="accent-blue-600"
+                        type="checkbox"
+                        checked={form.paymentTypes.includes(value)}
+                        onChange={() => set('paymentTypes', form.paymentTypes.includes(value) ? form.paymentTypes.filter(p => p !== value) : [...form.paymentTypes, value])}
+                        className="accent-blue-600 rounded"
                       />
-                      <span className={`text-sm font-medium ${form.paymentType === value ? 'text-blue-700' : 'text-gray-700'}`}>
+                      <span className={`text-sm font-medium ${form.paymentTypes.includes(value) ? 'text-blue-700' : 'text-gray-700'}`}>
                         {label}
                       </span>
                     </label>
@@ -931,7 +929,7 @@ export default function AddListing() {
                 { label: t('addListing.reviewCity'),        value: form.city || '—' },
                 { label: t('addListing.reviewPhotos'),      value: selectedFiles.length > 0 ? `${selectedFiles.length}/${MAX_FILES}` : t('addListing.noPhotos') },
                 { label: t('addListing.reviewPrice'),       value: form.price ? `₼${form.price}` : '—' },
-                { label: t('addListing.reviewPayment'),     value: PAYMENT_OPTS.find(o => o.value === form.paymentType)?.label || t('addListing.cash') },
+                { label: t('addListing.reviewPayment'),     value: form.paymentTypes.map(pt => PAYMENT_OPTS.find(o => o.value === pt)?.label || pt).join(', ') || t('addListing.cash') },
               ].map(row => (
                 <div key={row.label} className="flex justify-between items-start py-3">
                   <span className="text-sm text-gray-500">{row.label}</span>

@@ -156,7 +156,7 @@ const SUBCATEGORY_PLACEHOLDERS = {
 
 const EMPTY_FORM = {
   category: '', subcategory: '', otherDescription: '', title: '', description: '',
-  condition: 'Yeni', city: '', price: '', paymentType: 'cash',
+  condition: 'Yeni', city: '', price: '', paymentTypes: ['cash'],
 }
 
 export default function EditListing() {
@@ -223,7 +223,7 @@ export default function EditListing() {
         condition:   data.condition === 'new' ? 'Yeni' : 'İşlənmiş',
         city:        data.city        || '',
         price:       data.price != null ? String(data.price) : '',
-        paymentType: data.payment_type || 'cash',
+        paymentTypes: Array.isArray(data.payment_type) ? data.payment_type : (data.payment_type ? [data.payment_type] : ['cash']),
       })
       setExistingImages(Array.isArray(data.images) ? data.images : [])
       setPageLoading(false)
@@ -316,7 +316,7 @@ export default function EditListing() {
         condition:    form.condition === 'Yeni' ? 'new' : 'used',
         city:         form.city,
         price:        Number(form.price),
-        payment_type: form.paymentType,
+        payment_type: form.paymentTypes,
         images:       [...existingImages, ...newUrls],
       })
       .eq('id', id)
@@ -629,20 +629,18 @@ export default function EditListing() {
                   <label
                     key={value}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all ${
-                      form.paymentType === value
+                      form.paymentTypes.includes(value)
                         ? 'border-blue-600 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
                     }`}
                   >
                     <input
-                      type="radio"
-                      name="paymentType"
-                      value={value}
-                      checked={form.paymentType === value}
-                      onChange={() => set('paymentType', value)}
-                      className="accent-blue-600"
+                      type="checkbox"
+                      checked={form.paymentTypes.includes(value)}
+                      onChange={() => set('paymentTypes', form.paymentTypes.includes(value) ? form.paymentTypes.filter(p => p !== value) : [...form.paymentTypes, value])}
+                      className="accent-blue-600 rounded"
                     />
-                    <span className={`text-sm font-medium ${form.paymentType === value ? 'text-blue-700' : 'text-gray-700'}`}>
+                    <span className={`text-sm font-medium ${form.paymentTypes.includes(value) ? 'text-blue-700' : 'text-gray-700'}`}>
                       {label}
                     </span>
                   </label>

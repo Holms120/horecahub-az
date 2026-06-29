@@ -197,7 +197,7 @@ export default function ListingDetail() {
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
     : `₼${price.toLocaleString('az-AZ')}`
   const isOwner      = !!(user && userId && user.id === userId)
-  const ptKey        = paymentType || 'cash'
+  const ptArr        = Array.isArray(paymentType) ? paymentType : (paymentType ? [paymentType] : ['cash'])
   const PAYMENT_LABELS = { cash: t('filter.cash'), credit: t('filter.credit'), order: t('filter.order') }
   const PAYMENT_BADGE  = { cash: 'bg-blue-50 text-blue-700', credit: 'bg-amber-50 text-amber-700', order: 'bg-purple-50 text-purple-700' }
 
@@ -312,11 +312,11 @@ export default function ListingDetail() {
           </h1>
           <div className="flex items-center gap-3 mb-4">
             <p className="text-3xl font-bold text-blue-600">{displayPrice}</p>
-            {listing.category !== 'staff' && (
-              <span className={`text-sm font-semibold px-3 py-1 rounded-full ${PAYMENT_BADGE[ptKey] || PAYMENT_BADGE.cash}`}>
-                {PAYMENT_LABELS[ptKey] || t('filter.cash')}
+            {listing.category !== 'staff' && ptArr.map(pt => (
+              <span key={pt} className={`text-sm font-semibold px-3 py-1 rounded-full ${PAYMENT_BADGE[pt] || PAYMENT_BADGE.cash}`}>
+                {PAYMENT_LABELS[pt] || pt}
               </span>
-            )}
+            ))}
           </div>
 
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 pb-6 border-b border-gray-100 flex-wrap">
