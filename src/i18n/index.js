@@ -12,9 +12,15 @@ i18n.use(initReactI18next).init({
 })
 
 function syncCrispLocale(lang) {
+  const messages = {
+    az: 'HorecaHub.az ilə bağlı suallarınızı yazın. Tez cavab veririk! 👋',
+    ru: 'Напишите нам ваш вопрос о HorecaHub.az. Отвечаем быстро! 👋',
+    en: 'Have a question about HorecaHub.az? We reply fast! 👋',
+  }
+
   if (window.$crisp) {
-    const crispLang = lang === 'ru' ? 'ru' : lang === 'en' ? 'en' : 'az'
-    window.$crisp.push(['config', 'locale', [crispLang]])
+    window.$crisp.push(['config', 'locale', [lang === 'az' ? 'az' : lang === 'ru' ? 'ru' : 'en']])
+    window.$crisp.push(['config', 'welcome_message', [messages[lang] || messages['en']]])
   }
 }
 
