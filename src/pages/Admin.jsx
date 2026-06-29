@@ -544,13 +544,18 @@ function ListingsTab({ adminId }) {
   const [error, setError]             = useState(null)
   const [viewModal, setViewModal]     = useState(null)
   const [msgTarget, setMsgTarget]     = useState(null)
+  const [cats, setCats]               = useState([])
+  const [allSubs, setAllSubs]         = useState([])
+  const [editCat, setEditCat]         = useState('')
+  const [editSub, setEditSub]         = useState('')
+  const [catSaving, setCatSaving]     = useState(false)
 
   useEffect(() => {
     async function load() {
       try {
         const { data, error: err } = await supabase
           .from('listings')
-          .select('id, title, category, status, city, created_at, user_id, images, description, price, profiles!left(id, full_name, company_name)')
+          .select('id, title, category, subcategory, status, city, created_at, user_id, images, description, price, profiles!left(id, full_name, company_name)')
           .not('status', 'eq', 'deleted')
           .order('created_at', { ascending: false })
           .limit(300)
@@ -567,6 +572,12 @@ function ListingsTab({ adminId }) {
         ;(favsRes.data   || []).forEach(f => { fc[f.listing_id] = (fc[f.listing_id] || 0) + 1 })
         ;(clicksRes.data || []).forEach(c => { pc[c.listing_id] = (pc[c.listing_id] || 0) + 1 })
         setListings(items.map(l => ({ ...l, views: vc[l.id] || 0, favorites: fc[l.id] || 0, phoneClicks: pc[l.id] || 0 })))
+        const [{ data: catData }, { data: subData }] = await Promise.all([
+          supabase.from('categories').select('id, label').eq('is_active', true).order('sort_order'),
+          supabase.from('subcategories').select('id, label, category_id').eq('is_active', true).order('sort_order'),
+        ])
+        setCats(catData || [])
+        setAllSubs(subData || [])
       } catch (e) {
         setError('Elanlar yüklənərkən xəta: ' + (e.message || ''))
       } finally {
@@ -680,7 +691,7 @@ function ListingsTab({ adminId }) {
               {filtered.map(l => (
                 <tr key={l.id} className={`hover:bg-gray-50 ${l.status === 'pending' ? 'bg-amber-50/60' : ''}`}>
                   <td className="px-3 py-3 font-medium text-[#0A2342] max-w-[160px] truncate">
-                    <button onClick={() => setViewModal(l)} className="hover:text-blue-600 text-left w-full truncate">{l.title || '—'}</button>
+                    <button onClick={() => { setViewModal(l); setEditCat(l.category || ''); setEditSub(l.subcategory || '') }} className="hover:text-blue-600 text-left w-full truncate">{l.title || '—'}</button>
                   </td>
                   <td className="px-3 py-3 text-gray-500 whitespace-nowrap">{l.category}</td>
                   <td className="px-3 py-3 text-gray-500 max-w-[110px] truncate">{l.profiles?.full_name || l.profiles?.company_name || '—'}</td>
@@ -726,7 +737,22 @@ function ListingsTab({ adminId }) {
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><p className="text-xs text-gray-400 mb-0.5">Kateqoriya</p><p className="font-medium">{viewModal.category}</p></div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Kateqoriya</p>
+                  <select value={editCat} onChange={e => { setEditCat(e.target.value); setEditSub('') }}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    <option value="">—</option>
+                    {cats.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">Alt kateqoriya</p>
+                  <select value={editSub} onChange={e => setEditSub(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                    <option value="">—</option>
+                    {allSubs.filter(s => s.category_id === editCat).map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+                  </select>
+                </div>
                 <div><p className="text-xs text-gray-400 mb-0.5">Status</p><span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor(viewModal.status)}`}>{viewModal.status}</span></div>
                 <div><p className="text-xs text-gray-400 mb-0.5">Şəhər</p><p className="font-medium">{viewModal.city || '—'}</p></div>
                 <div><p className="text-xs text-gray-400 mb-0.5">Qiymət</p><p className="font-medium">{viewModal.price ? `${viewModal.price} ₼` : '—'}</p></div>
@@ -737,11 +763,29 @@ function ListingsTab({ adminId }) {
                 <div><p className="text-xs text-gray-400 mb-1">Təsvir</p><p className="text-sm text-gray-700 leading-relaxed">{viewModal.description}</p></div>
               )}
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex-shrink-0">
+            <div className="px-6 py-4 border-t border-gray-100 flex-shrink-0 flex items-center justify-between">
               <Link to={`/listings/${viewModal.id}`} target="_blank"
                 className="text-sm text-blue-600 font-semibold hover:underline">
                 Saytda aç →
               </Link>
+              {(editCat !== viewModal.category || editSub !== (viewModal.subcategory || '')) && (
+                <button
+                  disabled={catSaving || !editCat}
+                  onClick={async () => {
+                    setCatSaving(true)
+                    const { error } = await supabase.from('listings').update({ category: editCat, subcategory: editSub || null }).eq('id', viewModal.id)
+                    if (!error) {
+                      const updated = { ...viewModal, category: editCat, subcategory: editSub || null }
+                      setViewModal(updated)
+                      setListings(ls => ls.map(l => l.id === viewModal.id ? { ...l, category: editCat, subcategory: editSub || null } : l))
+                    }
+                    setCatSaving(false)
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {catSaving ? 'Saxlanılır...' : 'Yadda saxla'}
+                </button>
+              )}
             </div>
           </div>
         </div>
