@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabaseClient'
 
 export default function ForgotPassword() {
@@ -8,6 +9,34 @@ export default function ForgotPassword() {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { i18n } = useTranslation()
+
+  function translateError(msg) {
+    if (!msg) return msg
+    const lang = i18n.language?.startsWith('ru') ? 'ru' : i18n.language?.startsWith('en') ? 'en' : 'az'
+    const errors = {
+      az: {
+        'User not found': 'Bu email ilə istifadəçi tapılmadı',
+        'Email not confirmed': 'Email təsdiqlənməyib',
+        'rate limit': 'Çox sayda cəhd. Bir az gözləyin',
+      },
+      ru: {
+        'User not found': 'Пользователь с таким email не найден',
+        'Email not confirmed': 'Email не подтверждён',
+        'rate limit': 'Слишком много попыток. Подождите немного',
+      },
+      en: {
+        'User not found': 'No user found with this email',
+        'Email not confirmed': 'Email not confirmed',
+        'rate limit': 'Too many attempts. Please wait a moment',
+      },
+    }
+    const langErrors = errors[lang]
+    for (const [key, val] of Object.entries(langErrors)) {
+      if (msg.includes(key)) return val
+    }
+    return msg
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -38,7 +67,7 @@ export default function ForgotPassword() {
         ) : (
           <>
             <p className="text-gray-500 text-sm mb-6">Emailinizi daxil edin, şifrə sıfırlama linki göndərəcəyik.</p>
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {error && <p className="text-red-500 text-sm mb-4">{translateError(error)}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="email"

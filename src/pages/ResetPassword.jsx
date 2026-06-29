@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../supabaseClient'
 
 export default function ResetPassword() {
@@ -10,6 +11,40 @@ export default function ResetPassword() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const navigate = useNavigate()
+  const { i18n } = useTranslation()
+
+  function translateError(msg) {
+    if (!msg) return msg
+    const lang = i18n.language?.startsWith('ru') ? 'ru' : i18n.language?.startsWith('en') ? 'en' : 'az'
+    const errors = {
+      az: {
+        'different from the old password': 'Yeni şifrə köhnə şifrədən fərqli olmalıdır',
+        'Password should be at least': 'Şifrə ən az 6 simvol olmalıdır',
+        'Invalid': 'Keçərsiz link. Yenidən şifrə sıfırlama tələb edin',
+        'expired': 'Linkın müddəti bitib. Yenidən şifrə sıfırlama tələb edin',
+        'Token has expired': 'Linkın müddəti bitib. Yenidən cəhd edin',
+      },
+      ru: {
+        'different from the old password': 'Новый пароль должен отличаться от старого',
+        'Password should be at least': 'Пароль должен содержать не менее 6 символов',
+        'Invalid': 'Недействительная ссылка. Запросите сброс пароля заново',
+        'expired': 'Срок действия ссылки истёк. Запросите сброс пароля заново',
+        'Token has expired': 'Срок действия ссылки истёк. Попробуйте снова',
+      },
+      en: {
+        'different from the old password': 'New password must be different from the old password',
+        'Password should be at least': 'Password must be at least 6 characters',
+        'Invalid': 'Invalid link. Please request a new password reset',
+        'expired': 'Link has expired. Please request a new password reset',
+        'Token has expired': 'Link has expired. Please try again',
+      },
+    }
+    const langErrors = errors[lang]
+    for (const [key, val] of Object.entries(langErrors)) {
+      if (msg.includes(key)) return val
+    }
+    return msg
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -35,7 +70,7 @@ export default function ResetPassword() {
           <p className="text-green-600 font-semibold text-center">Şifrə yeniləndi! Yönləndirilirsiniz...</p>
         ) : (
           <>
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            {error && <p className="text-red-500 text-sm mb-4">{translateError(error)}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="password"
