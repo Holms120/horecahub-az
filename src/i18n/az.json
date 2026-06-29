@@ -739,7 +739,7 @@
     "askAnother": "Başqa sualım var",
     "endChat": "Söhbəti bitir",
     "closedMessage": "Söhbət tamamlandı. Yeni sual üçün yenidən Support-a müraciət edin.",
-    "openPrompt": "Sualınızı yazın, admin ən qısa zamanda cavab verəcək.",
+    "openPrompt": "Sualınızı yazın, komandamız ən qısa zamanda cavab verəcək.",
     "inputPlaceholder": "Mesajınızı yazın...",
     "faq": {
       "1": {
@@ -760,7 +760,7 @@
       },
       "5": {
         "question": "Hesabımla bağlı problem var",
-        "answer": "Hesab probleminizi aşağıda ətraflı təsvir edin, admin ən qısa zamanda cavab verəcək."
+        "answer": "Hesab probleminizi aşağıda ətraflı təsvir edin, komandamız ən qısa zamanda cavab verəcək."
       },
       "6": {
         "question": "Başqa sualım var",
