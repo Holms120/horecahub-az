@@ -20,7 +20,9 @@ function syncCrispLocale(lang) {
 
   if (window.$crisp) {
     window.$crisp.push(['config', 'locale', [lang === 'az' ? 'az' : lang === 'ru' ? 'ru' : 'en']])
-    window.$crisp.push(['set', 'message:text', [messages[lang] || messages['en']]])
+    window.$crisp.push(['on', 'session:loaded', function() {
+      window.$crisp.push(['do', 'message:show', ['text', messages[lang] || messages['en']]])
+    }])
   }
 }
 
