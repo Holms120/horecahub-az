@@ -12,7 +12,7 @@ export default function Footer() {
       links: [
         { label: t('footer.equipment'),    href: '/listings?category=kitchen' },
         { label: t('footer.staff'),        href: '/listings?category=staff' },
-        { label: t('footer.suppliers'),    href: '/listings?category=suppliers' },
+        { label: t('footer.suppliers'),    href: '/listings?seller_type=supplier' },
         { label: t('footer.allCategories'),href: '/listings' },
       ],
     },

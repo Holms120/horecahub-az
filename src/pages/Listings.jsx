@@ -35,6 +35,7 @@ export default function Listings() {
   })
   const [sort, setSort]               = useState('newest')
   const [query, setQuery]             = useState(searchParams.get('q') || '')
+  const [sellerType, setSellerType]   = useState(searchParams.get('seller_type') || '')
   const [drawerOpen, setDrawerOpen]   = useState(false)
   const [page, setPage]               = useState(1)
   const [staffTab, setStaffTab]       = useState('cv')
@@ -56,6 +57,7 @@ export default function Listings() {
     if (filters.paymentTypes?.length) q = q.overlaps('payment_type', filters.paymentTypes)
     if (filters.priceMin) q = q.gte('price', Number(filters.priceMin))
     if (filters.priceMax) q = q.lte('price', Number(filters.priceMax))
+    if (sellerType === 'supplier') q = q.eq('profiles.account_type', 'supplier')
 
     if (filters.category === 'staff') {
       if (staffTab === 'vacancy') {
@@ -88,13 +90,14 @@ export default function Listings() {
       setTotalCount(count || 0)
     }
     setLoading(false)
-  }, [query, filters, sort, page, staffTab])
+  }, [query, filters, sort, page, staffTab, sellerType])
 
   useEffect(() => { fetchListings() }, [fetchListings])
 
   useEffect(() => {
     setFilters(f => ({ ...f, category: searchParams.get('category') || '' }))
     setQuery(searchParams.get('q') || '')
+    setSellerType(searchParams.get('seller_type') || '')
   }, [searchParams])
 
   useEffect(() => { setPage(1) }, [filters, query, staffTab, sort])

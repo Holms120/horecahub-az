@@ -65,7 +65,7 @@ export default function Navbar() {
   ]
 
   const SERVICES_ITEMS = [
-    { id: 'suppliers',     key: 'cat.suppliers'     },
+    { id: 'suppliers',     key: 'cat.suppliers', href: '/listings?seller_type=supplier' },
     { id: 'consulting',    key: 'cat.consulting'    },
     { id: 'software',      key: 'cat.software'      },
     { id: 'training',      key: 'cat.training'      },
@@ -161,7 +161,7 @@ export default function Navbar() {
               {servicesOpen && (
                 <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
                   {SERVICES_ITEMS.map(item => (
-                    <Link key={item.id} to={`/listings?category=${item.id}`}
+                    <Link key={item.id} to={item.href || `/listings?category=${item.id}`}
                       onClick={() => setServicesOpen(false)}
                       className="block px-4 py-2.5 text-sm text-navy hover:bg-gray-50 transition-colors">
                       {t(item.key)}
@@ -373,7 +373,7 @@ export default function Navbar() {
             {mobileServicesOpen && (
               <div className="pl-4 space-y-0.5">
                 {SERVICES_ITEMS.map(item => (
-                  <Link key={item.id} to={`/listings?category=${item.id}`}
+                  <Link key={item.id} to={item.href || `/listings?category=${item.id}`}
                     onClick={() => { setMenuOpen(false); setMobileServicesOpen(false) }}
                     className="block py-2 px-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                     {t(item.key)}
