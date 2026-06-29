@@ -115,9 +115,9 @@ export default function EditProfile() {
 
     if (avatarFile) {
       const ext      = avatarFile.name.split('.').pop()
-      const fileName = `avatars/${user.id}/${Date.now()}.${ext}`
+      const fileName = `${user.id}/${Date.now()}.${ext}`
       const { error: uploadErr } = await supabase.storage
-        .from('listings')
+        .from('avatars')
         .upload(fileName, avatarFile, { upsert: true, contentType: avatarFile.type })
 
       if (uploadErr) {
@@ -125,7 +125,7 @@ export default function EditProfile() {
         setSaving(false)
         return
       }
-      const { data: urlData } = supabase.storage.from('listings').getPublicUrl(fileName)
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName)
       logoUrl = urlData.publicUrl
     }
 
