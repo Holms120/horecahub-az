@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { SlidersHorizontal, X, ChevronDown, Search, AlertCircle } from 'lucide-react'
@@ -13,6 +13,8 @@ const EMPTY_FILTERS = {
   conditions: [], paymentTypes: [], subcategories: [], city: '', verifiedOnly: false,
 }
 
+const PAGE_SIZE = 20
+
 export default function Listings() {
   const { t, i18n } = useTranslation()
 
@@ -23,88 +25,87 @@ export default function Listings() {
   ]
 
   const [searchParams] = useSearchParams()
-  const [allListings, setAllListings] = useState([])
-  const [loading, setLoading]         = useState(true)
-  const [fetchError, setFetchError]   = useState('')
-  const [filters, setFilters]         = useState({
+  const [listings, setListings]         = useState([])
+  const [totalCount, setTotalCount]     = useState(0)
+  const [loading, setLoading]           = useState(true)
+  const [fetchError, setFetchError]     = useState('')
+  const [filters, setFilters]           = useState({
     ...EMPTY_FILTERS,
     category: searchParams.get('category') || '',
   })
   const [sort, setSort]               = useState('newest')
   const [query, setQuery]             = useState(searchParams.get('q') || '')
   const [drawerOpen, setDrawerOpen]   = useState(false)
-  const [visibleCount, setVisibleCount] = useState(12)
+  const [page, setPage]               = useState(1)
   const [staffTab, setStaffTab]       = useState('cv')
 
-  useEffect(() => {
-    async function fetchListings() {
-      setLoading(true)
-      setFetchError('')
-      const { data, error } = await supabase
-        .from('listings')
-        .select('*, listing_type, experience_years, work_type, skills, bio, certifications, requirements, other_description, profiles!left(id, full_name, company_name, account_type, logo_url, phone)')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
+  const fetchListings = useCallback(async () => {
+    setLoading(true)
+    setFetchError('')
 
-      if (error) {
-        setFetchError(error.message)
+    let q = supabase
+      .from('listings')
+      .select('*, listing_type, experience_years, work_type, skills, bio, certifications, requirements, other_description, profiles!left(id, full_name, company_name, account_type, logo_url, phone, is_verified)', { count: 'exact' })
+      .eq('status', 'active')
+
+    if (query) q = q.ilike('title', `%${query}%`)
+    if (filters.category) q = q.eq('category', filters.category)
+    if (filters.subcategories?.length) q = q.in('subcategory', filters.subcategories)
+    if (filters.city) q = q.eq('city', filters.city)
+    if (filters.conditions.length) q = q.in('condition', filters.conditions)
+    if (filters.paymentTypes?.length) q = q.overlaps('payment_type', filters.paymentTypes)
+    if (filters.priceMin) q = q.gte('price', Number(filters.priceMin))
+    if (filters.priceMax) q = q.lte('price', Number(filters.priceMax))
+
+    if (filters.category === 'staff') {
+      if (staffTab === 'vacancy') {
+        q = q.eq('listing_type', 'vacancy')
       } else {
-        setAllListings((data || []).map(normalizeListing))
+        q = q.or('listing_type.is.null,listing_type.neq.vacancy')
       }
-      setLoading(false)
     }
-    fetchListings()
-  }, [i18n.language])
+
+    if (sort === 'price_asc') q = q.order('price', { ascending: true })
+    else if (sort === 'price_desc') q = q.order('price', { ascending: false })
+    else q = q.order('created_at', { ascending: false })
+
+    const from = (page - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+    q = q.range(from, to)
+
+    const { data, error, count } = await q
+
+    if (error) {
+      setFetchError(error.message)
+      setListings([])
+      setTotalCount(0)
+    } else {
+      let normalized = (data || []).map(normalizeListing)
+      if (filters.verifiedOnly) {
+        normalized = normalized.filter(l => l.seller.isVerified)
+      }
+      setListings(normalized)
+      setTotalCount(count || 0)
+    }
+    setLoading(false)
+  }, [query, filters, sort, page, staffTab])
+
+  useEffect(() => { fetchListings() }, [fetchListings])
 
   useEffect(() => {
     setFilters(f => ({ ...f, category: searchParams.get('category') || '' }))
     setQuery(searchParams.get('q') || '')
   }, [searchParams])
 
-  const filtered = useMemo(() => {
-    let items = [...allListings]
-    if (query) {
-      const q = query.toLowerCase()
-      items = items.filter(l =>
-        l.title.toLowerCase().includes(q) || l.categoryLabel.toLowerCase().includes(q)
-      )
-    }
-    if (filters.category)           items = items.filter(l => l.category === filters.category)
-    if (filters.priceMin) {
-      const min = Number(filters.priceMin)
-      items = items.filter(l => l.price >= min)
-    }
-    if (filters.priceMax) {
-      const max = Number(filters.priceMax)
-      items = items.filter(l => l.price <= max)
-    }
-    if (filters.conditions.length)            items = items.filter(l => filters.conditions.includes(l.condition))
-    if (filters.paymentTypes?.length)          items = items.filter(l => { const pts = Array.isArray(l.paymentType) ? l.paymentType : [l.paymentType || 'cash']; return filters.paymentTypes.some(fp => pts.includes(fp)) })
-    if (filters.subcategories?.length)         items = items.filter(l => filters.subcategories.includes(l.subcategory))
-    if (filters.city)                         items = items.filter(l => l.city === filters.city)
-    if (filters.verifiedOnly)                 items = items.filter(l => l.seller.isVerified)
-    if (filters.category === 'staff') {
-      const cvListings      = items.filter(l => l.listingType !== 'vacancy')
-      const vacancyListings = items.filter(l => l.listingType === 'vacancy')
-      items = staffTab === 'vacancy' ? vacancyListings : cvListings
-    }
+  useEffect(() => { setPage(1) }, [filters, query, staffTab, sort])
 
-    if (sort === 'price_asc')       items.sort((a, b) => a.price - b.price)
-    else if (sort === 'price_desc') items.sort((a, b) => b.price - a.price)
-    return items
-  }, [allListings, filters, query, sort, staffTab])
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [page])
 
-  const visible = filtered.slice(0, visibleCount)
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
   function clearFilters() { setFilters(EMPTY_FILTERS); setQuery(''); setStaffTab('cv') }
-
-  if (loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -163,7 +164,7 @@ export default function Listings() {
       )}
 
       <p className="text-sm text-gray-500 mb-6">
-        <span className="font-semibold text-navy">{filtered.length}</span> {t('listings.results')}
+        <span className="font-semibold text-navy">{totalCount}</span> {t('listings.results')}
       </p>
 
       <div className="flex gap-8">
@@ -176,9 +177,12 @@ export default function Listings() {
 
         {/* Grid */}
         <div className="flex-1 min-w-0">
-          {visible.length === 0 ? (
-            allListings.length === 0 ? (
-              /* DB-də heç bir elan yoxdur */
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : listings.length === 0 ? (
+            totalCount === 0 && !query && !filters.category && !filters.city ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">🏪</div>
                 <h3 className="text-lg font-semibold text-navy mb-2">{t('listings.noListings')}</h3>
@@ -191,7 +195,6 @@ export default function Listings() {
                 </a>
               </div>
             ) : (
-              /* Filter nəticəsi boşdur */
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-lg font-semibold text-navy mb-2">{t('listings.noResults')}</h3>
@@ -205,13 +208,26 @@ export default function Listings() {
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {visible.map(listing => <ListingCard key={listing.id} listing={listing} />)}
+                {listings.map(listing => <ListingCard key={listing.id} listing={listing} />)}
               </div>
-              {visibleCount < filtered.length && (
-                <div className="text-center mt-10">
-                  <button onClick={() => setVisibleCount(c => c + 12)}
-                    className="px-8 py-3 border border-blue-600 text-blue-600 text-sm font-semibold rounded-xl hover:bg-blue-50 transition-colors">
-                    {t('listings.loadMore')} ({filtered.length - visibleCount})
+              {totalCount > PAGE_SIZE && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
+                  >
+                    ← Əvvəlki
+                  </button>
+                  <span className="text-sm text-gray-500 px-3">
+                    {page} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages}
+                    className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
+                  >
+                    Növbəti →
                   </button>
                 </div>
               )}
@@ -235,7 +251,7 @@ export default function Listings() {
               <FilterSidebar filters={filters} onChange={setFilters} onClear={clearFilters} />
               <button onClick={() => setDrawerOpen(false)}
                 className="w-full mt-4 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700">
-                {t('listings.apply')} ({filtered.length})
+                {t('listings.apply')} ({totalCount})
               </button>
             </div>
           </div>
