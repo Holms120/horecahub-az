@@ -846,7 +846,8 @@ function UsersTab({ adminId }) {
   }
 
   async function handleDeleteUser(uid, name) {
-    if (!window.confirm(`"${name}" istifadəçisini tamamilə silmək istədiyinizə əminsiniz? Bu əməliyyat geri alına bilməz.`)) return
+    const input = window.prompt(`"${name}" istifadəçisini və bütün elanlarını silmək üçün "SİL" yazın:`)
+    if (input !== 'SİL') return
 
     const { error } = await supabase.from('profiles').delete().eq('id', uid)
     if (error) { alert('Xəta: ' + error.message); return }
