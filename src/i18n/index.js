@@ -11,6 +11,8 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false }
 })
 
+let crispWelcomeListenerRegistered = false
+
 function syncCrispLocale(lang) {
   const messages = {
     az: 'HorecaHub.az ilə bağlı suallarınızı yazın. Tez cavab veririk! 👋',
@@ -20,9 +22,14 @@ function syncCrispLocale(lang) {
 
   if (window.$crisp) {
     window.$crisp.push(['config', 'locale', [lang === 'az' ? 'az' : lang === 'ru' ? 'ru' : 'en']])
-    window.$crisp.push(['on', 'session:loaded', function() {
-      window.$crisp.push(['do', 'message:show', ['text', messages[lang] || messages['en']]])
-    }])
+
+    if (!crispWelcomeListenerRegistered && !sessionStorage.getItem('crisp_welcome_sent')) {
+      crispWelcomeListenerRegistered = true
+      window.$crisp.push(['on', 'session:loaded', function() {
+        window.$crisp.push(['do', 'message:show', ['text', messages[lang] || messages['en']]])
+        sessionStorage.setItem('crisp_welcome_sent', 'true')
+      }])
+    }
   }
 }
 
