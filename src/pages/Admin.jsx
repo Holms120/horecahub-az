@@ -5,7 +5,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu,
+  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -845,6 +845,20 @@ function UsersTab({ adminId }) {
     if (!error) setUsers(us => us.map(u => u.id === uid ? { ...u, is_blocked: !current } : u))
   }
 
+  async function handleDeleteUser(uid, name) {
+    if (!window.confirm(`"${name}" istifadəçisini tamamilə silmək istədiyinizə əminsiniz? Bu əməliyyat geri alına bilməz.`)) return
+
+    const { error } = await supabase.from('profiles').delete().eq('id', uid)
+    if (error) { alert('Xəta: ' + error.message); return }
+
+    const { error: authError } = await supabase.functions.invoke('delete-user', {
+      body: { user_id: uid }
+    })
+
+    setUsers(us => us.filter(u => u.id !== uid))
+    if (authError) console.warn('Auth delete failed:', authError)
+  }
+
   async function expandUser(uid) {
     if (expanded === uid) { setExpanded(null); return }
     setExpanded(uid)
@@ -965,6 +979,10 @@ function UsersTab({ adminId }) {
                         <button onClick={() => setMsgTarget({ id: u.id, name: u.full_name || u.company_name || u.email })}
                           className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100">
                           <MessageSquare size={11} /> Mesaj
+                        </button>
+                        <button onClick={() => handleDeleteUser(u.id, u.full_name || u.company_name || u.email)}
+                          className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100">
+                          <Trash2 size={11} /> Sil
                         </button>
                       </div>
                     </td>
