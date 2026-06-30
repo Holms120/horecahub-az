@@ -555,7 +555,7 @@ function ListingsTab({ adminId }) {
       try {
         const { data, error: err } = await supabase
           .from('listings')
-          .select('id, title, category, subcategory, status, city, created_at, user_id, images, description, price, profiles!left(id, full_name, company_name)')
+          .select('id, title, category, subcategory, status, city, created_at, user_id, images, description, keywords, price, profiles!left(id, full_name, company_name)')
           .not('status', 'eq', 'deleted')
           .order('created_at', { ascending: false })
           .limit(300)
@@ -761,6 +761,9 @@ function ListingsTab({ adminId }) {
               </div>
               {viewModal.description && (
                 <div><p className="text-xs text-gray-400 mb-1">Təsvir</p><p className="text-sm text-gray-700 leading-relaxed">{viewModal.description}</p></div>
+              )}
+              {viewModal.keywords && (
+                <div><p className="text-xs text-gray-400 mb-1">Açar sözlər</p><p className="text-sm text-gray-700">{viewModal.keywords}</p></div>
               )}
             </div>
             <div className="px-6 py-4 border-t border-gray-100 flex-shrink-0 flex items-center justify-between">

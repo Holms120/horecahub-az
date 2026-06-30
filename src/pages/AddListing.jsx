@@ -22,7 +22,7 @@ const NO_CONDITION_categories = [
 ]
 const EMPTY     = {
   category: '', subcategory: '', otherDescription: '',
-  title: '', description: '', condition: 'Yeni', city: '', price: '', paymentTypes: ['cash'],
+  title: '', description: '', keywords: '', condition: 'Yeni', city: '', price: '', paymentTypes: ['cash'],
   // Staff-specific
   listingType: 'cv', experienceYears: '', workType: 'full',
   skills: [], bio: '', certifications: '', requirements: '', companyNameVacancy: '',
@@ -374,6 +374,7 @@ export default function AddListing() {
       user_id:      user.id,
       title:        strip(form.title),
       description:  strip(form.description),
+      keywords:     form.keywords.trim() || null,
       price:        Number(form.price),
       payment_type: form.paymentTypes,
       category:          form.category,
@@ -642,6 +643,18 @@ export default function AddListing() {
                   placeholder={placeholder.desc}
                   rows={5}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none" />
+              </div>
+            )}
+            {form.category !== 'staff' && (
+              <div>
+                <label className="block text-sm font-medium text-navy mb-1.5">Açar sözlər (keywords)</label>
+                <input
+                  type="text"
+                  value={form.keywords}
+                  onChange={e => set('keywords', e.target.value)}
+                  placeholder="məs: püre, pure, sos, sauce — vergüllə ayırın"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
               </div>
             )}
             {!NO_CONDITION_categories.includes(form.category) && (

@@ -155,7 +155,7 @@ const SUBCATEGORY_PLACEHOLDERS = {
 }
 
 const EMPTY_FORM = {
-  category: '', subcategory: '', otherDescription: '', title: '', description: '',
+  category: '', subcategory: '', otherDescription: '', title: '', description: '', keywords: '',
   condition: 'Yeni', city: '', price: '', paymentTypes: ['cash'],
 }
 
@@ -220,6 +220,7 @@ export default function EditListing() {
         otherDescription: data.other_description || '',
         title:       data.title       || '',
         description: data.description || '',
+        keywords:    data.keywords    || '',
         condition:   data.condition === 'new' ? 'Yeni' : 'İşlənmiş',
         city:        data.city        || '',
         price:       data.price != null ? String(data.price) : '',
@@ -310,6 +311,7 @@ export default function EditListing() {
       .update({
         title:        strip(form.title),
         description:  strip(form.description),
+        keywords:     form.keywords.trim() || null,
         category:          form.category,
         subcategory:       form.subcategory || null,
         other_description: form.subcategory?.endsWith('_other') && form.otherDescription ? strip(form.otherDescription) : null,
@@ -470,6 +472,17 @@ export default function EditListing() {
               placeholder={placeholder.desc}
               rows={5}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-navy mb-1.5">Açar sözlər (keywords)</label>
+            <input
+              type="text"
+              value={form.keywords}
+              onChange={e => set('keywords', e.target.value)}
+              placeholder="məs: püre, pure, sos, sauce — vergüllə ayırın"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
           </div>
 

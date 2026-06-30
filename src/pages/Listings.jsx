@@ -49,7 +49,7 @@ export default function Listings() {
       .select('*, listing_type, experience_years, work_type, skills, bio, certifications, requirements, other_description, profiles!left(id, full_name, company_name, account_type, logo_url, phone)', { count: 'exact' })
       .eq('status', 'active')
 
-    if (query) q = q.ilike('title', `%${query}%`)
+    if (query) q = q.or(`title.ilike.%${query}%,description.ilike.%${query}%,keywords.ilike.%${query}%`)
     if (filters.category) q = q.eq('category', filters.category)
     if (filters.subcategories?.length) q = q.in('subcategory', filters.subcategories)
     if (filters.city) q = q.eq('city', filters.city)
