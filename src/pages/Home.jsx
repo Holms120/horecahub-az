@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
@@ -46,6 +46,9 @@ export default function Home() {
   const { t, i18n } = useTranslation()
   const [query, setQuery]       = useState('')
   const [category, setCategory] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const searchRef = useRef(null)
   const [listings, setListings] = useState([])
   const [loadingListings, setLoadingListings] = useState(true)
   const [stats, setStats] = useState({ listings: 0, sellers: 0 })
@@ -99,6 +102,36 @@ export default function Home() {
     fetchData()
   }, [i18n.language])
 
+  useEffect(() => {
+    if (!query.length) { setSuggestions([]); setShowSuggestions(false); return }
+    const timer = setTimeout(async () => {
+      const { data } = await supabase
+        .from('listings')
+        .select('id, title, keywords')
+        .eq('status', 'active')
+        .or(`title.ilike.%${query}%,keywords.ilike.%${query}%`)
+        .limit(6)
+      setSuggestions(data || [])
+      setShowSuggestions(true)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [query])
+
+  useEffect(() => {
+    function onClickOutside(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', onClickOutside)
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [])
+
+  function handleSuggestionClick(suggestion) {
+    setShowSuggestions(false)
+    navigate(`/listings/${suggestion.id}`)
+  }
+
   function handleSearch(e) {
     e.preventDefault()
     const params = new URLSearchParams()
@@ -143,15 +176,31 @@ export default function Home() {
               ))}
             </select>
             <div className="flex flex-1 gap-2">
-              <div className="relative flex-1">
+              <div className="relative flex-1" ref={searchRef}>
                 <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder={t('hero.searchPlaceholder')}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
+                  onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                  onKeyDown={e => e.key === 'Escape' && setShowSuggestions(false)}
                   className="w-full pl-9 pr-3 py-2.5 text-sm text-gray-800 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 bg-gray-50"
                 />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                    {suggestions.map(s => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onMouseDown={e => { e.preventDefault(); handleSuggestionClick(s) }}
+                        className="w-full px-4 py-2.5 text-left text-sm text-gray-800 hover:bg-blue-50 hover:text-blue-700 border-b border-gray-100 last:border-0"
+                      >
+                        {s.title}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <button
                 type="submit"
