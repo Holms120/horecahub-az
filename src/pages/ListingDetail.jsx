@@ -13,6 +13,16 @@ import ListingCard from '../components/ListingCard'
 import { useTranslation } from 'react-i18next'
 import { useRelativeTime } from '../hooks/useRelativeTime'
 
+function linkifyText(text) {
+  if (!text) return null
+  const parts = text.split(/(https?:\/\/[^\s]+)/g)
+  return parts.map((part, i) =>
+    i % 2 === 1
+      ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">{part}</a>
+      : part
+  )
+}
+
 export default function ListingDetail() {
   const { t }        = useTranslation()
   const { id }       = useParams()
@@ -459,7 +469,7 @@ export default function ListingDetail() {
       {listing.category !== 'staff' && description && (
         <div className="mb-14 max-w-3xl">
           <h2 className="text-lg font-bold text-navy mb-4">{t('listingDetail.description')}</h2>
-          <p className="text-gray-600 leading-relaxed whitespace-pre-line">{description}</p>
+          <p className="text-gray-600 leading-relaxed whitespace-pre-line">{linkifyText(description)}</p>
         </div>
       )}
 
@@ -542,7 +552,7 @@ export default function ListingDetail() {
               {description && (
                 <div>
                   <h2 className="text-lg font-bold text-navy mb-3">{t('listingDetail.additionalInfo')}</h2>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">{description}</p>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">{linkifyText(description)}</p>
                 </div>
               )}
             </>
