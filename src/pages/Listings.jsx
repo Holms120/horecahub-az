@@ -45,7 +45,7 @@ export default function Listings() {
   const searchRef   = useRef(null)
 
   useEffect(() => {
-    if (query.length < 2) { setSuggestions([]); setShowSuggestions(false); return }
+    if (!query.length) { setSuggestions([]); setShowSuggestions(false); return }
     const timer = setTimeout(async () => {
       const { data } = await supabase
         .from('listings')
