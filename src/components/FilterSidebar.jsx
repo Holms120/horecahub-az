@@ -133,7 +133,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
                   onChange={() => toggleSubcategory(sub.id)}
                   className="accent-blue-600 rounded"
                 />
-                <span className="text-sm text-gray-700">{t('subcat.' + sub.id) || sub.label}</span>
+                <span className="text-sm text-gray-700">{(() => { const k = 'subcat.' + sub.id; const v = t(k); return v === k ? sub.label : v })()}</span>
               </label>
             ))}
           </div>

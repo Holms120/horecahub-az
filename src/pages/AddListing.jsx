@@ -564,7 +564,7 @@ export default function AddListing() {
                           : 'border-gray-200 hover:border-blue-300 text-gray-600'
                       }`}
                     >
-                      {t('subcat.' + sub.id) || sub.label}
+                      {(() => { const k = 'subcat.' + sub.id; const v = t(k); return v === k ? sub.label : v })()}
                     </button>
                   ))}
                 </div>
