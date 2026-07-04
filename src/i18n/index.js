@@ -13,9 +13,9 @@ i18n.use(initReactI18next).init({
 
 function syncCrispLocale(lang) {
   const messages = {
-    az: 'HorecaHub.az ilə bağlı suallarınızı yazın. Tez cavab veririk! 👋',
-    ru: 'Напишите нам ваш вопрос о HorecaHub.az. Отвечаем быстро! 👋',
-    en: 'Have a question about HorecaHub.az? We reply fast! 👋',
+    az: 'Horeca ilə bağlı suallarınızı bizə ünvanlayın. Sizə ən qısa zamanda geri dönüş edəcəyik 🙏',
+    ru: 'Задайте нам ваш вопрос о HoReCa. Мы ответим вам в ближайшее время 🙏',
+    en: 'Send us your HoReCa related question. We will get back to you as soon as possible 🙏',
   }
 
   if (window.$crisp) {
