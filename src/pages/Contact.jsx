@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Phone, Mail, Instagram, Facebook, MessageCircle } from 'lucide-react'
 import { supabase } from '../supabaseClient'
+import { notifyTelegram } from '../lib/notify'
 import { useAuth } from '../context/AuthContext'
 
 export default function Contact() {
@@ -71,23 +72,12 @@ export default function Contact() {
       })
     }
 
-    try {
-      await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          title: '💬 Support mesajı',
-          category: 'Support',
-          city: '',
-          user_name: user?.user_metadata?.full_name || user?.email || 'Anonim',
-        }),
-      })
-    } catch (e) {
-      console.warn('Telegram notification failed:', e)
-    }
+    await notifyTelegram({
+      title: '💬 Support mesajı',
+      category: 'Support',
+      city: '',
+      user_name: user?.user_metadata?.full_name || user?.email || 'Anonim',
+    })
     setLoadingSupport(false)
     navigate('/messages')
   }

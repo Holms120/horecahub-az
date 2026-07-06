@@ -20,12 +20,48 @@ function esc(v: unknown, max = 200): string {
     .replace(/>/g, '&gt;')
 }
 
+// The gateway's verify_jwt only proves the caller holds the (public) anon
+// key. Logged-in callers send their session JWT instead; anonymous callers
+// (e.g. the registration form before a session exists) stay allowed but are
+// rate-limited per function instance to cap Telegram spam.
+const ANON_LIMIT     = 5
+const ANON_WINDOW_MS = 60_000
+let anonCalls: number[] = []
+
+async function isRealUser(token: string): Promise<boolean> {
+  if (!token) return false
+  try {
+    const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        apikey: Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      },
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405, headers: corsHeaders })
+  }
+
+  const token = (req.headers.get('Authorization') ?? '').replace('Bearer ', '')
+  if (!(await isRealUser(token))) {
+    const now = Date.now()
+    anonCalls = anonCalls.filter((t) => now - t < ANON_WINDOW_MS)
+    if (anonCalls.length >= ANON_LIMIT) {
+      return new Response(JSON.stringify({ ok: false }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    anonCalls.push(now)
   }
 
   try {

@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { SlidersHorizontal, X, ChevronDown, Search, AlertCircle } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { normalizeListing } from '../lib/normalize'
+import { sanitizeSearch } from '../lib/search'
 import ListingCard from '../components/ListingCard'
 import FilterSidebar from '../components/FilterSidebar'
 import { useTranslation } from 'react-i18next'
@@ -47,11 +48,13 @@ export default function Listings() {
   useEffect(() => {
     if (!query.length) { setSuggestions([]); setShowSuggestions(false); return }
     const timer = setTimeout(async () => {
+      const term = sanitizeSearch(query)
+      if (!term) { setSuggestions([]); setShowSuggestions(false); return }
       const { data } = await supabase
         .from('listings')
         .select('id, title, keywords')
         .eq('status', 'active')
-        .or(`title.ilike.%${query}%,keywords.ilike.%${query}%`)
+        .or(`title.ilike.%${term}%,keywords.ilike.%${term}%`)
         .limit(6)
       setSuggestions(data || [])
       setShowSuggestions(true)
@@ -83,7 +86,8 @@ export default function Listings() {
       .select('*, listing_type, experience_years, work_type, skills, bio, certifications, requirements, other_description, profiles!left(id, full_name, company_name, account_type, logo_url, phone)', { count: 'exact' })
       .eq('status', 'active')
 
-    if (query) q = q.or(`title.ilike.%${query}%,description.ilike.%${query}%,keywords.ilike.%${query}%`)
+    const term = sanitizeSearch(query)
+    if (term) q = q.or(`title.ilike.%${term}%,description.ilike.%${term}%,keywords.ilike.%${term}%`)
     if (filters.category) q = q.eq('category', filters.category)
     if (filters.subcategories?.length) q = q.in('subcategory', filters.subcategories)
     if (filters.city) q = q.eq('city', filters.city)

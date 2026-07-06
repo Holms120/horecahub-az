@@ -12,6 +12,7 @@ import {
 import { useCategories } from '../hooks/useCategories'
 import { supabase } from '../supabaseClient'
 import { normalizeListing } from '../lib/normalize'
+import { sanitizeSearch } from '../lib/search'
 import ListingCard from '../components/ListingCard'
 import { useTranslation } from 'react-i18next'
 
@@ -105,11 +106,13 @@ export default function Home() {
   useEffect(() => {
     if (!query.length) { setSuggestions([]); setShowSuggestions(false); return }
     const timer = setTimeout(async () => {
+      const term = sanitizeSearch(query)
+      if (!term) { setSuggestions([]); setShowSuggestions(false); return }
       const { data } = await supabase
         .from('listings')
         .select('id, title, keywords')
         .eq('status', 'active')
-        .or(`title.ilike.%${query}%,keywords.ilike.%${query}%`)
+        .or(`title.ilike.%${term}%,keywords.ilike.%${term}%`)
         .limit(6)
       setSuggestions(data || [])
       setShowSuggestions(true)
@@ -147,7 +150,7 @@ export default function Home() {
         <meta name="description" content="Azərbaycanda HoReCa sektoru üçün ilk marketplace. Avadanlıq, kadr və təchizatçı elanları. Vasitəçisiz, birbaşa. Pulsuz qeydiyyat." />
         <meta property="og:title" content="HorecaHub — HoReCa Marketplace" />
         <meta property="og:description" content="Avadanlıq, kadr və təchizatçı elanları. Vasitəçisiz, birbaşa." />
-        <meta property="og:image" content="https://horecahub.az/logo.png" />
+        <meta property="og:image" content="https://horecahub.az/og-image.png" />
         <meta property="og:url" content="https://horecahub.az" />
       </Helmet>
       {/* ── HERO ── */}

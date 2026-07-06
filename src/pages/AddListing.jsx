@@ -8,6 +8,7 @@ import {
   ShieldCheck, GlassWater,
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
+import { notifyTelegram } from '../lib/notify'
 import { useAuth } from '../context/AuthContext'
 import { CITIES } from '../data/mockData'
 import { useCategories } from '../hooks/useCategories'
@@ -397,26 +398,14 @@ export default function AddListing() {
       setSubmitError(error.message)
       setSubmitting(false)
     } else {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        const userName = session?.user?.user_metadata?.full_name || session?.user?.email || 'Anonim'
-
-        await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            title: form.title,
-            category: form.category,
-            city: form.city,
-            user_name: userName,
-          }),
-        })
-      } catch (e) {
-        console.warn('Telegram notification failed:', e)
-      }
+      const { data: { session } } = await supabase.auth.getSession()
+      const userName = session?.user?.user_metadata?.full_name || session?.user?.email || 'Anonim'
+      await notifyTelegram({
+        title: form.title,
+        category: form.category,
+        city: form.city,
+        user_name: userName,
+      })
       setSubmitting(false)
       setFeedbackStep(true)
     }
@@ -432,23 +421,12 @@ export default function AddListing() {
         message: feedbackData.message.trim(),
         context: 'listing_create',
       })
-      try {
-        await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            title: `📝 Yeni feedback: ${feedbackData.type === 'suggestion' ? 'Təklif' : 'Problem'}`,
-            category: 'Feedback',
-            city: '',
-            user_name: 'İstifadəçi',
-          }),
-        })
-      } catch (e) {
-        console.warn('Telegram notification failed:', e)
-      }
+      await notifyTelegram({
+        title: `📝 Yeni feedback: ${feedbackData.type === 'suggestion' ? 'Təklif' : 'Problem'}`,
+        category: 'Feedback',
+        city: '',
+        user_name: 'İstifadəçi',
+      })
     }
     window.location.href = '/'
   }

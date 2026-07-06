@@ -15,7 +15,11 @@ dist/
 *.log
 .claude/
 
+# Local-only Claude notes (may contain deploy hooks / secrets — never commit)
+CLAUDE.local.md
+
 # Supabase local CLI state
 supabase/.temp/
 .env
 deno.lock
+.vercel

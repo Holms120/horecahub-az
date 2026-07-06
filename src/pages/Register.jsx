@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../supabaseClient'
+import { notifyTelegram } from '../lib/notify'
 import { CITIES } from '../data/mockData'
 import { translateAuthError } from '../lib/authErrors'
 import PhoneInput from '../components/PhoneInput'
@@ -107,23 +108,12 @@ export default function Register() {
       return
     }
 
-    try {
-      await fetch('https://ehlgmylgsaegsazobexw.supabase.co/functions/v1/notify-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          title: '🆕 Yeni qeydiyyat',
-          category: form.accountType === 'supplier' ? 'Təchizatçı' : 'Fərdi',
-          city: form.city || '',
-          user_name: form.fullName || form.email,
-        }),
-      })
-    } catch (e) {
-      console.warn('Telegram notification failed:', e)
-    }
+    await notifyTelegram({
+      title: '🆕 Yeni qeydiyyat',
+      category: form.accountType === 'supplier' ? 'Təchizatçı' : 'Fərdi',
+      city: form.city || '',
+      user_name: form.fullName || form.email,
+    })
 
     if (!signUpData.session) {
       setConfirmed(true)
