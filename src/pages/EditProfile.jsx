@@ -53,11 +53,11 @@ export default function EditProfile() {
     if (!user) return
     async function load() {
       setLoading(true)
+      // Own full profile via SECURITY DEFINER RPC (see AuthContext) —
+      // base table no longer exposes a blanket select('*') to clients.
       const { data, error: fetchErr } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+        .rpc('get_my_profile')
+        .maybeSingle()
 
       if (fetchErr || !data) {
         setError(t('editProfile.loadError'))

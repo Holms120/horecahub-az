@@ -16,8 +16,17 @@ function buildConfirmUrl(payload: EmailHookPayload): string {
   return `https://ehlgmylgsaegsazobexw.supabase.co/auth/v1/verify?token=${token_hash}&type=signup&redirect_to=${encodeURIComponent(redirectTo)}`
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 function buildHtml(name: string, confirmUrl: string): string {
-  const displayName = name || 'İstifadəçi'
+  const displayName = escapeHtml(name || 'İstifadəçi')
   return `<!DOCTYPE html>
 <html lang="az">
 <head>
@@ -226,11 +235,13 @@ serve(async (req: Request) => {
     return new Response('ok', { headers: CORS })
   }
 
-  // Require Authorization header — must be called by Supabase Auth Hook (hook secret)
+  // Require Authorization header — must be called by Supabase Auth Hook.
+  // Fail CLOSED: if the hook secret is not configured, reject everything
+  // rather than accepting any request that carries an Authorization header.
   const hookSecret = Deno.env.get('SEND_CONFIRMATION_HOOK_SECRET')
   const authHeader = req.headers.get('Authorization')
 
-  if (!authHeader || (hookSecret && authHeader !== `Bearer ${hookSecret}`)) {
+  if (!hookSecret || authHeader !== `Bearer ${hookSecret}`) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       headers: { ...CORS, 'Content-Type': 'application/json' },
       status: 401,

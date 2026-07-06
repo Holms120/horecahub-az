@@ -1,11 +1,24 @@
+# Edge function auth settings.
+# verify_jwt = true  → the API gateway requires a valid project JWT
+#                      (the anon key qualifies) before the function runs.
+# Functions that also enforce their own admin/JWT checks keep verify_jwt
+# on as a first line of defence.
+
+[functions.delete-user]
+enabled = true
+verify_jwt = true          # + in-function admin check (see index.ts)
+
+[functions.send-rejection-email]
+enabled = true
+verify_jwt = true          # + in-function admin check (see index.ts)
 
 [functions.notify-telegram]
 enabled = true
-verify_jwt = false
+verify_jwt = true          # was false — now requires the project JWT
 import_map = "./functions/notify-telegram/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
 entrypoint = "./functions/notify-telegram/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/notify-telegram/*.html" ]
+
+[functions.send-confirmation-email]
+enabled = true
+verify_jwt = false         # Supabase Auth email hook: authenticated via
+                           # SEND_CONFIRMATION_HOOK_SECRET, not a JWT.

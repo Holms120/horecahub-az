@@ -14,3 +14,8 @@ dist/
 .vscode/
 *.log
 .claude/
+
+# Supabase local CLI state
+supabase/.temp/
+.env
+deno.lock

@@ -7,11 +7,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
   async function fetchProfile(userId) {
     if (!userId) { setProfile(null); return }
+    // Own full profile via a SECURITY DEFINER RPC — the base `profiles`
+    // table no longer grants a blanket select('*') to authenticated
+    // clients (the email column is column-revoked to stop PII harvesting).
     const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+      .rpc('get_my_profile')
+      .maybeSingle()
     setProfile(data)
   }
   useEffect(() => {
