@@ -22,22 +22,14 @@ function syncCrispLocale(lang) {
     window.$crisp.push(['config', 'locale', [lang === 'az' ? 'az' : lang === 'ru' ? 'ru' : 'en']])
 
     const sendWelcome = () => {
-      console.log('[Crisp] sendWelcome called, guard:', localStorage.getItem('crisp_welcome_sent'))
-      if (localStorage.getItem('crisp_welcome_sent')) {
-        console.log('[Crisp] blocked by guard')
-        return
-      }
+      if (localStorage.getItem('crisp_welcome_sent')) return
       window.$crisp.push(['do', 'message:show', ['text', messages[lang] || messages['en']]])
       localStorage.setItem('crisp_welcome_sent', 'true')
-      console.log('[Crisp] message sent and guard set')
     }
 
     if (!window.__crispWelcomeListenerRegistered) {
-      console.log('[Crisp] registering session:loaded listener')
       window.__crispWelcomeListenerRegistered = true
       window.$crisp.push(['on', 'session:loaded', sendWelcome])
-    } else {
-      console.log('[Crisp] listener already registered, skipping')
     }
   }
 }
