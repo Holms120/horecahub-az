@@ -223,40 +223,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── MINI TRUST INDICATORS ── */}
-      <section className="py-6 bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { Icon: ShieldCheck, color: 'text-green-600', title: t('home.trust1_title'), desc: t('home.trust1_desc') },
-              { Icon: Phone,       color: 'text-blue-600',  title: t('home.trust2_title'), desc: t('home.trust2_desc') },
-              { Icon: Zap,         color: 'text-yellow-500',title: t('home.trust3_title'), desc: t('home.trust3_desc') },
-              { Icon: Lock,        color: 'text-purple-600',title: t('home.trust4_title'), desc: t('home.trust4_desc') },
-            ].map(({ Icon, color, title, desc }) => (
-              <div key={title} className="flex items-start gap-3">
-                <Icon size={20} className={`flex-shrink-0 mt-0.5 ${color}`} />
-                <div>
-                  <p className="text-sm font-semibold text-navy">{title}</p>
-                  <p className="text-xs text-gray-500 leading-snug">{desc}</p>
-                </div>
-              </div>
-            ))}
+      {/* ── LATEST LISTINGS ── */}
+      <section className="py-14 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-navy">{t('home.latestListings')}</h2>
+            <button
+              onClick={() => navigate('/listings')}
+              className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
+            >
+              {t('home.viewAll')} <ArrowRight size={15} />
+            </button>
           </div>
-        </div>
-      </section>
 
-      {/* ── INLINE FREE CTA ── */}
-      <section className="py-10 bg-blue-50 border-b border-blue-100">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl md:text-2xl font-bold text-navy mb-2">{t('home.cta_title')}</h2>
-          <p className="text-sm text-gray-500 mb-5">{t('home.cta_desc')}</p>
-          <button
-            onClick={() => navigate('/sell')}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
-          >
-            <Plus size={16} />
-            {t('home.cta_btn')}
-          </button>
+          {loadingListings ? (
+            <div className="flex justify-center py-16">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : listings.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+              <div className="text-5xl mb-4">📦</div>
+              <p className="text-gray-600 font-medium mb-2">{t('home.noListings')}</p>
+              <p className="text-gray-400 text-sm mb-6">{t('home.beFirst')}</p>
+              <button
+                onClick={() => navigate('/sell')}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                <Plus size={16} />
+                {t('home.postListing')}
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {listings.map(listing => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -301,43 +304,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── LATEST LISTINGS ── */}
-      <section className="py-14 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-navy">{t('home.latestListings')}</h2>
-            <button
-              onClick={() => navigate('/listings')}
-              className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium"
-            >
-              {t('home.viewAll')} <ArrowRight size={15} />
-            </button>
+      {/* ── MINI TRUST INDICATORS ── */}
+      <section className="py-6 bg-white border-b border-gray-100">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { Icon: ShieldCheck, color: 'text-green-600', title: t('home.trust1_title'), desc: t('home.trust1_desc') },
+              { Icon: Phone,       color: 'text-blue-600',  title: t('home.trust2_title'), desc: t('home.trust2_desc') },
+              { Icon: Zap,         color: 'text-yellow-500',title: t('home.trust3_title'), desc: t('home.trust3_desc') },
+              { Icon: Lock,        color: 'text-purple-600',title: t('home.trust4_title'), desc: t('home.trust4_desc') },
+            ].map(({ Icon, color, title, desc }) => (
+              <div key={title} className="flex items-start gap-3">
+                <Icon size={20} className={`flex-shrink-0 mt-0.5 ${color}`} />
+                <div>
+                  <p className="text-sm font-semibold text-navy">{title}</p>
+                  <p className="text-xs text-gray-500 leading-snug">{desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-
-          {loadingListings ? (
-            <div className="flex justify-center py-16">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : listings.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-              <div className="text-5xl mb-4">📦</div>
-              <p className="text-gray-600 font-medium mb-2">{t('home.noListings')}</p>
-              <p className="text-gray-400 text-sm mb-6">{t('home.beFirst')}</p>
-              <button
-                onClick={() => navigate('/sell')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={16} />
-                {t('home.postListing')}
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {listings.map(listing => (
-                <ListingCard key={listing.id} listing={listing} />
-              ))}
-            </div>
-          )}
         </div>
       </section>
 

@@ -43,12 +43,21 @@ function buildDayLabels(n) {
   }
   return labels
 }
+// Neutralise CSV/formula injection: a cell that starts with = + - @ (or a
+// leading tab/CR) is interpreted as a formula by Excel/Sheets. Prefix such
+// values with a single quote so they are treated as plain text.
+function csvCell(value) {
+  let s = String(value ?? '')
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s
+  return `"${s.replace(/"/g, '""')}"`
+}
+
 function exportCSV(rows, filename) {
   if (!rows.length) return
   const keys = Object.keys(rows[0])
   const csv = [
-    keys.join(','),
-    ...rows.map(r => keys.map(k => `"${String(r[k] ?? '').replace(/"/g, '""')}"`).join(',')),
+    keys.map(csvCell).join(','),
+    ...rows.map(r => keys.map(k => csvCell(r[k])).join(',')),
   ].join('\n')
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' }))
@@ -140,9 +149,9 @@ function DashboardTab({ realtimeEvents }) {
           supabase.from('listings').select('*', { count: 'exact', head: true }),
           supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'active'),
           supabase.from('listings').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-          supabase.from('profiles').select('*', { count: 'exact', head: true }),
+          supabase.from('profiles').select('id', { count: 'exact', head: true }),
           supabase.from('listings').select('*', { count: 'exact', head: true }).gte('created_at', ws),
-          supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', ws),
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', ws),
           supabase.from('listings').select('category').eq('status', 'active'),
           supabase.from('phone_clicks').select('*', { count: 'exact', head: true }).gte('created_at', ws).not('user_id', 'is', null),
           supabase.from('phone_clicks').select('*', { count: 'exact', head: true }).gte('created_at', ws).is('user_id', null),
@@ -849,15 +858,16 @@ function UsersTab({ adminId }) {
     const input = window.prompt(`"${name}" istifadəçisini və bütün elanlarını silmək üçün "SİL" yazın:`)
     if (input !== 'SİL') return
 
-    const { error } = await supabase.from('profiles').delete().eq('id', uid)
-    if (error) { alert('Xəta: ' + error.message); return }
-
-    const { error: authError } = await supabase.functions.invoke('delete-user', {
-      body: { user_id: uid }
+    // Deletion (profile + auth user + cascaded rows) is performed
+    // server-side by the delete-user function, which verifies the
+    // caller is an admin. Do NOT delete the profile row from the
+    // client first — that ran with no authorization guarantee.
+    const { error } = await supabase.functions.invoke('delete-user', {
+      body: { user_id: uid },
     })
+    if (error) { alert('Xəta: ' + (error.message || 'silinmə uğursuz oldu')); return }
 
     setUsers(us => us.filter(u => u.id !== uid))
-    if (authError) console.warn('Auth delete failed:', authError)
   }
 
   async function expandUser(uid) {
@@ -1060,7 +1070,10 @@ function SupportTab({ adminId }) {
         setConvs(list)
         const ids = list.map(c => c.userId)
         if (ids.length) {
-          const { data: pData } = await supabase.from('profiles')
+          // Read counterpart email through the admin-only `admin_users`
+          // view — the base profiles table column-revokes email from
+          // authenticated clients (PII hardening, migration 002).
+          const { data: pData } = await supabase.from('admin_users')
             .select('id, full_name, company_name, email').in('id', ids)
           const pm = {}
           ;(pData || []).forEach(p => { pm[p.id] = p })
