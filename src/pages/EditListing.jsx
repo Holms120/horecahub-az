@@ -162,8 +162,14 @@ const EMPTY_FORM = {
 export default function EditListing() {
   const { t }                       = useTranslation()
   const { id }                      = useParams()
-  const { user, loading: authLoading } = useAuth()
+  const { user, profile, loading: authLoading } = useAuth()
   const navigate                    = useNavigate()
+
+  const isAdmin = !!profile?.is_admin
+  // When an admin edits someone else's listing (moderation flow), the
+  // ownership guard and the user_id-scoped update are relaxed. RLS still
+  // gates the write via the listings_update_admin policy.
+  const [editingAsAdmin, setEditingAsAdmin] = useState(false)
 
   const PAYMENT_OPTS = [
     { value: 'cash',   label: t('addListing.cash') },
@@ -212,7 +218,9 @@ export default function EditListing() {
         .single()
 
       if (error || !data) { navigate('/listings'); return }
-      if (data.user_id !== user.id) { navigate(`/listings/${id}`); return }
+      const ownListing = data.user_id === user.id
+      if (!ownListing && !isAdmin) { navigate(`/listings/${id}`); return }
+      setEditingAsAdmin(!ownListing && isAdmin)
 
       setForm({
         category:    data.category    || '',
@@ -306,7 +314,7 @@ export default function EditListing() {
       }
     }
 
-    const { error } = await supabase
+    let query = supabase
       .from('listings')
       .update({
         title:        strip(form.title),
@@ -322,14 +330,17 @@ export default function EditListing() {
         images:       [...existingImages, ...newUrls],
       })
       .eq('id', id)
-      .eq('user_id', user.id)
+    // Owners are scoped to their own row; admins editing another user's
+    // listing rely on the listings_update_admin RLS policy instead.
+    if (!editingAsAdmin) query = query.eq('user_id', user.id)
+    const { error } = await query
 
     if (error) {
       setSaveError(error.message)
       setSaving(false)
     } else {
       setSaved(true)
-      setTimeout(() => navigate(`/listings/${id}`), 1800)
+      setTimeout(() => navigate(editingAsAdmin ? '/admin' : `/listings/${id}`), 1800)
     }
   }
 
@@ -349,22 +360,33 @@ export default function EditListing() {
           <CheckCircle2 size={36} className="text-green-600" />
         </div>
         <h2 className="text-2xl font-bold text-navy mb-3">Elan yeniləndi!</h2>
-        <p className="text-gray-500">Elan səhifəsinə yönləndirilirsiniz...</p>
+        <p className="text-gray-500">
+          {editingAsAdmin ? 'Moderasiya səhifəsinə yönləndirilirsiniz...' : 'Elan səhifəsinə yönləndirilirsiniz...'}
+        </p>
       </div>
     )
   }
+
+  const backTo = editingAsAdmin ? '/admin' : `/listings/${id}`
 
   // ── Main form ─────────────────────────────────────────────────
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
       <Link
-        to={`/listings/${id}`}
+        to={backTo}
         className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-navy mb-8 transition-colors"
       >
-        <ChevronLeft size={16} /> {t('listingDetail.back')}
+        <ChevronLeft size={16} /> {editingAsAdmin ? 'Moderasiyaya qayıt' : t('listingDetail.back')}
       </Link>
 
-      <h1 className="text-2xl font-bold text-navy mb-8">Elanı redaktə et</h1>
+      <h1 className={`text-2xl font-bold text-navy ${editingAsAdmin ? 'mb-2' : 'mb-8'}`}>Elanı redaktə et</h1>
+
+      {editingAsAdmin && (
+        <div className="flex items-start gap-2.5 p-4 mb-6 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+          <span>Admin rejimi: başqa istifadəçinin elanını redaktə edirsiniz. Dəyişikliklər yadda saxlandıqdan sonra elanı təsdiqləyə bilərsiniz.</span>
+        </div>
+      )}
 
       {saveError && (
         <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 mb-6">
@@ -666,7 +688,7 @@ export default function EditListing() {
         {/* ── Actions ── */}
         <div className="flex gap-3 justify-end">
           <Link
-            to={`/listings/${id}`}
+            to={backTo}
             className="px-6 py-3 border border-gray-200 text-navy font-semibold rounded-xl hover:bg-gray-50 transition-colors text-sm"
           >
             {t('editProfile.cancel')}
