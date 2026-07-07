@@ -5,7 +5,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2,
+  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2, Pencil,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -438,6 +438,24 @@ function ModerationTab({ adminId, onApprove }) {
     }
   }
 
+  async function handleSilentDelete(listing) {
+    if (!window.confirm(`"${listing.title}" elanı satıcıya heç bir bildiriş göndərilmədən silinəcək. Davam edilsin?`)) return
+    setProcessing(listing.id)
+    // Soft-delete via the admin UPDATE policy (same as the Listings tab).
+    // No message and no rejection email are sent to the seller.
+    const { error } = await supabase
+      .from('listings')
+      .update({ status: 'deleted' })
+      .eq('id', listing.id)
+    if (!error) {
+      setListings(ls => ls.filter(l => l.id !== listing.id))
+      onApprove?.()
+    } else {
+      console.warn('Silent delete failed:', error)
+    }
+    setProcessing(null)
+  }
+
   if (loading) return <Spinner />
 
   return (
@@ -487,20 +505,35 @@ function ModerationTab({ adminId, onApprove }) {
                     {seller?.phone && <p className="text-gray-500 text-xs mt-0.5">{seller.phone}</p>}
                     <p className="text-gray-400 text-xs mt-0.5">{shortDate(l.created_at)}</p>
                   </div>
-                  <div className="flex gap-2 mt-auto pt-1">
-                    <button
-                      onClick={() => handleApprove(l)}
-                      disabled={processing === l.id}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 disabled:opacity-50 transition-colors"
+                  <div className="mt-auto pt-1 space-y-2">
+                    <Link
+                      to={`/listings/${l.id}/edit`}
+                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-700 text-sm font-semibold rounded-xl hover:bg-blue-100 transition-colors border border-blue-200"
                     >
-                      <Check size={14} /> Təsdiqlə
-                    </button>
+                      <Pencil size={14} /> Redaktə et
+                    </Link>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleApprove(l)}
+                        disabled={processing === l.id}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 disabled:opacity-50 transition-colors"
+                      >
+                        <Check size={14} /> Təsdiqlə
+                      </button>
+                      <button
+                        onClick={() => { setRejectModal(l); setRejectReason('') }}
+                        disabled={processing === l.id}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-xl hover:bg-red-100 disabled:opacity-50 transition-colors border border-red-200"
+                      >
+                        <XCircle size={14} /> Rədd et
+                      </button>
+                    </div>
                     <button
-                      onClick={() => { setRejectModal(l); setRejectReason('') }}
+                      onClick={() => handleSilentDelete(l)}
                       disabled={processing === l.id}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-xl hover:bg-red-100 disabled:opacity-50 transition-colors border border-red-200"
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-gray-400 hover:text-red-600 disabled:opacity-50 transition-colors"
                     >
-                      <XCircle size={14} /> Rədd et
+                      <Trash2 size={13} /> Bildirişsiz sil
                     </button>
                   </div>
                 </div>
