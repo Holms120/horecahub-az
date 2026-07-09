@@ -102,8 +102,13 @@ export default function ListingCard({ listing, viewCount: viewCountProp, favorit
     e.stopPropagation()
     if (!window.confirm(t('listingCard.deleteConfirm'))) return
     setDeleting(true)
-    await supabase.from('listings').update({ status: 'deleted' })
+    const { error } = await supabase.from('listings').update({ status: 'deleted' })
       .eq('id', id).eq('user_id', user.id)
+    if (error) {
+      alert(t('listingCard.deleteError'))
+      setDeleting(false)
+      return
+    }
     window.location.reload()
   }
 

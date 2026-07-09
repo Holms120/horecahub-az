@@ -118,7 +118,8 @@
     "delete": "Delete",
     "deleteConfirm": "Are you sure you want to delete this listing?",
     "addToFavorites": "Add to favorites",
-    "newListing": "New listing"
+    "newListing": "New listing",
+    "deleteError": "Failed to delete the listing. Please try again."
   },
   "listingDetail": {
     "back": "Back",
@@ -273,7 +274,17 @@
     "pendingTitle": "Listing submitted!",
     "pendingDesc": "Your listing has been sent for moderation. It will be published after admin review.",
     "viewListings": "View listings",
-    "postAnother": "Post another listing"
+    "postAnother": "Post another listing",
+    "uploadError": "Failed to upload a photo. Please try again.",
+    "keywordsPlaceholder": "e.g.: puree, pure, sauce, sos — separate with commas",
+    "keywordsLabel": "Keywords",
+    "feedbackTitle": "Your listing has been submitted! 🎉",
+    "feedbackDesc": "It will appear on the site after admin approval. Share your thoughts with us:",
+    "feedbackSuggestion": "💡 Suggestion",
+    "feedbackProblem": "⚠️ Problem",
+    "feedbackPlaceholder": "Write your thoughts... (optional)",
+    "feedbackSkip": "Skip",
+    "feedbackSend": "Send"
   },
   "auth": {
     "loginTitle": "Sign in to your account",
@@ -330,7 +341,8 @@
     "errEmailNotConfirmed": "Email not confirmed. Please check your inbox",
     "errInvalidEmailFormat": "Invalid email format",
     "errRateLimit": "Too many attempts. Please wait a few minutes.",
-    "and": "and"
+    "and": "and",
+    "forgotPassword": "Forgot your password?"
   },
   "profile": {
     "verified": "Verified Supplier",
@@ -796,5 +808,504 @@
     "updating": "Updating...",
     "mismatch": "Passwords do not match",
     "tooShort": "Password must be at least 6 characters"
+  },
+  "ph": {
+    "kitchen": {
+      "title": "e.g. Rational SCC 61 combi steamer",
+      "desc": "Model, condition, technical specs, reason for sale..."
+    },
+    "coffee": {
+      "title": "e.g. La Marzocco Linea PB 2-group espresso machine",
+      "desc": "Model, years in use, technical condition..."
+    },
+    "cold": {
+      "title": "e.g. Liebherr GKv 4310 refrigerator",
+      "desc": "Capacity, temperature, condition, years in use..."
+    },
+    "tableware": {
+      "title": "e.g. Porcelain plate set, 50 pcs",
+      "desc": "Material, quantity, condition, brand..."
+    },
+    "furniture": {
+      "title": "e.g. Wooden restaurant table set for 4",
+      "desc": "Material, size, quantity, condition..."
+    },
+    "service": {
+      "title": "e.g. Meiko UPster H500 service equipment",
+      "desc": "Model, technical condition, time in use..."
+    },
+    "packaging": {
+      "title": "e.g. Kraft packaging boxes, 500 pcs",
+      "desc": "Size, material, quantity, price..."
+    },
+    "food_ingredients": {
+      "title": "e.g. Matcha powder, 1kg, premium grade",
+      "desc": "Brand, quantity, origin, packaging..."
+    },
+    "hygiene": {
+      "title": "e.g. Latex gloves, size L, 100 pcs",
+      "desc": "Brand, size, quantity, certificate..."
+    },
+    "alcohol": {
+      "title": "e.g. Evian mineral water, 0.5L, pack of 24",
+      "desc": "Brand, volume, quantity, delivery terms..."
+    },
+    "textile": {
+      "title": "e.g. Chef uniform set, size L, 10 pcs",
+      "desc": "Material, size, color, quantity..."
+    },
+    "maintenance": {
+      "title": "e.g. Brita Purity C300 water filter system",
+      "desc": "Model, service scope, installation terms..."
+    },
+    "print_ads": {
+      "title": "e.g. Menu printing in A1 format, 100 pcs",
+      "desc": "Format, quantity, material, delivery time..."
+    },
+    "construction": {
+      "title": "e.g. Restaurant terrace awning, 5x10m",
+      "desc": "Size, material, installation service, warranty..."
+    },
+    "legal_finance": {
+      "title": "e.g. Monthly accounting service for SMEs",
+      "desc": "Service scope, experience, price..."
+    },
+    "consulting": {
+      "title": "e.g. Restaurant concept development",
+      "desc": "Service scope, experience, portfolio..."
+    },
+    "software": {
+      "title": "e.g. Cloud-based POS system for restaurants",
+      "desc": "Features, pricing plan, support..."
+    },
+    "training": {
+      "title": "e.g. Barista course, 2 weeks, Baku",
+      "desc": "Program, duration, certificate, price..."
+    },
+    "staff": {
+      "title": "e.g. Experienced head chef, European cuisine",
+      "desc": "Experience, skills, salary expectations..."
+    },
+    "business_sale": {
+      "title": "e.g. Operating café, Narimanov, 60m², 8,000 AZN/month",
+      "desc": "Turnover, costs, equipment, lease term..."
+    },
+    "convection_ovens": {
+      "title": "e.g. Unox XVC 305E convection oven",
+      "desc": "Model, power, capacity, condition, years in use..."
+    },
+    "combi_steamers": {
+      "title": "e.g. Rational SCC 61 combi steamer",
+      "desc": "Model, rack count, condition, service history..."
+    },
+    "pizza_ovens": {
+      "title": "e.g. Moretti Forni T64E pizza oven",
+      "desc": "Model, chamber count, temperature, condition..."
+    },
+    "fryers": {
+      "title": "e.g. Henny Penny fryer",
+      "desc": "Model, capacity, power, condition..."
+    },
+    "stoves": {
+      "title": "e.g. 6-burner gas range, cast-iron grates",
+      "desc": "Burner count, fuel type, condition..."
+    },
+    "mixers_blenders": {
+      "title": "e.g. Robot Coupe R301 blender",
+      "desc": "Model, power, capacity, accessories, condition..."
+    },
+    "meat_equipment": {
+      "title": "e.g. Tre Spade bone saw",
+      "desc": "Model, power, condition, time in use..."
+    },
+    "slicers": {
+      "title": "e.g. Berkel 250 meat slicer",
+      "desc": "Model, blade diameter, condition..."
+    },
+    "water_baths": {
+      "title": "e.g. Sous-vide bath, 20L",
+      "desc": "Capacity, temperature range, condition..."
+    },
+    "pasta_cookers": {
+      "title": "e.g. Pasta cooker, 40L",
+      "desc": "Capacity, material, condition..."
+    },
+    "kitchen_spare_parts": {
+      "title": "e.g. Rational spare part, model number",
+      "desc": "Appliance model, part name, originality..."
+    },
+    "kitchen_other": {
+      "title": "e.g. Professional kitchen equipment",
+      "desc": "Type, model, condition, features..."
+    },
+    "espresso_machines": {
+      "title": "e.g. La Marzocco Linea PB, 2 groups",
+      "desc": "Model, group count, condition, service history..."
+    },
+    "grinders": {
+      "title": "e.g. Mahlkönig EK43 grinder",
+      "desc": "Model, burr diameter, condition..."
+    },
+    "brewing_equipment": {
+      "title": "e.g. Chemex, Hario V60, batch brew",
+      "desc": "Type, size, condition..."
+    },
+    "refrigerators_bar": {
+      "title": "e.g. Display refrigerator, 120L",
+      "desc": "Capacity, size, condition..."
+    },
+    "ice_machines": {
+      "title": "e.g. Scotsman ice machine, 30kg/day",
+      "desc": "Model, daily output, condition..."
+    },
+    "bar_equipment": {
+      "title": "e.g. Professional blender, glass jar",
+      "desc": "Model, power, condition..."
+    },
+    "coffee_other": {
+      "title": "e.g. Coffee & bar equipment",
+      "desc": "Type, model, condition..."
+    },
+    "refrigerators": {
+      "title": "e.g. Liebherr GKv 4310 refrigerator",
+      "desc": "Capacity, temperature, condition..."
+    },
+    "freezers": {
+      "title": "e.g. Chest freezer, 500L",
+      "desc": "Capacity, temperature, condition..."
+    },
+    "display_fridges": {
+      "title": "e.g. Glass display fridge, 3 doors",
+      "desc": "Size, temperature, condition..."
+    },
+    "blast_chillers": {
+      "title": "e.g. Blast chiller, 10 GN trays",
+      "desc": "Tray count, cooling speed, condition..."
+    },
+    "cold_other": {
+      "title": "e.g. Refrigeration equipment",
+      "desc": "Type, capacity, condition..."
+    },
+    "plates_bowls": {
+      "title": "e.g. Porcelain plate set, 50 pcs",
+      "desc": "Material, size, quantity, brand..."
+    },
+    "glasses": {
+      "title": "e.g. Riedel wine glasses, 24 pcs",
+      "desc": "Type, volume, quantity, condition..."
+    },
+    "cutlery": {
+      "title": "e.g. 84-piece silver set",
+      "desc": "Material, piece count, brand, condition..."
+    },
+    "serving_equipment": {
+      "title": "e.g. Serving trolley, 3 tiers",
+      "desc": "Size, material, condition..."
+    },
+    "tableware_other": {
+      "title": "e.g. Tableware and accessories",
+      "desc": "Type, material, quantity, condition..."
+    },
+    "tables_chairs": {
+      "title": "e.g. Table for 4 + 4 chairs",
+      "desc": "Material, size, color, quantity, condition..."
+    },
+    "bar_counters": {
+      "title": "e.g. Bar counter, 3 meters, stainless steel",
+      "desc": "Length, material, condition..."
+    },
+    "shelving": {
+      "title": "e.g. Stainless steel shelving, 5 tiers",
+      "desc": "Size, load capacity, material, condition..."
+    },
+    "lounge_furniture": {
+      "title": "e.g. Sofa set for restaurant",
+      "desc": "Material, size, color, condition..."
+    },
+    "furniture_other": {
+      "title": "e.g. Furniture and decor",
+      "desc": "Type, material, condition..."
+    },
+    "gloves_masks": {
+      "title": "e.g. Latex gloves, size L, 100 pcs",
+      "desc": "Brand, size, quantity, certificate..."
+    },
+    "disinfectants": {
+      "title": "e.g. Suma disinfectant, 5L",
+      "desc": "Brand, volume, quantity..."
+    },
+    "cleaning_products": {
+      "title": "e.g. Professional kitchen cleaning set",
+      "desc": "Brand, type, quantity..."
+    },
+    "soap_paper": {
+      "title": "e.g. Paper towels, 6 rolls, white",
+      "desc": "Type, quantity, brand..."
+    },
+    "haccp_materials": {
+      "title": "e.g. Color-coded cutting board set for HACCP",
+      "desc": "Set contents, standard, quantity..."
+    },
+    "hygiene_other": {
+      "title": "e.g. Hygiene product",
+      "desc": "Type, quantity, area of use..."
+    },
+    "wine": {
+      "title": "e.g. Local wine, Madrasa, 2023, 6 bottles",
+      "desc": "Brand, year, volume, quantity..."
+    },
+    "beer": {
+      "title": "e.g. Draft beer system, keg, 30L",
+      "desc": "Brand, volume, quantity, delivery..."
+    },
+    "spirits": {
+      "title": "e.g. Whisky, 0.7L, 12 bottles",
+      "desc": "Brand, volume, quantity..."
+    },
+    "soft_drinks": {
+      "title": "e.g. Coca-Cola, 0.33L, pack of 24",
+      "desc": "Brand, volume, quantity, delivery..."
+    },
+    "energy_drinks": {
+      "title": "e.g. Red Bull, 0.25L, pack of 24",
+      "desc": "Brand, volume, quantity..."
+    },
+    "water": {
+      "title": "e.g. Evian mineral water, 0.5L, pack of 24",
+      "desc": "Brand, volume, quantity, delivery..."
+    },
+    "juice": {
+      "title": "e.g. Freshly squeezed orange juice, 1L",
+      "desc": "Type, volume, quantity, production date..."
+    },
+    "alcohol_other": {
+      "title": "e.g. Beverage",
+      "desc": "Type, brand, volume, quantity..."
+    },
+    "chef_uniform": {
+      "title": "e.g. Chef uniform set, size M, 5 pcs",
+      "desc": "Material, size, color, quantity..."
+    },
+    "waiter_uniform": {
+      "title": "e.g. Waiter uniform, black, S/M/L",
+      "desc": "Material, size, color, quantity..."
+    },
+    "aprons": {
+      "title": "e.g. Leather apron for barista",
+      "desc": "Material, size, color, quantity..."
+    },
+    "hotel_textile": {
+      "title": "e.g. Hotel towel set, 50 pcs",
+      "desc": "Size, material, quantity..."
+    },
+    "table_cloth": {
+      "title": "e.g. Zigzag tablecloth, 10 pcs",
+      "desc": "Size, material, color, quantity..."
+    },
+    "textile_other": {
+      "title": "e.g. Textile product",
+      "desc": "Type, material, size, quantity..."
+    },
+    "equipment_repair": {
+      "title": "e.g. Espresso machine repair, Baku",
+      "desc": "Appliance type, service scope, warranty..."
+    },
+    "refrigeration_service": {
+      "title": "e.g. Refrigerator maintenance service",
+      "desc": "Service type, duration, price..."
+    },
+    "plumbing": {
+      "title": "e.g. Plumbing installation and repair",
+      "desc": "Service type, area, experience..."
+    },
+    "electrical": {
+      "title": "e.g. Electrical work for restaurant",
+      "desc": "Service type, area, license..."
+    },
+    "ventilation": {
+      "title": "e.g. Kitchen ventilation installation",
+      "desc": "System type, power, area, price..."
+    },
+    "filter_water": {
+      "title": "e.g. Brita Purity C300 water filter installation",
+      "desc": "Model, filtration capacity, installation service..."
+    },
+    "maintenance_other": {
+      "title": "e.g. Technical service",
+      "desc": "Service type, area, experience..."
+    },
+    "menu_print": {
+      "title": "e.g. A4 laminated menu, 100 pcs, double-sided",
+      "desc": "Format, quantity, material, delivery time..."
+    },
+    "banner_signage": {
+      "title": "e.g. Banner printing 3x1m, with frame",
+      "desc": "Size, material, quantity..."
+    },
+    "brand_materials": {
+      "title": "e.g. Corporate identity package for a café",
+      "desc": "Service scope, format, duration..."
+    },
+    "business_cards": {
+      "title": "e.g. Business cards, 500 pcs, double-sided",
+      "desc": "Format, material, quantity, delivery..."
+    },
+    "digital_ads": {
+      "title": "e.g. Instagram/Facebook ad management",
+      "desc": "Platform, budget, duration, target..."
+    },
+    "print_other": {
+      "title": "e.g. Printing service",
+      "desc": "Type, format, quantity..."
+    },
+    "interior_design": {
+      "title": "e.g. Restaurant interior design, 120m²",
+      "desc": "Area, style, duration, portfolio..."
+    },
+    "renovation": {
+      "title": "e.g. Turnkey café renovation, 60m²",
+      "desc": "Area, scope of work, duration, warranty..."
+    },
+    "engineering": {
+      "title": "e.g. Kitchen engineering project",
+      "desc": "Service type, experience, license..."
+    },
+    "furniture_custom": {
+      "title": "e.g. Custom bar counter, stainless steel",
+      "desc": "Material, size, duration, portfolio..."
+    },
+    "terrace_outdoor": {
+      "title": "e.g. Restaurant terrace awning, 5x10m",
+      "desc": "Size, material, installation, warranty..."
+    },
+    "construction_other": {
+      "title": "e.g. Construction service",
+      "desc": "Service type, area, duration..."
+    },
+    "accounting": {
+      "title": "e.g. Monthly accounting service for SMEs",
+      "desc": "Service scope, report type, price..."
+    },
+    "tax_consulting": {
+      "title": "e.g. Tax advice on VAT registration",
+      "desc": "Matter, service duration, price..."
+    },
+    "legal_service": {
+      "title": "e.g. Lease agreement drafting",
+      "desc": "Service type, duration, price..."
+    },
+    "licensing": {
+      "title": "e.g. License for restaurant operations",
+      "desc": "License type, duration, service..."
+    },
+    "hr_service": {
+      "title": "e.g. Employment contract + HR service",
+      "desc": "Service scope, staff count, price..."
+    },
+    "legal_other": {
+      "title": "e.g. Financial/legal service",
+      "desc": "Service type, field, price..."
+    },
+    "chef": {
+      "title": "e.g. Head chef, European cuisine, 5 years experience",
+      "desc": "Position, experience, salary expectations, specialization..."
+    },
+    "barista": {
+      "title": "e.g. Specialty coffee barista, SCA certified",
+      "desc": "Certificate, experience, salary expectations..."
+    },
+    "waiter": {
+      "title": "e.g. Waiter with English, Baku",
+      "desc": "Language skills, experience, city..."
+    },
+    "manager": {
+      "title": "e.g. Restaurant manager, 3+ years experience",
+      "desc": "Position, experience, salary expectations..."
+    },
+    "staff_other": {
+      "title": "e.g. HoReCa sector employee",
+      "desc": "Position, experience, requirements..."
+    },
+    "cafe_sale": {
+      "title": "e.g. Operating coffee shop, Narimanov, 40m²",
+      "desc": "Monthly turnover, costs, lease price, equipment..."
+    },
+    "restaurant_sale": {
+      "title": "e.g. Restaurant, 80 seats, fully equipped",
+      "desc": "Seat count, turnover, lease, equipment..."
+    },
+    "business_other": {
+      "title": "e.g. Business for sale",
+      "desc": "Turnover, costs, assets, reason for sale..."
+    },
+    "coffee_beans": {
+      "title": "e.g. Ethiopia Yirgacheffe, 1kg, specialty",
+      "desc": "Origin, processing method, roast level, quantity..."
+    },
+    "alternative_milk": {
+      "title": "e.g. Oat milk, Oatly barista, 6x1L",
+      "desc": "Brand, type, volume, quantity..."
+    },
+    "matcha": {
+      "title": "e.g. Ippodo Matcha, ceremonial grade, 100g",
+      "desc": "Brand, quality grade, quantity, price..."
+    },
+    "chocolate_powder": {
+      "title": "e.g. Valrhona cocoa powder, 1kg",
+      "desc": "Brand, type, quantity, price..."
+    },
+    "salep": {
+      "title": "e.g. Turkish salep powder, 500g, original",
+      "desc": "Origin, quantity, packaging..."
+    },
+    "chai_tea": {
+      "title": "e.g. Masala chai blend, 1kg",
+      "desc": "Composition, quantity, brand..."
+    },
+    "syrups_toppings": {
+      "title": "e.g. Monin caramel syrup, 700ml",
+      "desc": "Brand, flavor, volume, quantity..."
+    },
+    "flour_sugar": {
+      "title": "e.g. Premium flour, 25kg, for baking",
+      "desc": "Type, weight, quantity, manufacturer..."
+    },
+    "spices": {
+      "title": "e.g. Professional spice set, 12 kinds",
+      "desc": "Number of kinds, quantity, manufacturer..."
+    },
+    "food_other": {
+      "title": "e.g. Food product",
+      "desc": "Type, quantity, storage conditions..."
+    },
+    "boxes": {
+      "title": "e.g. Pizza box, 30cm, 100 pcs",
+      "desc": "Size, material, print, quantity..."
+    },
+    "bags": {
+      "title": "e.g. Kraft bag with handles, 500 pcs",
+      "desc": "Size, material, print, quantity..."
+    },
+    "cups": {
+      "title": "e.g. Paper cup, 350ml, 1000 pcs",
+      "desc": "Volume, material, quantity, print..."
+    },
+    "packaging_other": {
+      "title": "e.g. Packaging material",
+      "desc": "Type, size, quantity..."
+    }
+  },
+  "editListing": {
+    "title": "Edit listing",
+    "updated": "Listing updated!",
+    "redirecting": "Redirecting to the listing page...",
+    "adminRedirecting": "Redirecting to the moderation page...",
+    "existingPhotos": "Current photos",
+    "newPhotos": "New photos",
+    "maxPhotosReached": "Maximum number of photos reached",
+    "minPrice": "Price must be at least ₼1",
+    "listingTitle": "Listing",
+    "adminBanner": "Admin mode: you are editing another user's listing. After saving changes you can approve the listing.",
+    "backToModeration": "Back to moderation"
   }
 }
