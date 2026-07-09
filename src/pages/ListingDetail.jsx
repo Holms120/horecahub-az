@@ -308,7 +308,7 @@ export default function ListingDetail() {
                 </button>
                 {copied && (
                   <div className="absolute right-0 top-full mt-1.5 whitespace-nowrap bg-gray-900 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow-lg pointer-events-none">
-                    Link kopyalandı!
+                    {t('common.linkCopied')}
                   </div>
                 )}
               </div>
@@ -375,7 +375,7 @@ export default function ListingDetail() {
                     className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <Phone size={16} />
-                    Zəng et
+                    {t('common.callBtn')}
                   </a>
                 </div>
               </div>
@@ -599,7 +599,7 @@ export default function ListingDetail() {
               <a href={sellerPhone ? `tel:${sellerPhone}` : undefined}
                 className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 flex items-center justify-center gap-1.5">
                 <Phone size={15} />
-                Zəng et
+                {t('common.callBtn')}
               </a>
             </>
           )}

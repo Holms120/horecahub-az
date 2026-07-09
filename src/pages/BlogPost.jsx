@@ -479,7 +479,7 @@ const POST_CONTENT = {
 
 export default function BlogPost() {
   const { id } = useParams()
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const lang = i18n.language?.startsWith('ru') ? 'ru' : i18n.language?.startsWith('en') ? 'en' : 'az'
 
   const post = POST_CONTENT[id]
@@ -487,8 +487,8 @@ export default function BlogPost() {
   if (!post) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <p className="text-gray-500 mb-4">Məqalə tapılmadı</p>
-        <Link to="/blog" className="text-blue-600 hover:underline">Bloga qayıt</Link>
+        <p className="text-gray-500 mb-4">{t('blog.notFound')}</p>
+        <Link to="/blog" className="text-blue-600 hover:underline">{t('blog.back')}</Link>
       </div>
     </div>
   )
@@ -508,7 +508,7 @@ export default function BlogPost() {
         <meta property="og:type" content="article" />
       </Helmet>
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <Link to="/blog" className="text-sm text-blue-600 hover:underline mb-6 inline-block">← Bloga qayıt</Link>
+        <Link to="/blog" className="text-sm text-blue-600 hover:underline mb-6 inline-block">{t('blog.back')}</Link>
         <div className="flex items-center gap-2 mb-4">
           <span className="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full">{category}</span>
           <span className="text-xs text-gray-400">{date}</span>

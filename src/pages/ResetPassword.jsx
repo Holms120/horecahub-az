@@ -11,7 +11,7 @@ export default function ResetPassword() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   function translateError(msg) {
     if (!msg) return msg
@@ -48,8 +48,8 @@ export default function ResetPassword() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (password !== confirm) { setError('Şifrələr uyğun gəlmir'); return }
-    if (password.length < 6) { setError('Şifrə ən az 6 simvol olmalıdır'); return }
+    if (password !== confirm) { setError(t('password.mismatch')); return }
+    if (password.length < 6) { setError(t('password.tooShort')); return }
     setLoading(true)
     const { error: err } = await supabase.auth.updateUser({ password })
     if (err) {
@@ -63,18 +63,18 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <Helmet><title>Yeni şifrə — HorecaHub</title></Helmet>
+      <Helmet><title>{t('password.resetMeta')} — HorecaHub</title></Helmet>
       <div className="w-full max-w-md bg-white rounded-2xl border border-gray-200 p-8">
-        <h1 className="text-2xl font-bold text-navy mb-6">Yeni şifrə təyin et</h1>
+        <h1 className="text-2xl font-bold text-navy mb-6">{t('password.resetTitle')}</h1>
         {success ? (
-          <p className="text-green-600 font-semibold text-center">Şifrə yeniləndi! Yönləndirilirsiniz...</p>
+          <p className="text-green-600 font-semibold text-center">{t('password.updatedRedirect')}</p>
         ) : (
           <>
             {error && <p className="text-red-500 text-sm mb-4">{translateError(error)}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="password"
-                placeholder="Yeni şifrə"
+                placeholder={t('password.newPlaceholder')}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -82,7 +82,7 @@ export default function ResetPassword() {
               />
               <input
                 type="password"
-                placeholder="Şifrəni təsdiq edin"
+                placeholder={t('password.confirmPlaceholder')}
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 required
@@ -93,7 +93,7 @@ export default function ResetPassword() {
                 disabled={loading}
                 className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-60"
               >
-                {loading ? 'Yenilənir...' : 'Şifrəni yenilə'}
+                {loading ? t('password.updating') : t('password.update')}
               </button>
             </form>
           </>

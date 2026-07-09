@@ -80,7 +80,9 @@
     "clearFilters": "Сбросить фильтры",
     "loadMore": "Загрузить ещё",
     "error": "Ошибка загрузки объявлений:",
-    "apply": "Применить"
+    "apply": "Применить",
+    "prev": "← Назад",
+    "next": "Вперёд →"
   },
   "filter": {
     "title": "Фильтры",
@@ -392,7 +394,9 @@
     "confirmNewPassword": "Повторите пароль",
     "updatePassword": "Обновить пароль",
     "updatingPassword": "Обновление...",
-    "passwordUpdated": "Пароль успешно обновлён."
+    "passwordUpdated": "Пароль успешно обновлён.",
+    "avatarTypeError": "Допустимы только форматы JPG, PNG, WEBP",
+    "avatarSizeError": "Максимальный размер файла {{mb}} МБ"
   },
   "messages": {
     "title": "Сообщения",
@@ -753,5 +757,44 @@
         "answer": ""
       }
     }
+  },
+  "common": {
+    "callBtn": "Позвонить",
+    "linkCopied": "Ссылка скопирована!",
+    "pendingBadge": "На модерации",
+    "views": "просмотров",
+    "listings": "объявлений",
+    "unknownUser": "Пользователь"
+  },
+  "suppliers": {
+    "metaTitle": "Поставщики — HorecaHub.az",
+    "metaDesc": "Поставщики для сектора HoReCa Азербайджана",
+    "title": "Поставщики",
+    "subtitle": "Компании-поставщики для сектора HoReCa",
+    "empty": "Поставщиков пока нет"
+  },
+  "blog": {
+    "back": "← Назад в блог",
+    "notFound": "Статья не найдена"
+  },
+  "password": {
+    "forgotMeta": "Сбросить пароль",
+    "forgotTitle": "Сбросить пароль",
+    "forgotDesc": "Введите ваш email, и мы отправим ссылку для сброса пароля.",
+    "sentTitle": "Письмо отправлено!",
+    "sentDesc": "Проверьте почту — мы отправили ссылку для сброса пароля.",
+    "backToLogin": "Вернуться ко входу",
+    "emailPlaceholder": "Email",
+    "send": "Отправить",
+    "sending": "Отправка...",
+    "resetMeta": "Новый пароль",
+    "resetTitle": "Задать новый пароль",
+    "updatedRedirect": "Пароль обновлён! Перенаправляем...",
+    "newPlaceholder": "Новый пароль",
+    "confirmPlaceholder": "Подтвердите пароль",
+    "update": "Обновить пароль",
+    "updating": "Обновление...",
+    "mismatch": "Пароли не совпадают",
+    "tooShort": "Пароль должен содержать не менее 6 символов"
   }
 }

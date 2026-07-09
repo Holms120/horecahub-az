@@ -7,6 +7,7 @@ import { normalizeListing } from '../lib/normalize'
 import { sanitizeSearch } from '../lib/search'
 import ListingCard from '../components/ListingCard'
 import FilterSidebar from '../components/FilterSidebar'
+import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 
 const EMPTY_FILTERS = {
@@ -25,8 +26,11 @@ export default function Listings() {
     { value: 'price_desc', label: t('listings.expensive') },
   ]
 
+  const { user } = useAuth()
   const [searchParams] = useSearchParams()
   const [listings, setListings]         = useState([])
+  const [viewCounts, setViewCounts]     = useState({})
+  const [favIds, setFavIds]             = useState(() => new Set())
   const [totalCount, setTotalCount]     = useState(0)
   const [loading, setLoading]           = useState(true)
   const [fetchError, setFetchError]     = useState('')
@@ -131,6 +135,28 @@ export default function Listings() {
   }, [query, filters, sort, page, staffTab, sellerType])
 
   useEffect(() => { fetchListings() }, [fetchListings])
+
+  // Batch-load view counts and the user's favorites for the whole page in
+  // two queries, instead of each ListingCard firing its own pair (N+1).
+  useEffect(() => {
+    if (!listings.length) { setViewCounts({}); setFavIds(new Set()); return }
+    const ids = listings.map(l => l.id)
+    let ignore = false
+    ;(async () => {
+      const [vRes, fRes] = await Promise.all([
+        supabase.from('listing_views').select('listing_id').in('listing_id', ids),
+        user
+          ? supabase.from('favorites').select('listing_id').eq('user_id', user.id).in('listing_id', ids)
+          : Promise.resolve({ data: [] }),
+      ])
+      if (ignore) return
+      const vc = {}
+      ;(vRes.data || []).forEach(v => { vc[v.listing_id] = (vc[v.listing_id] || 0) + 1 })
+      setViewCounts(vc)
+      setFavIds(new Set((fRes.data || []).map(f => f.listing_id)))
+    })()
+    return () => { ignore = true }
+  }, [listings, user])
 
   useEffect(() => {
     setFilters(f => ({ ...f, category: searchParams.get('category') || '' }))
@@ -265,7 +291,14 @@ export default function Listings() {
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {listings.map(listing => <ListingCard key={listing.id} listing={listing} />)}
+                {listings.map(listing => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    viewCount={viewCounts[listing.id] || 0}
+                    favorited={user ? favIds.has(listing.id) : false}
+                  />
+                ))}
               </div>
               {totalCount > PAGE_SIZE && (
                 <div className="flex items-center justify-center gap-2 mt-8">
@@ -274,7 +307,7 @@ export default function Listings() {
                     disabled={page === 1}
                     className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
                   >
-                    ← Əvvəlki
+                    {t('listings.prev')}
                   </button>
                   <span className="text-sm text-gray-500 px-3">
                     {page} / {totalPages}
@@ -284,7 +317,7 @@ export default function Listings() {
                     disabled={page >= totalPages}
                     className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
                   >
-                    Növbəti →
+                    {t('listings.next')}
                   </button>
                 </div>
               )}

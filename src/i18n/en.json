@@ -80,7 +80,9 @@
     "clearFilters": "Clear filters",
     "loadMore": "Load more",
     "error": "Error loading listings:",
-    "apply": "Apply"
+    "apply": "Apply",
+    "prev": "← Previous",
+    "next": "Next →"
   },
   "filter": {
     "title": "Filters",
@@ -392,7 +394,9 @@
     "confirmNewPassword": "Confirm new password",
     "updatePassword": "Update password",
     "updatingPassword": "Updating...",
-    "passwordUpdated": "Password updated successfully."
+    "passwordUpdated": "Password updated successfully.",
+    "avatarTypeError": "Only JPG, PNG, WEBP formats are allowed",
+    "avatarSizeError": "Maximum file size is {{mb}}MB"
   },
   "messages": {
     "title": "Messages",
@@ -753,5 +757,44 @@
         "answer": ""
       }
     }
+  },
+  "common": {
+    "callBtn": "Call",
+    "linkCopied": "Link copied!",
+    "pendingBadge": "Pending",
+    "views": "views",
+    "listings": "listings",
+    "unknownUser": "User"
+  },
+  "suppliers": {
+    "metaTitle": "Suppliers — HorecaHub.az",
+    "metaDesc": "Suppliers for Azerbaijan's HoReCa sector",
+    "title": "Suppliers",
+    "subtitle": "Supplier companies for the HoReCa sector",
+    "empty": "No suppliers yet"
+  },
+  "blog": {
+    "back": "← Back to blog",
+    "notFound": "Article not found"
+  },
+  "password": {
+    "forgotMeta": "Reset password",
+    "forgotTitle": "Reset password",
+    "forgotDesc": "Enter your email and we'll send a password reset link.",
+    "sentTitle": "Email sent!",
+    "sentDesc": "Check your inbox — we've sent a password reset link.",
+    "backToLogin": "Back to login",
+    "emailPlaceholder": "Email",
+    "send": "Send",
+    "sending": "Sending...",
+    "resetMeta": "New password",
+    "resetTitle": "Set a new password",
+    "updatedRedirect": "Password updated! Redirecting...",
+    "newPlaceholder": "New password",
+    "confirmPlaceholder": "Confirm password",
+    "update": "Update password",
+    "updating": "Updating...",
+    "mismatch": "Passwords do not match",
+    "tooShort": "Password must be at least 6 characters"
   }
 }
