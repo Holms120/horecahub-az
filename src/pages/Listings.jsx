@@ -48,6 +48,7 @@ export default function Listings() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const navigate    = useNavigate()
   const searchRef   = useRef(null)
+  const reqIdRef    = useRef(0)
 
   useEffect(() => {
     if (!query.length) { setSuggestions([]); setShowSuggestions(false); return }
@@ -82,6 +83,10 @@ export default function Listings() {
   }
 
   const fetchListings = useCallback(async () => {
+    // Guard against out-of-order responses: rapid filter/sort/page changes
+    // fire overlapping requests, and a slower earlier one must not clobber
+    // the latest result.
+    const reqId = ++reqIdRef.current
     setLoading(true)
     setFetchError('')
 
@@ -118,6 +123,9 @@ export default function Listings() {
     q = q.range(from, to)
 
     const { data, error, count } = await q
+
+    // A newer request superseded this one while it was in flight — drop it.
+    if (reqId !== reqIdRef.current) return
 
     if (error) {
       setFetchError(error.message)
