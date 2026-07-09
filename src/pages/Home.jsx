@@ -14,6 +14,7 @@ import { supabase } from '../supabaseClient'
 import { normalizeListing } from '../lib/normalize'
 import { sanitizeSearch } from '../lib/search'
 import ListingCard from '../components/ListingCard'
+import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 
 const ICON_MAP = {
@@ -51,8 +52,11 @@ export default function Home() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const searchRef = useRef(null)
   const [listings, setListings] = useState([])
+  const [viewCounts, setViewCounts] = useState({})
+  const [favIds, setFavIds] = useState(() => new Set())
   const [loadingListings, setLoadingListings] = useState(true)
   const [stats, setStats] = useState({ listings: 0, sellers: 0 })
+  const { user } = useAuth()
   const navigate = useNavigate()
   const { categories } = useCategories()
   const [activeCategoryIds, setActiveCategoryIds] = useState([])
@@ -102,6 +106,27 @@ export default function Home() {
     }
     fetchData()
   }, [i18n.language])
+
+  // Batch view counts + favorites for the featured cards (avoids N+1).
+  useEffect(() => {
+    if (!listings.length) { setViewCounts({}); setFavIds(new Set()); return }
+    const ids = listings.map(l => l.id)
+    let ignore = false
+    ;(async () => {
+      const [vRes, fRes] = await Promise.all([
+        supabase.from('listing_views').select('listing_id').in('listing_id', ids),
+        user
+          ? supabase.from('favorites').select('listing_id').eq('user_id', user.id).in('listing_id', ids)
+          : Promise.resolve({ data: [] }),
+      ])
+      if (ignore) return
+      const vc = {}
+      ;(vRes.data || []).forEach(v => { vc[v.listing_id] = (vc[v.listing_id] || 0) + 1 })
+      setViewCounts(vc)
+      setFavIds(new Set((fRes.data || []).map(f => f.listing_id)))
+    })()
+    return () => { ignore = true }
+  }, [listings, user])
 
   useEffect(() => {
     if (!query.length) { setSuggestions([]); setShowSuggestions(false); return }
@@ -259,7 +284,12 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {listings.map(listing => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard
+                  key={listing.id}
+                  listing={listing}
+                  viewCount={viewCounts[listing.id] || 0}
+                  favorited={user ? favIds.has(listing.id) : false}
+                />
               ))}
             </div>
           )}

@@ -53,7 +53,7 @@ export default function Profile() {
           .order('created_at', { ascending: false }),
       ])
 
-      if (pRes.error) setError('Profil tapılmadı.')
+      if (pRes.error) setError('not_found')
       else setProfile(pRes.data)
 
       const normalizedListings = (lRes.data || []).map(normalizeListing)
@@ -120,7 +120,7 @@ export default function Profile() {
     )
   }
 
-  const displayName = profile.full_name || profile.company_name || 'İstifadəçi'
+  const displayName = profile.full_name || profile.company_name || t('common.unknownUser')
   const initial     = displayName.charAt(0).toUpperCase()
   const memberYear  = profile.created_at ? new Date(profile.created_at).getFullYear() : ''
 
@@ -224,7 +224,7 @@ export default function Profile() {
           {!isOwn && (
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-navy">{t('profile.tabListings')}</h2>
-              <span className="text-sm text-gray-500">{listings.length} elan</span>
+              <span className="text-sm text-gray-500">{listings.length} {t('common.listings')}</span>
             </div>
           )}
           {listings.length === 0 ? (
@@ -248,14 +248,14 @@ export default function Profile() {
                     <ListingCard listing={l} />
                     {isOwn && l.status === 'pending' && (
                       <div className="absolute top-2 right-8 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        Gözləmədə
+                        {t('common.pendingBadge')}
                       </div>
                     )}
                   </div>
                   {isOwn && (
                     <div className="flex items-center gap-3 mt-1 px-1 text-xs text-gray-400">
                       <span className="flex items-center gap-1">
-                        <Eye size={11} /> {viewCounts[l.id] || 0} baxış
+                        <Eye size={11} /> {viewCounts[l.id] || 0} {t('common.views')}
                       </span>
                     </div>
                   )}

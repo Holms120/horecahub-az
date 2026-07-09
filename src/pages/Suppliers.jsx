@@ -27,14 +27,14 @@ export default function Suppliers() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>Təchizatçılar — HorecaHub.az</title>
-        <meta name="description" content="Azərbaycanın HoReCa sektoru üçün təchizatçılar" />
+        <title>{t('suppliers.metaTitle')}</title>
+        <meta name="description" content={t('suppliers.metaDesc')} />
       </Helmet>
 
       <section className="bg-gradient-to-br from-navy to-blue-700 text-white py-12">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-2">Təchizatçılar</h1>
-          <p className="text-blue-200 text-sm">HoReCa sektoru üçün təchizatçı şirkətlər</p>
+          <h1 className="text-3xl font-bold mb-2">{t('suppliers.title')}</h1>
+          <p className="text-blue-200 text-sm">{t('suppliers.subtitle')}</p>
         </div>
       </section>
 
@@ -45,7 +45,7 @@ export default function Suppliers() {
           </div>
         ) : suppliers.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-gray-500">Hələ təchizatçı yoxdur</p>
+            <p className="text-gray-500">{t('suppliers.empty')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

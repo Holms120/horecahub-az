@@ -80,7 +80,9 @@
     "clearFilters": "Filtrləri sıfırla",
     "loadMore": "Daha çox yüklə",
     "error": "Elanlar yüklənərkən xəta baş verdi:",
-    "apply": "Tətbiq et"
+    "apply": "Tətbiq et",
+    "prev": "← Əvvəlki",
+    "next": "Növbəti →"
   },
   "filter": {
     "title": "Filtrlər",
@@ -392,7 +394,9 @@
     "confirmNewPassword": "Şifrəni təkrarla",
     "updatePassword": "Şifrəni yenilə",
     "updatingPassword": "Yenilənir...",
-    "passwordUpdated": "Şifrə uğurla yeniləndi."
+    "passwordUpdated": "Şifrə uğurla yeniləndi.",
+    "avatarTypeError": "Yalnız JPG, PNG, WEBP formatlar qəbul edilir",
+    "avatarSizeError": "Maksimum fayl ölçüsü {{mb}}MB-dır"
   },
   "messages": {
     "title": "Mesajlar",
@@ -770,5 +774,36 @@
         "answer": ""
       }
     }
+  },
+  "suppliers": {
+    "metaTitle": "Təchizatçılar — HorecaHub.az",
+    "metaDesc": "Azərbaycanın HoReCa sektoru üçün təchizatçılar",
+    "title": "Təchizatçılar",
+    "subtitle": "HoReCa sektoru üçün təchizatçı şirkətlər",
+    "empty": "Hələ təchizatçı yoxdur"
+  },
+  "blog": {
+    "back": "← Bloga qayıt",
+    "notFound": "Məqalə tapılmadı"
+  },
+  "password": {
+    "forgotMeta": "Şifrəni sıfırla",
+    "forgotTitle": "Şifrəni sıfırla",
+    "forgotDesc": "Emailinizi daxil edin, şifrə sıfırlama linki göndərəcəyik.",
+    "sentTitle": "Email göndərildi!",
+    "sentDesc": "Emailinizi yoxlayın, şifrə sıfırlama linki göndərildi.",
+    "backToLogin": "Girişə qayıt",
+    "emailPlaceholder": "Email",
+    "send": "Göndər",
+    "sending": "Göndərilir...",
+    "resetMeta": "Yeni şifrə",
+    "resetTitle": "Yeni şifrə təyin et",
+    "updatedRedirect": "Şifrə yeniləndi! Yönləndirilirsiniz...",
+    "newPlaceholder": "Yeni şifrə",
+    "confirmPlaceholder": "Şifrəni təsdiq edin",
+    "update": "Şifrəni yenilə",
+    "updating": "Yenilənir...",
+    "mismatch": "Şifrələr uyğun gəlmir",
+    "tooShort": "Şifrə ən az 6 simvol olmalıdır"
   }
 }

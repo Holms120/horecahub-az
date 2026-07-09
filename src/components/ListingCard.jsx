@@ -13,12 +13,12 @@ const PAYMENT_BADGE  = {
   order:  'bg-purple-50 text-purple-700',
 }
 
-export default function ListingCard({ listing }) {
+export default function ListingCard({ listing, viewCount: viewCountProp, favorited: favoritedProp }) {
   const { t } = useTranslation()
-  const [isFavorited, setIsFavorited] = useState(false)
+  const [isFavorited, setIsFavorited] = useState(!!favoritedProp)
   const [favLoading, setFavLoading]   = useState(false)
   const [deleting, setDeleting]       = useState(false)
-  const [viewCount, setViewCount]     = useState(0)
+  const [viewCount, setViewCount]     = useState(viewCountProp ?? 0)
   const { user }  = useAuth()
   const navigate  = useNavigate()
   const { id, title, price, condition, city, image, paymentType, userId,
@@ -28,13 +28,16 @@ export default function ListingCard({ listing }) {
   const isNew = isNewListing(createdAt || created_at)
 
   useEffect(() => {
+    // When the parent batch-loads view counts, use that and skip the
+    // per-card round-trip (avoids an N+1 across a grid of cards).
+    if (viewCountProp != null) { setViewCount(viewCountProp); return }
     if (!id) return
     supabase
       .from('listing_views')
       .select('*', { count: 'exact', head: true })
       .eq('listing_id', id)
       .then(({ count }) => setViewCount(count || 0))
-  }, [id])
+  }, [id, viewCountProp])
 
   const PAYMENT_LABELS = { cash: t('listingCard.cash'), credit: t('listingCard.credit'), order: t('listingCard.order') }
 
@@ -68,13 +71,15 @@ export default function ListingCard({ listing }) {
         ? { label: t('listingCard.unused'), cls: 'bg-green-100 text-green-700' }
         : { label: t('listingCard.used'),   cls: 'bg-gray-100 text-gray-600' })
 
-  // Fetch favorite status
+  // Fetch favorite status. When the parent provides it (batch-loaded for
+  // the whole grid), use that instead of one query per card.
   useEffect(() => {
+    if (favoritedProp !== undefined) { setIsFavorited(!!favoritedProp); return }
     if (!user || !id) return
     supabase.from('favorites').select('id')
       .eq('user_id', user.id).eq('listing_id', id).maybeSingle()
       .then(({ data }) => setIsFavorited(!!data))
-  }, [user, id])
+  }, [user, id, favoritedProp])
 
   async function toggleFavorite(e) {
     e.preventDefault()
