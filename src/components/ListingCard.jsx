@@ -47,6 +47,17 @@ export default function ListingCard({ listing }) {
     : `₼${price.toLocaleString('az-AZ')}`
 
   const SERVICE_CATS = ['consulting', 'software', 'training', 'business_sale']
+
+  // Category · Subcategory breadcrumb; hidden for categories where the
+  // subcategory already replaces the title (staff/services below)
+  const SUBCAT_AS_TITLE = ['staff', 'consulting', 'software', 'training']
+  const catKey    = 'cat.' + category
+  const subcatKey = 'subcat.' + listing.subcategory
+  const catLabel    = category && t(catKey) !== catKey ? t(catKey) : ''
+  const subcatLabel = listing.subcategory && t(subcatKey) !== subcatKey ? t(subcatKey) : ''
+  const breadcrumb = !SUBCAT_AS_TITLE.includes(category) && subcatLabel
+    ? [catLabel, subcatLabel].filter(Boolean).join(' · ')
+    : ''
   const conditionBadge = isStaff
     ? (listingType === 'vacancy'
         ? { label: t('listingCard.vacancy'), cls: 'bg-purple-100 text-purple-700' }
@@ -128,8 +139,11 @@ export default function ListingCard({ listing }) {
       </div>
 
       <div className="p-3">
+        {breadcrumb && (
+          <p className="text-[11px] text-gray-500 truncate mb-1">{breadcrumb}</p>
+        )}
         <p className="text-sm font-medium text-navy line-clamp-2 leading-snug mb-2 min-h-[2.5rem]">
-          {['staff', 'consulting', 'software', 'training'].includes(category) && listing.subcategory
+          {SUBCAT_AS_TITLE.includes(category) && listing.subcategory
             ? (t('subcat.' + listing.subcategory) || title)
             : title}
         </p>
