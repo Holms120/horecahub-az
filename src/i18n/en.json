@@ -770,6 +770,18 @@
       }
     }
   },
+  "aiSupport": {
+    "title": "HorecaHub Assistant",
+    "subtitle": "AI support — instant answers",
+    "welcome": "Hi! I'm the HorecaHub AI assistant. Ask me anything about the platform 👋",
+    "placeholder": "Type your question...",
+    "error": "Couldn't get an answer. Please try again later or contact a human.",
+    "escalate": "Talk to a human",
+    "clear": "Clear chat",
+    "close": "Close",
+    "open": "Open support chat",
+    "disclaimer": "AI answers may contain mistakes"
+  },
   "common": {
     "callBtn": "Call",
     "linkCopied": "Link copied!",

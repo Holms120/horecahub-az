@@ -3,6 +3,7 @@ import { useEffect, lazy, Suspense } from 'react'
 import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import SupportWidget from './components/SupportWidget'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -82,6 +83,7 @@ function Layout() {
         </Suspense>
       </main>
       {!isAuth && <Footer />}
+      {!isAuth && <SupportWidget />}
     </div>
   )
 }

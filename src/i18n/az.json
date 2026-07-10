@@ -790,6 +790,18 @@
       }
     }
   },
+  "aiSupport": {
+    "title": "HorecaHub Köməkçi",
+    "subtitle": "AI dəstək — dərhal cavab verir",
+    "welcome": "Salam! Mən HorecaHub-un AI köməkçisiyəm. Platforma haqqında istənilən sualınızı cavablandırım 👋",
+    "placeholder": "Sualınızı yazın...",
+    "error": "Cavab almaq mümkün olmadı. Bir az sonra yenidən cəhd edin və ya operatorla əlaqə saxlayın.",
+    "escalate": "Operatorla əlaqə",
+    "clear": "Söhbəti təmizlə",
+    "close": "Bağla",
+    "open": "Dəstək çatını aç",
+    "disclaimer": "AI cavabları səhv ola bilər"
+  },
   "suppliers": {
     "metaTitle": "Təchizatçılar — HorecaHub.az",
     "metaDesc": "Azərbaycanın HoReCa sektoru üçün təchizatçılar",
