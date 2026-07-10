@@ -430,6 +430,12 @@
     "supportName": "HorecaHub Dəstək",
     "supportService": "Dəstək xidməti"
   },
+  "listingChat": {
+    "title": "Satıcı ilə söhbət",
+    "continueChat": "Söhbətə davam et",
+    "emptyHint": "Satıcıya sualınızı yazın — cavabı burada və «Mesajlar» bölməsində görəcəksiniz.",
+    "openInMessages": "Mesajlarda aç"
+  },
   "notFound": {
     "code": "404",
     "title": "Səhifə tapılmadı",

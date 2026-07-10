@@ -22,3 +22,7 @@ entrypoint = "./functions/notify-telegram/index.ts"
 enabled = true
 verify_jwt = false         # Supabase Auth email hook: authenticated via
                            # SEND_CONFIRMATION_HOOK_SECRET, not a JWT.
+
+[functions.notify-message-email]
+enabled = true
+verify_jwt = true          # + in-function check: caller must be the sender
