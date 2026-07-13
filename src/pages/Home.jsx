@@ -10,6 +10,7 @@ import {
   Phone, Zap, Lock, GlassWater
 } from 'lucide-react'
 import { useCategories } from '../hooks/useCategories'
+import { catalogLabel } from '../lib/catalogLabel'
 import { supabase } from '../supabaseClient'
 import { normalizeListing } from '../lib/normalize'
 import { sanitizeSearch } from '../lib/search'
@@ -327,7 +328,7 @@ export default function Home() {
                       <Icon className="w-full h-full" />
                     </div>
                   )}
-                  <p className="text-[10px] sm:text-xs text-center text-gray-600 mt-1 leading-tight line-clamp-2">{t(cat.key) || cat.label}</p>
+                  <p className="text-[10px] sm:text-xs text-center text-gray-600 mt-1 leading-tight line-clamp-2">{catalogLabel(cat, 'cat')}</p>
                 </button>
               )
             })}
