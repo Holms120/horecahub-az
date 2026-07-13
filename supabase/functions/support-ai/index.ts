@@ -1,9 +1,8 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import Anthropic from 'npm:@anthropic-ai/sdk'
 
-const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY') ?? ''
-const MODEL             = Deno.env.get('SUPPORT_AI_MODEL') ?? 'claude-opus-4-8'
-const ALLOWED_ORIGIN    = Deno.env.get('SITE_ORIGIN') ?? 'https://horecahub.az'
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY') ?? ''
+const MODEL          = Deno.env.get('SUPPORT_AI_MODEL') ?? 'gpt-4o-mini'
+const ALLOWED_ORIGIN = Deno.env.get('SITE_ORIGIN') ?? 'https://horecahub.az'
 
 const CORS = {
   'Access-Control-Allow-Origin':  ALLOWED_ORIGIN,
@@ -12,9 +11,9 @@ const CORS = {
 }
 
 // Widget input caps: history the client may send / we forward to the model.
-const MAX_MESSAGES     = 20
-const MAX_MSG_CHARS    = 2000
-const HISTORY_SENT     = 12
+const MAX_MESSAGES  = 20
+const MAX_MSG_CHARS = 2000
+const HISTORY_SENT  = 12
 
 // The gateway's verify_jwt only proves the caller holds the (public) anon
 // key. Logged-in callers send their session JWT; anonymous visitors are
@@ -23,8 +22,6 @@ const HISTORY_SENT     = 12
 const ANON_LIMIT     = 8
 const ANON_WINDOW_MS = 60_000
 let anonCalls: number[] = []
-
-const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY })
 
 const LANG_NAMES: Record<string, string> = {
   az: 'Azerbaijani',
@@ -122,26 +119,33 @@ serve(async (req: Request) => {
       return json({ error: 'invalid messages' }, 400)
     }
 
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1024,
-      system: [{
-        type: 'text',
-        text: buildSystem(lang),
-        cache_control: { type: 'ephemeral' },
-      }],
-      messages,
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_completion_tokens: 700,
+        messages: [
+          { role: 'system', content: buildSystem(lang) },
+          ...messages,
+        ],
+      }),
     })
 
-    if (response.stop_reason === 'refusal') {
-      return json({ error: 'no_answer' }, 502)
+    if (!openaiRes.ok) {
+      const errText = await openaiRes.text()
+      console.error('OpenAI error:', openaiRes.status, errText.slice(0, 500))
+      return json(
+        { error: openaiRes.status === 429 ? 'rate_limited' : 'upstream' },
+        openaiRes.status === 429 ? 429 : 502,
+      )
     }
 
-    const reply = response.content
-      .filter((b) => b.type === 'text')
-      .map((b) => (b as { text: string }).text)
-      .join('\n')
-      .trim()
+    const data  = await openaiRes.json()
+    const reply = (data.choices?.[0]?.message?.content ?? '').trim()
 
     if (!reply) {
       return json({ error: 'no_answer' }, 502)
@@ -149,13 +153,6 @@ serve(async (req: Request) => {
 
     return json({ reply })
   } catch (err) {
-    if (err instanceof Anthropic.RateLimitError) {
-      return json({ error: 'rate_limited' }, 429)
-    }
-    if (err instanceof Anthropic.APIError) {
-      console.error('Anthropic API error:', err.status, err.message)
-      return json({ error: 'upstream' }, 502)
-    }
     console.error('Function error:', err)
     return json({ error: String(err) }, 500)
   }
