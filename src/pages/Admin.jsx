@@ -1540,29 +1540,42 @@ function CategoriesTab() {
     if (!modal) return
     setSaving(true)
     const { mode, data } = modal
+    const labels = {
+      label: data.label,
+      label_ru: data.label_ru?.trim() || null,
+      label_en: data.label_en?.trim() || null,
+    }
+    let error = null
+    let count = null
     if (mode === 'cat_add') {
-      const { error } = await supabase.from('categories').insert({
-        id: data.id, key: `cat.${data.id}`, label: data.label,
+      ;({ error } = await supabase.from('categories').insert({
+        id: data.id, key: `cat.${data.id}`, ...labels,
         icon: data.icon || '', sort_order: Number(data.sort_order) || 99, is_active: true,
-      })
-      if (!error) { await load(); setModal(null) }
+      }))
     } else if (mode === 'cat_edit') {
-      const { error } = await supabase.from('categories').update({
-        label: data.label, icon: data.icon || '', sort_order: Number(data.sort_order) || 0,
-      }).eq('id', data.id)
-      if (!error) { await load(); setModal(null) }
+      ;({ error, count } = await supabase.from('categories').update({
+        ...labels, icon: data.icon || '', sort_order: Number(data.sort_order) || 0,
+      }, { count: 'exact' }).eq('id', data.id))
     } else if (mode === 'sub_add') {
-      const { error } = await supabase.from('subcategories').insert({
+      ;({ error } = await supabase.from('subcategories').insert({
         id: data.id, category_id: data.category_id,
-        key: `subcat.${data.id}`, label: data.label,
+        key: `subcat.${data.id}`, ...labels,
         sort_order: Number(data.sort_order) || 99, is_active: true,
-      })
-      if (!error) { await load(); setModal(null) }
+      }))
     } else if (mode === 'sub_edit') {
-      const { error } = await supabase.from('subcategories').update({
-        label: data.label, sort_order: Number(data.sort_order) || 0,
-      }).eq('id', data.id)
-      if (!error) { await load(); setModal(null) }
+      ;({ error, count } = await supabase.from('subcategories').update({
+        ...labels, sort_order: Number(data.sort_order) || 0,
+      }, { count: 'exact' }).eq('id', data.id))
+    }
+    // count === 0 → RLS silently filtered the row: the write "succeeded"
+    // but nothing changed. Surface it instead of pretending it saved.
+    if (error) {
+      alert('Saxlanılmadı: ' + error.message)
+    } else if (count === 0) {
+      alert('Saxlanılmadı: dəyişiklik bazaya yazılmadı (icazə problemi — RLS).')
+    } else {
+      await load()
+      setModal(null)
     }
     setSaving(false)
   }
@@ -1709,12 +1722,32 @@ function CategoriesTab() {
                 </div>
               )}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Ad</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Ad (AZ)</label>
                 <input
                   value={modal.data.label}
                   onChange={e => setModal(m => ({ ...m, data: { ...m.data, label: e.target.value } }))}
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Ad (RU)</label>
+                  <input
+                    value={modal.data.label_ru || ''}
+                    onChange={e => setModal(m => ({ ...m, data: { ...m.data, label_ru: e.target.value } }))}
+                    placeholder="boş = AZ"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Ad (EN)</label>
+                  <input
+                    value={modal.data.label_en || ''}
+                    onChange={e => setModal(m => ({ ...m, data: { ...m.data, label_en: e.target.value } }))}
+                    placeholder="boş = AZ"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
               </div>
               {(modal.mode === 'cat_add' || modal.mode === 'cat_edit') && (
                 <div>

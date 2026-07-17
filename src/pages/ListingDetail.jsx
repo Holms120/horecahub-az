@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
@@ -13,6 +13,8 @@ import ListingCard from '../components/ListingCard'
 import ListingChat from '../components/ListingChat'
 import { useTranslation } from 'react-i18next'
 import { useRelativeTime } from '../hooks/useRelativeTime'
+import { useCategories } from '../hooks/useCategories'
+import { catalogLabel } from '../lib/catalogLabel'
 
 function linkifyText(text) {
   if (!text) return null
@@ -29,6 +31,7 @@ export default function ListingDetail() {
   const { id }       = useParams()
   const navigate     = useNavigate()
   const { user }     = useAuth()
+  const { catById, subById } = useCategories()
 
   const [listing, setListing]     = useState(null)
   const [similar, setSimilar]     = useState([])
@@ -178,7 +181,9 @@ export default function ListingDetail() {
     )
   }
 
-  const { title, price, condition, city, images, description, seller, categoryKey, categoryLabel, subcategoryLabel, otherDescription, paymentType, userId } = listing
+  const { title, price, condition, city, images, description, seller, categoryLabel, subcategoryLabel, otherDescription, paymentType, userId } = listing
+  const catLabel    = catalogLabel(catById[listing.category], 'cat', listing.category)
+  const subcatLabel = catalogLabel(subById[listing.subcategory], 'subcat', listing.subcategory)
   const displayPrice = listing.category === 'staff'
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
     : `₼${price.toLocaleString('az-AZ')}`
@@ -293,7 +298,7 @@ export default function ListingDetail() {
 
           <h1 className="text-2xl font-bold text-navy mb-3 leading-snug">
             {['staff', 'consulting', 'software', 'training'].includes(listing.category) && listing.subcategory
-              ? (t('subcat.' + listing.subcategory) || title)
+              ? (subcatLabel || title)
               : title}
           </h1>
           <div className="flex items-center gap-3 mb-4">
@@ -309,9 +314,9 @@ export default function ListingDetail() {
             <span className="flex items-center gap-1.5"><MapPin size={14} />{city}</span>
             <span className="flex items-center gap-1.5"><Clock size={14} />{timeDisplay}</span>
             <span className="flex items-center gap-1.5"><Eye size={14} />{viewCount}</span>
-            <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{(categoryKey && t(categoryKey)) || categoryLabel}</span>
+            <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{catLabel || categoryLabel}</span>
             {subcategoryLabel && (
-              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{(listing.subcategory && t('subcat.' + listing.subcategory)) || subcategoryLabel}</span>
+              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{subcatLabel || subcategoryLabel}</span>
             )}
             {subcategoryLabel && otherDescription && (
               <span className="text-gray-400 text-xs">— {otherDescription}</span>
