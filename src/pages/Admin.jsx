@@ -5,7 +5,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2, Pencil,
+  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2, Pencil, Store,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -862,7 +862,7 @@ function UsersTab({ adminId }) {
       try {
         const { data: profileData, error: err } = await supabase
           .from('admin_users')
-          .select('id, full_name, company_name, email, phone, city, account_type, is_blocked, created_at')
+          .select('id, full_name, company_name, email, phone, city, account_type, supplier_status, is_blocked, created_at')
           .order('created_at', { ascending: false })
         if (err) { setError('Supabase xətası: ' + err.message); setLoading(false); return }
         setUsers(profileData || [])
@@ -1003,6 +1003,9 @@ function UsersTab({ adminId }) {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                         u.account_type === 'supplier' ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-blue-700'
                       }`}>{u.account_type || 'fərdi'}</span>
+                      {u.supplier_status === 'pending' && (
+                        <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">gözləmədə</span>
+                      )}
                     </td>
                     <td className="px-3 py-3 text-center font-semibold text-gray-700">{listingCounts[u.id] || 0}</td>
                     <td className="px-3 py-3 text-gray-400 text-xs whitespace-nowrap">{shortDate(u.created_at)}</td>
@@ -1064,6 +1067,151 @@ function UsersTab({ adminId }) {
       {msgTarget && (
         <SendMsgModal receiverId={msgTarget.id} senderId={adminId}
           receiverName={msgTarget.name} onClose={() => setMsgTarget(null)} />
+      )}
+    </div>
+  )
+}
+
+/* ─── Supplier applications ─────────────────────────────── */
+function SuppliersTab({ adminId, onReview }) {
+  const [apps, setApps]             = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [error, setError]           = useState(null)
+  const [processing, setProcessing] = useState(null)
+  const [rejectModal, setRejectModal] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
+
+  async function load() {
+    setLoading(true); setError(null)
+    const { data, error: err } = await supabase
+      .from('admin_users')
+      .select('id, full_name, company_name, email, phone, phone2, city, supplier_categories, supplier_requested_at, created_at')
+      .eq('supplier_status', 'pending')
+      .order('supplier_requested_at', { ascending: false })
+    if (err) setError('Supabase xətası: ' + err.message)
+    else setApps(data || [])
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [])
+
+  // The decision is authorized server-side (definer RPC checks is_admin),
+  // so the panel never needs UPDATE rights on other people's profiles.
+  async function review(app, approve, reason) {
+    setProcessing(app.id)
+    const { error: err } = await supabase.rpc('review_supplier_application', {
+      p_user_id: app.id,
+      p_approve: approve,
+      p_reason:  reason || null,
+    })
+    if (err) {
+      alert('Xəta: ' + err.message)
+      setProcessing(null)
+      return
+    }
+    setApps(a => a.filter(x => x.id !== app.id))
+    onReview?.()
+    if (adminId) {
+      supabase.from('messages').insert({
+        sender_id:   adminId,
+        receiver_id: app.id,
+        content: approve
+          ? '✅ Təchizatçı hesabınız təsdiqləndi. Artıq təchizatçı elanları yerləşdirə bilərsiniz.'
+          : `❌ Təchizatçı müraciətiniz rədd edildi.${reason ? ` Səbəb: ${reason}` : ''}`,
+        is_support: true,
+      }).then(({ error: msgErr }) => {
+        if (msgErr) console.warn('Message insert failed:', msgErr)
+      })
+    }
+    setProcessing(null)
+  }
+
+  if (loading) return <Spinner />
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-[#0A2342]">Təchizatçı müraciətləri</h2>
+        <button onClick={load} className="text-xs text-blue-600 hover:underline">Yenilə</button>
+      </div>
+
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>
+      )}
+
+      {apps.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center">
+          <Store size={40} className="mx-auto text-gray-300 mb-3" />
+          <p className="text-gray-400 text-sm">Gözləyən müraciət yoxdur</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {apps.map(app => (
+            <div key={app.id} className="bg-white border border-gray-200 rounded-2xl p-5">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="min-w-0">
+                  <p className="font-bold text-[#0A2342]">{app.company_name || '— şirkət adı yoxdur —'}</p>
+                  <p className="text-sm text-gray-600 mt-0.5">{app.full_name}</p>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
+                    <span>{app.email}</span>
+                    <span>{app.phone}</span>
+                    {app.phone2 && <span>{app.phone2}</span>}
+                    <span>{app.city}</span>
+                    <span>{timeStr(app.supplier_requested_at || app.created_at)}</span>
+                  </div>
+                  {app.supplier_categories?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {app.supplier_categories.map(c => (
+                        <span key={c} className="bg-blue-50 text-blue-700 text-[11px] font-medium px-2 py-0.5 rounded-full">{c}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link to={`/profile/${app.id}`} target="_blank"
+                    className="px-3 py-2 text-xs border border-gray-200 rounded-xl hover:bg-gray-50">Profil</Link>
+                  <button
+                    onClick={() => review(app, true)}
+                    disabled={processing === app.id}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white text-xs font-semibold rounded-xl hover:bg-green-700 disabled:opacity-50">
+                    <Check size={14} /> Təsdiqlə
+                  </button>
+                  <button
+                    onClick={() => { setRejectModal(app); setRejectReason('') }}
+                    disabled={processing === app.id}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 text-xs font-semibold rounded-xl hover:bg-red-100 disabled:opacity-50">
+                    <XCircle size={14} /> Rədd et
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h3 className="font-bold text-[#0A2342] mb-1">Müraciəti rədd et</h3>
+            <p className="text-xs text-gray-500 mb-4">{rejectModal.company_name || rejectModal.full_name}</p>
+            <textarea
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+              rows={3}
+              placeholder="Səbəb (istifadəçiyə göndəriləcək, istəyə bağlı)"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 resize-none"
+            />
+            <div className="flex gap-2 justify-end mt-5">
+              <button onClick={() => setRejectModal(null)}
+                className="px-4 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50">Ləğv et</button>
+              <button
+                onClick={() => { const m = rejectModal, r = rejectReason; setRejectModal(null); review(m, false, r) }}
+                className="px-5 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700">
+                Rədd et
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -1896,6 +2044,7 @@ const TABS = [
   { id: 'moderation', label: 'Moderasiya',    icon: CheckCircle2 },
   { id: 'listings',   label: 'Elanlar',       icon: List },
   { id: 'users',      label: 'İstifadəçilər', icon: Users },
+  { id: 'suppliers',  label: 'Təchizatçılar', icon: Store },
   { id: 'support',    label: 'Support',       icon: MessageSquare },
   { id: 'analytics',   label: 'Analitika',      icon: BarChart2 },
   { id: 'categories', label: 'Kateqoriyalar', icon: Tag },
@@ -1911,6 +2060,7 @@ export default function Admin() {
   const [supportBadge, setSupportBadge]   = useState(0)
   const [pendingBadge, setPendingBadge]   = useState(0)
   const [feedbackBadge, setFeedbackBadge] = useState(0)
+  const [supplierBadge, setSupplierBadge] = useState(0)
   const [realtimeEvents, setRealtimeEvents] = useState([])
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
@@ -1951,6 +2101,10 @@ export default function Admin() {
       .select('*', { count: 'exact', head: true })
       .eq('is_read', false)
       .then(({ count }) => setFeedbackBadge(count || 0))
+    supabase.from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('supplier_status', 'pending')
+      .then(({ count }) => setSupplierBadge(count || 0))
   }, [adminId])
 
   useEffect(() => {
@@ -1978,6 +2132,15 @@ export default function Admin() {
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, payload => {
         addEvent('user', `Yeni qeydiyyat: ${payload.new?.full_name || payload.new?.email || 'istifadəçi'}`)
+        if (payload.new?.supplier_status === 'pending') {
+          setSupplierBadge(n => n + 1)
+          addEvent('pending', `Yeni təchizatçı müraciəti: ${payload.new?.company_name || payload.new?.full_name || ''}`)
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, payload => {
+        if (payload.new?.supplier_status === 'pending' && payload.old?.supplier_status !== 'pending') {
+          setSupplierBadge(n => n + 1)
+        }
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'feedback' }, () => {
         setFeedbackBadge(n => n + 1)
@@ -2019,8 +2182,9 @@ export default function Admin() {
                 const badge = t.id === 'support'    ? supportBadge :
                               t.id === 'moderation' ? pendingBadge :
                               t.id === 'listings'   ? pendingBadge :
+                              t.id === 'suppliers'  ? supplierBadge :
                               t.id === 'feedback'   ? feedbackBadge : 0
-                const badgeColor = t.id === 'moderation' || t.id === 'listings' ? 'bg-amber-500' : 'bg-red-500'
+                const badgeColor = ['moderation', 'listings', 'suppliers'].includes(t.id) ? 'bg-amber-500' : 'bg-red-500'
                 return (
                   <button key={t.id} onClick={() => { setTab(t.id); setMobileSidebarOpen(false) }}
                     className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -2058,8 +2222,9 @@ export default function Admin() {
               const badge = t.id === 'support'    ? supportBadge :
                             t.id === 'moderation' ? pendingBadge :
                             t.id === 'listings'   ? pendingBadge :
+                            t.id === 'suppliers'  ? supplierBadge :
                             t.id === 'feedback'   ? feedbackBadge : 0
-              const badgeColor = t.id === 'moderation' || t.id === 'listings' ? 'bg-amber-500' : 'bg-red-500'
+              const badgeColor = ['moderation', 'listings', 'suppliers'].includes(t.id) ? 'bg-amber-500' : 'bg-red-500'
               return (
                 <button key={t.id} onClick={() => setTab(t.id)}
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -2092,6 +2257,7 @@ export default function Admin() {
             <ListingsTab adminId={adminId} />
           </div>
           {tab === 'users'      && <UsersTab      adminId={adminId} />}
+          {tab === 'suppliers'  && <SuppliersTab  adminId={adminId} onReview={() => setSupplierBadge(n => Math.max(0, n - 1))} />}
           {tab === 'support'    && <SupportTab    adminId={adminId} />}
           {tab === 'analytics'   && <AnalyticsTab />}
           {tab === 'categories'  && <CategoriesTab />}

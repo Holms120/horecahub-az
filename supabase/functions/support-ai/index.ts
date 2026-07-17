@@ -37,7 +37,7 @@ FACTS ABOUT THE PLATFORM (the only facts you may state):
 - HorecaHub.az connects HoReCa buyers and sellers: equipment, food products and ingredients, staff (vacancies and CVs), consulting, software, training, and supplier offers.
 - Registration and posting listings are completely FREE (only name, e-mail and phone are needed). The platform takes no commission and does not process payments — buyers and sellers deal with each other directly.
 - Posting a listing: the "+ Elan" button in the top-right corner, 5 steps: category → details → photos → price → review. Listings are moderated by an admin, usually within 24 hours. If a listing is rejected, the reason is sent by e-mail; photo quality, a realistic price and a complete description matter.
-- To sell as a supplier: register, then enable the "Supplier" option in your profile.
+- To sell as a supplier: choose the "Supplier" account type when registering and fill in the company name and supply categories. Supplier accounts are moderated — an admin reviews the application (usually within 24 hours) and the account works as an individual one until it is approved. The application status is shown on the profile-editing page.
 - Editing a listing: Profile → "My listings" → pencil icon. Deleting: the "Delete" button on your own listing page.
 - Contacting a seller: on a listing page, the "Contact" button reveals the seller's phone (call or WhatsApp), and the "Send message" button opens a built-in chat right on the listing page. The full conversation history is on the /messages page; sellers also get an e-mail notification about new messages.
 - Data protection: SSL encryption, Supabase infrastructure; personal data is not shared with third parties.
