@@ -183,7 +183,7 @@
     "subcategory": "Alt kateqoriya *",
     "otherDesc": "Dəqiq növü qeyd edin (isteğe bağlı)",
     "otherPlaceholder": "Məsələn: Çay bişirən aparat",
-    "suppliersOnly": "Təchizatçı elanı yerləşdirmək üçün Təchizatçı hesabı ilə qeydiyyatdan keçməlisiniz.",
+    "suppliersOnly": "Təchizatçı elanı yerləşdirmək üçün təsdiqlənmiş Təchizatçı hesabı lazımdır. Qeydiyyatda \"Təchizatçı\" hesabını seçin — müraciətiniz admin tərəfindən yoxlanıldıqdan sonra aktivləşəcək.",
     "listingDetails": "Elan detalları",
     "listingFor": "Bu elan nə üçündür?",
     "cv": "CV yerləşdirirəm",
@@ -342,7 +342,9 @@
     "errInvalidEmailFormat": "Email formatı yanlışdır",
     "errRateLimit": "Çox sayda cəhd edildi. Bir neçə dəqiqə gözləyin.",
     "and": "və",
-    "forgotPassword": "Şifrəni unutmusunuz?"
+    "forgotPassword": "Şifrəni unutmusunuz?",
+    "supplierModerationHint": "Təchizatçı hesabı moderasiyadan keçir: qeydiyyatdan sonra müraciətiniz admin tərəfindən yoxlanılacaq (adətən 24 saat ərzində).",
+    "supplierPendingNotice": "Təchizatçı müraciətiniz yoxlanılır. Təsdiqlənənə qədər hesabınız fərdi hesab kimi işləyəcək — nəticə barədə sizə bildiriş göndəriləcək."
   },
   "profile": {
     "verified": "Doğrulanmış Təchizatçı",
@@ -408,7 +410,12 @@
     "updatingPassword": "Yenilənir...",
     "passwordUpdated": "Şifrə uğurla yeniləndi.",
     "avatarTypeError": "Yalnız JPG, PNG, WEBP formatlar qəbul edilir",
-    "avatarSizeError": "Maksimum fayl ölçüsü {{mb}}MB-dır"
+    "avatarSizeError": "Maksimum fayl ölçüsü {{mb}}MB-dır",
+    "supplierPendingTitle": "Təchizatçı müraciətiniz yoxlanılır",
+    "supplierPendingDesc": "Admin müraciətinizi yoxlayır. Təsdiqlənəndən sonra təchizatçı elanları yerləşdirə biləcəksiniz.",
+    "supplierRejectedTitle": "Təchizatçı müraciətiniz rədd edildi",
+    "supplierRejectedReason": "Səbəb:",
+    "supplierReapply": "Yenidən müraciət et"
   },
   "messages": {
     "title": "Mesajlar",
@@ -429,6 +436,12 @@
     "delete": "Sil",
     "supportName": "HorecaHub Dəstək",
     "supportService": "Dəstək xidməti"
+  },
+  "listingChat": {
+    "title": "Satıcı ilə söhbət",
+    "continueChat": "Söhbətə davam et",
+    "emptyHint": "Satıcıya sualınızı yazın — cavabı burada və «Mesajlar» bölməsində görəcəksiniz.",
+    "openInMessages": "Mesajlarda aç"
   },
   "notFound": {
     "code": "404",

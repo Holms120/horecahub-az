@@ -134,6 +134,11 @@ export default function Register() {
           <p className="text-gray-600 mb-3 leading-relaxed">
             {t('auth.confirmEmailDesc', { email: form.email })}
           </p>
+          {isSupplier && (
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 leading-relaxed">
+              {t('auth.supplierPendingNotice')}
+            </p>
+          )}
           <p className="text-sm text-gray-400 mb-8">{t('auth.checkSpam')}</p>
           <Link
             to="/login"
@@ -180,6 +185,11 @@ export default function Register() {
                   </label>
                 ))}
               </div>
+              {isSupplier && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2 leading-snug">
+                  {t('auth.supplierModerationHint')}
+                </p>
+              )}
             </div>
 
             {/* Full name */}

@@ -354,6 +354,12 @@ export default function Messages() {
       setConversations(prev =>
         prev.map(c => c.key === activeConv.key ? { ...c, lastMsg: data } : c)
       )
+      if (data.listing_id) {
+        // fire-and-forget: email the receiver if they have no unread yet
+        supabase.functions
+          .invoke('notify-message-email', { body: { message_id: data.id } })
+          .catch(() => {})
+      }
     } else {
       setMessages(prev => prev.filter(m => m.id !== optId))
       setReplyText(text)

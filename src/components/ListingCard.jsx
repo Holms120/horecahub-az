@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useRelativeTime } from '../hooks/useRelativeTime'
 import { isNewListing } from '../lib/time'
+import { useCategories } from '../hooks/useCategories'
+import { catalogLabel } from '../lib/catalogLabel'
 
 const PAYMENT_BADGE  = {
   cash:   'bg-blue-50 text-blue-700',
@@ -54,10 +56,9 @@ export default function ListingCard({ listing, viewCount: viewCountProp, favorit
   // Category · Subcategory breadcrumb; hidden for categories where the
   // subcategory already replaces the title (staff/services below)
   const SUBCAT_AS_TITLE = ['staff', 'consulting', 'software', 'training']
-  const catKey    = 'cat.' + category
-  const subcatKey = 'subcat.' + listing.subcategory
-  const catLabel    = category && t(catKey) !== catKey ? t(catKey) : ''
-  const subcatLabel = listing.subcategory && t(subcatKey) !== subcatKey ? t(subcatKey) : ''
+  const { catById, subById } = useCategories()
+  const catLabel    = catalogLabel(catById[category], 'cat', category)
+  const subcatLabel = catalogLabel(subById[listing.subcategory], 'subcat', listing.subcategory)
   const breadcrumb = !SUBCAT_AS_TITLE.includes(category) && subcatLabel
     ? [catLabel, subcatLabel].filter(Boolean).join(' · ')
     : ''
@@ -154,7 +155,7 @@ export default function ListingCard({ listing, viewCount: viewCountProp, favorit
         )}
         <p className="text-sm font-medium text-navy line-clamp-2 leading-snug mb-2 min-h-[2.5rem]">
           {SUBCAT_AS_TITLE.includes(category) && listing.subcategory
-            ? (t('subcat.' + listing.subcategory) || title)
+            ? (subcatLabel || title)
             : title}
         </p>
 

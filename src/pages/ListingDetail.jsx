@@ -1,17 +1,20 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
   MapPin, Clock, Heart, Share2, ShieldCheck,
-  Star, ChevronLeft, MessageSquare, Phone, ArrowRight, Send, CheckCircle2,
+  Star, ChevronLeft, Phone, ArrowRight,
   Pencil, Trash2, Eye
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { normalizeListing } from '../lib/normalize'
 import ListingCard from '../components/ListingCard'
+import ListingChat from '../components/ListingChat'
 import { useTranslation } from 'react-i18next'
 import { useRelativeTime } from '../hooks/useRelativeTime'
+import { useCategories } from '../hooks/useCategories'
+import { catalogLabel } from '../lib/catalogLabel'
 
 function linkifyText(text) {
   if (!text) return null
@@ -28,7 +31,7 @@ export default function ListingDetail() {
   const { id }       = useParams()
   const navigate     = useNavigate()
   const { user }     = useAuth()
-  const msgRef       = useRef(null)
+  const { catById, subById } = useCategories()
 
   const [listing, setListing]     = useState(null)
   const [similar, setSimilar]     = useState([])
@@ -48,11 +51,8 @@ export default function ListingDetail() {
 
   const [copied, setCopied] = useState(false)
 
-  // Messaging
-  const [msgOpen, setMsgOpen]     = useState(false)
-  const [msgText, setMsgText]     = useState('')
-  const [sendingMsg, setSendingMsg] = useState(false)
-  const [msgSent, setMsgSent]     = useState(false)
+  // Bump to open the inline chat from the mobile sticky bar
+  const [chatSignal, setChatSignal] = useState(0)
 
   const timeDisplay = useRelativeTime(listing?.createdAt)
 
@@ -150,27 +150,6 @@ export default function ListingDetail() {
     setPhoneFetching(false)
   }
 
-  function openMsgComposer() {
-    if (!user) { navigate('/login', { state: { from: `/listings/${id}` } }); return }
-    setMsgOpen(v => !v)
-    if (!msgOpen) {
-      setTimeout(() => msgRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100)
-    }
-  }
-
-  async function sendMessage() {
-    if (!msgText.trim() || !user || !listing) return
-    setSendingMsg(true)
-    const { error } = await supabase.from('messages').insert({
-      listing_id:  listing.id,
-      sender_id:   user.id,
-      receiver_id: listing.seller.id,
-      content:     msgText.trim(),
-    })
-    if (!error) { setMsgText(''); setMsgSent(true); setMsgOpen(false) }
-    setSendingMsg(false)
-  }
-
   async function handleDelete() {
     if (!window.confirm(t('listingDetail.deleteConfirm'))) return
     const { error } = await supabase
@@ -202,7 +181,9 @@ export default function ListingDetail() {
     )
   }
 
-  const { title, price, condition, city, images, description, seller, categoryKey, categoryLabel, subcategoryLabel, otherDescription, paymentType, userId } = listing
+  const { title, price, condition, city, images, description, seller, categoryLabel, subcategoryLabel, otherDescription, paymentType, userId } = listing
+  const catLabel    = catalogLabel(catById[listing.category], 'cat', listing.category)
+  const subcatLabel = catalogLabel(subById[listing.subcategory], 'subcat', listing.subcategory)
   const displayPrice = listing.category === 'staff'
     ? `₼${price.toLocaleString('az-AZ')}${t('listingDetail.perMonth')}`
     : `₼${price.toLocaleString('az-AZ')}`
@@ -317,7 +298,7 @@ export default function ListingDetail() {
 
           <h1 className="text-2xl font-bold text-navy mb-3 leading-snug">
             {['staff', 'consulting', 'software', 'training'].includes(listing.category) && listing.subcategory
-              ? (t('subcat.' + listing.subcategory) || title)
+              ? (subcatLabel || title)
               : title}
           </h1>
           <div className="flex items-center gap-3 mb-4">
@@ -333,9 +314,9 @@ export default function ListingDetail() {
             <span className="flex items-center gap-1.5"><MapPin size={14} />{city}</span>
             <span className="flex items-center gap-1.5"><Clock size={14} />{timeDisplay}</span>
             <span className="flex items-center gap-1.5"><Eye size={14} />{viewCount}</span>
-            <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{(categoryKey && t(categoryKey)) || categoryLabel}</span>
+            <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-medium">{catLabel || categoryLabel}</span>
             {subcategoryLabel && (
-              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{(listing.subcategory && t('subcat.' + listing.subcategory)) || subcategoryLabel}</span>
+              <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded text-xs font-medium">{subcatLabel || subcategoryLabel}</span>
             )}
             {subcategoryLabel && otherDescription && (
               <span className="text-gray-400 text-xs">— {otherDescription}</span>
@@ -381,48 +362,10 @@ export default function ListingDetail() {
               </div>
             )}
 
-            {/* Message button */}
-            <button
-              onClick={openMsgComposer}
-              className="w-full py-3.5 border-2 border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <MessageSquare size={18} />
-              {msgSent ? t('listingDetail.messageSent') : t('listingDetail.sendMessage')}
-            </button>
-
-            {/* Inline message composer */}
-            {msgOpen && (
-              <div ref={msgRef} className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                <p className="text-sm font-medium text-navy mb-3">{t('listingDetail.messageComposer')}</p>
-                <textarea
-                  value={msgText}
-                  onChange={e => setMsgText(e.target.value)}
-                  placeholder={t('listingDetail.messagePlaceholder')}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none mb-3"
-                />
-                <div className="flex gap-2 justify-end">
-                  <button onClick={() => setMsgOpen(false)}
-                    className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-100">
-                    {t('listingDetail.cancel')}
-                  </button>
-                  <button
-                    onClick={sendMessage}
-                    disabled={!msgText.trim() || sendingMsg}
-                    className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    <Send size={14} />
-                    {sendingMsg ? t('listingDetail.sending') : t('listingDetail.send')}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {msgSent && (
-              <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
-                <CheckCircle2 size={16} />
-                {t('listingDetail.messageSentDesc')}{' '}
-                <Link to="/messages" className="font-semibold underline">{t('listingDetail.viewMessages')}</Link>
+            {/* Chat with seller */}
+            {!isOwner && (
+              <div id="listing-chat">
+                <ListingChat listingId={listing.id} sellerId={userId || seller?.id} openSignal={chatSignal} />
               </div>
             )}
           </div>
@@ -579,10 +522,16 @@ export default function ListingDetail() {
       {/* Mobile sticky bar */}
       <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t border-gray-200 px-4 py-3 z-40 shadow-lg">
         <div className="flex gap-3">
-          <button onClick={openMsgComposer}
-            className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-50">
-            {msgSent ? t('listingDetail.mobileMessage') : t('listingDetail.sendMessage')}
-          </button>
+          {!isOwner && (
+            <button
+              onClick={() => {
+                setChatSignal(s => s + 1)
+                document.getElementById('listing-chat')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              }}
+              className="flex-1 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-50">
+              {t('listingDetail.sendMessage')}
+            </button>
+          )}
           {!phoneRevealed ? (
             <button onClick={revealPhone} disabled={phoneFetching}
               className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 disabled:opacity-70 flex items-center justify-center gap-1.5">

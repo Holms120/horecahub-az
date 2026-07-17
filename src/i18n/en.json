@@ -183,7 +183,7 @@
     "subcategory": "Subcategory *",
     "otherDesc": "Specify type (optional)",
     "otherPlaceholder": "e.g. Tea brewing machine",
-    "suppliersOnly": "You must register as a Supplier to post supplier listings.",
+    "suppliersOnly": "Posting a supplier listing requires an approved supplier account. Pick the \"Supplier\" account type when registering — it is activated once an admin reviews your application.",
     "listingDetails": "Listing details",
     "listingFor": "What is this listing for?",
     "cv": "Posting my CV",
@@ -342,7 +342,9 @@
     "errInvalidEmailFormat": "Invalid email format",
     "errRateLimit": "Too many attempts. Please wait a few minutes.",
     "and": "and",
-    "forgotPassword": "Forgot your password?"
+    "forgotPassword": "Forgot your password?",
+    "supplierModerationHint": "Supplier accounts are moderated: after you sign up, an admin reviews your application (usually within 24 hours).",
+    "supplierPendingNotice": "Your supplier application is under review. Until it is approved your account works as an individual one — we will notify you of the decision."
   },
   "profile": {
     "verified": "Verified Supplier",
@@ -408,7 +410,12 @@
     "updatingPassword": "Updating...",
     "passwordUpdated": "Password updated successfully.",
     "avatarTypeError": "Only JPG, PNG, WEBP formats are allowed",
-    "avatarSizeError": "Maximum file size is {{mb}}MB"
+    "avatarSizeError": "Maximum file size is {{mb}}MB",
+    "supplierPendingTitle": "Your supplier application is under review",
+    "supplierPendingDesc": "An admin is reviewing your application. Once approved, you will be able to post supplier listings.",
+    "supplierRejectedTitle": "Your supplier application was rejected",
+    "supplierRejectedReason": "Reason:",
+    "supplierReapply": "Apply again"
   },
   "messages": {
     "title": "Messages",
@@ -429,6 +436,12 @@
     "delete": "Delete",
     "supportName": "HorecaHub Support",
     "supportService": "Support service"
+  },
+  "listingChat": {
+    "title": "Chat with seller",
+    "continueChat": "Continue conversation",
+    "emptyHint": "Ask the seller a question — the reply will appear here and in Messages.",
+    "openInMessages": "Open in Messages"
   },
   "notFound": {
     "code": "404",

@@ -26,3 +26,7 @@ verify_jwt = false         # Supabase Auth email hook: authenticated via
 [functions.support-ai]
 enabled = true
 verify_jwt = true          # anon key qualifies; in-function anon rate limit
+
+[functions.notify-message-email]
+enabled = true
+verify_jwt = true          # + in-function check: caller must be the sender

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Camera, ChevronLeft, ChevronDown, CheckCircle2, AlertCircle, Loader2, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Camera, ChevronLeft, ChevronDown, CheckCircle2, AlertCircle, Loader2, Trash2, Eye, EyeOff, Clock } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +21,7 @@ export default function EditProfile() {
   const [fieldErrors, setFieldErrors]       = useState({})
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting]             = useState(false)
+  const [reapplying, setReapplying]         = useState(false)
 
   // Editable fields
   const [fullName, setFullName]       = useState('')
@@ -152,6 +153,23 @@ export default function EditProfile() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
     setSaving(false)
+  }
+
+  // Re-submit a rejected application. The DB trigger allows the owner to
+  // move only rejected/none → pending; account_type stays admin-granted.
+  async function handleReapply() {
+    setReapplying(true)
+    const { error: err } = await supabase
+      .from('profiles')
+      .update({ supplier_status: 'pending' })
+      .eq('id', user.id)
+    if (err) {
+      setError(err.message)
+    } else {
+      setProfile(prev => ({ ...prev, supplier_status: 'pending', supplier_reject_reason: null }))
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    setReapplying(false)
   }
 
   async function handlePasswordChange() {
@@ -322,6 +340,38 @@ export default function EditProfile() {
             </span>
           </div>
         </div>
+
+        {/* Supplier application status */}
+        {profile.supplier_status === 'pending' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex gap-3">
+            <Clock size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-amber-900">{t('editProfile.supplierPendingTitle')}</p>
+              <p className="text-sm text-amber-800 mt-1 leading-relaxed">{t('editProfile.supplierPendingDesc')}</p>
+            </div>
+          </div>
+        )}
+        {profile.supplier_status === 'rejected' && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex gap-3">
+            <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-900">{t('editProfile.supplierRejectedTitle')}</p>
+              {profile.supplier_reject_reason && (
+                <p className="text-sm text-red-800 mt-1 leading-relaxed">
+                  {t('editProfile.supplierRejectedReason')} {profile.supplier_reject_reason}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={handleReapply}
+                disabled={reapplying}
+                className="mt-3 px-4 py-2 bg-red-600 text-white text-xs font-semibold rounded-xl hover:bg-red-700 disabled:opacity-60"
+              >
+                {reapplying ? t('editProfile.saving') : t('editProfile.supplierReapply')}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3 justify-end">

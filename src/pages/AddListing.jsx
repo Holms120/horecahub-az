@@ -12,6 +12,7 @@ import { notifyTelegram } from '../lib/notify'
 import { useAuth } from '../context/AuthContext'
 import { CITIES } from '../data/mockData'
 import { useCategories } from '../hooks/useCategories'
+import { catalogLabel } from '../lib/catalogLabel'
 import { useTranslation } from 'react-i18next'
 
 const ICON_MAP  = { ChefHat, Coffee, Thermometer, UtensilsCrossed, LayoutGrid, Wine, Users, Truck, Briefcase, Monitor, GraduationCap, Package, Store, ShoppingBasket, Shirt, Wrench, Printer, HardHat, Scale, ShieldCheck, GlassWater }
@@ -402,7 +403,7 @@ export default function AddListing() {
                         : 'border-gray-200 hover:border-blue-300 text-gray-600'
                     }`}>
                     {Icon && <Icon size={22} />}
-                    <span className="text-xs font-medium text-center leading-tight">{t(cat.key) || cat.label}</span>
+                    <span className="text-xs font-medium text-center leading-tight">{catalogLabel(cat, 'cat')}</span>
                   </button>
                 )
               })}
@@ -431,7 +432,7 @@ export default function AddListing() {
                           : 'border-gray-200 hover:border-blue-300 text-gray-600'
                       }`}
                     >
-                      {(() => { const k = 'subcat.' + sub.id; const v = t(k); return v === k ? sub.label : v })()}
+                      {catalogLabel(sub, 'subcat')}
                     </button>
                   ))}
                 </div>

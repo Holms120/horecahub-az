@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { CITIES } from '../data/mockData'
 import { useCategories } from '../hooks/useCategories'
+import { catalogLabel } from '../lib/catalogLabel'
 import { supabase } from '../supabaseClient'
 import { useTranslation } from 'react-i18next'
 
@@ -110,7 +111,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
                     onChange={() => onChange({ ...filters, category: cat.id, subcategories: [] })}
                     className="accent-blue-600"
                   />
-                  <span className="text-sm text-gray-700 group-hover:text-navy">{t(cat.key) || cat.label}</span>
+                  <span className="text-sm text-gray-700 group-hover:text-navy">{catalogLabel(cat, 'cat')}</span>
                 </div>
                 {categoryCounts[cat.id] > 0 && (
                   <span className="text-xs text-gray-400">{categoryCounts[cat.id]}</span>
@@ -133,7 +134,7 @@ export default function FilterSidebar({ filters, onChange, onClear }) {
                   onChange={() => toggleSubcategory(sub.id)}
                   className="accent-blue-600 rounded"
                 />
-                <span className="text-sm text-gray-700">{(() => { const k = 'subcat.' + sub.id; const v = t(k); return v === k ? sub.label : v })()}</span>
+                <span className="text-sm text-gray-700">{catalogLabel(sub, 'subcat')}</span>
               </label>
             ))}
           </div>
