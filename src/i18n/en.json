@@ -430,6 +430,12 @@
     "supportName": "HorecaHub Support",
     "supportService": "Support service"
   },
+  "listingChat": {
+    "title": "Chat with seller",
+    "continueChat": "Continue conversation",
+    "emptyHint": "Ask the seller a question — the reply will appear here and in Messages.",
+    "openInMessages": "Open in Messages"
+  },
   "notFound": {
     "code": "404",
     "title": "Page not found",
