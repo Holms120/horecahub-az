@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import SupportWidget from './components/SupportWidget'
+import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -53,6 +54,7 @@ function Layout() {
     <div className="min-h-screen flex flex-col bg-white">
       {!isAuth && <Navbar />}
       <main className="flex-1">
+        <ErrorBoundary>
         <Suspense fallback={<PageSpinner />}>
           <Routes>
             <Route path="/"             element={<Home />} />
@@ -81,6 +83,7 @@ function Layout() {
             <Route path="*"             element={<NotFound />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </main>
       {!isAuth && <Footer />}
       {!isAuth && <SupportWidget />}
@@ -93,12 +96,14 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ScrollToTop />
-        <Suspense fallback={<PageSpinner />}>
-          <Routes>
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/*"     element={<Layout />} />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<PageSpinner />}>
+            <Routes>
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/*"     element={<Layout />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   )
