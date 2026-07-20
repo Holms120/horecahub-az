@@ -415,7 +415,11 @@
     "supplierPendingDesc": "An admin is reviewing your application. Once approved, you will be able to post supplier listings.",
     "supplierRejectedTitle": "Your supplier application was rejected",
     "supplierRejectedReason": "Reason:",
-    "supplierReapply": "Apply again"
+    "supplierReapply": "Apply again",
+    "supplierApplyTitle": "Need a supplier account?",
+    "supplierApplyDesc": "Send an application — once an admin reviews it you will be able to post supplier listings.",
+    "supplierApply": "Send application",
+    "supplierApplyFailed": "Could not send the application. Please try again."
   },
   "messages": {
     "title": "Messages",

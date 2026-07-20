@@ -415,7 +415,11 @@
     "supplierPendingDesc": "Admin müraciətinizi yoxlayır. Təsdiqlənəndən sonra təchizatçı elanları yerləşdirə biləcəksiniz.",
     "supplierRejectedTitle": "Təchizatçı müraciətiniz rədd edildi",
     "supplierRejectedReason": "Səbəb:",
-    "supplierReapply": "Yenidən müraciət et"
+    "supplierReapply": "Yenidən müraciət et",
+    "supplierApplyTitle": "Təchizatçı hesabı istəyirsiniz?",
+    "supplierApplyDesc": "Müraciət göndərin — admin yoxladıqdan sonra təchizatçı elanları yerləşdirə biləcəksiniz.",
+    "supplierApply": "Müraciət göndər",
+    "supplierApplyFailed": "Müraciət göndərilmədi. Yenidən cəhd edin."
   },
   "messages": {
     "title": "Mesajlar",
@@ -745,7 +749,8 @@
     "callUs": "Zəng edin",
     "followUs": "Bizi izləyin",
     "liveSupport": "Canlı dəstək",
-    "writeSupport": "Dəstəyə yaz"
+    "writeSupport": "Dəstəyə yaz",
+    "addressValue": "Bakı, Azərbaycan"
   },
   "common": {
     "callBtn": "Zəng et",
