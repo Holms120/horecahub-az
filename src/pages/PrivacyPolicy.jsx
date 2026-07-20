@@ -162,7 +162,7 @@ export default function PrivacyPolicy() {
           <Li><strong className="text-navy">Köçürmə:</strong> Məlumatlarınızı maşın oxunaqlı formatda almaq.</Li>
         </ul>
         <p className="mt-3">
-          Bu hüquqlardan istifadə etmək üçün <strong className="text-navy">info@horecahub.az</strong> ünvanına
+          Bu hüquqlardan istifadə etmək üçün <strong className="text-navy">horecahub.az@gmail.com</strong> ünvanına
           yazın. Sorğular 30 iş günü ərzində cavablandırılacaq.
         </p>
       </Section>
@@ -189,7 +189,7 @@ export default function PrivacyPolicy() {
       <Section title="10. Bizimlə əlaqə">
         <p>Məxfilik məsələlərindəki suallarınız üçün:</p>
         <p className="mt-2">
-          <strong className="text-navy">E-poçt:</strong> info@horecahub.az<br />
+          <strong className="text-navy">E-poçt:</strong> horecahub.az@gmail.com<br />
           <strong className="text-navy">Mövzu:</strong> "Məxfilik sorğusu"<br />
           <strong className="text-navy">Ünvan:</strong> Bakı, Azərbaycan
         </p>

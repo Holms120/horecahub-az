@@ -144,7 +144,7 @@ export default function TermsOfService() {
           Bu Şərtlərlə bağlı suallarınız üçün bizimlə əlaqə saxlayın:
         </p>
         <p className="mt-2">
-          <strong className="text-navy">E-poçt:</strong> info@horecahub.az<br />
+          <strong className="text-navy">E-poçt:</strong> horecahub.az@gmail.com<br />
           <strong className="text-navy">Ünvan:</strong> Bakı, Azərbaycan
         </p>
       </Section>

@@ -24,8 +24,8 @@ export default function Contact() {
     {
       Icon: Mail,
       label: t('contact.email'),
-      value: 'info@horecahub.az',
-      href: 'mailto:info@horecahub.az',
+      value: 'horecahub.az@gmail.com',
+      href: 'mailto:horecahub.az@gmail.com',
       color: 'bg-emerald-50 text-emerald-600',
     },
     {
