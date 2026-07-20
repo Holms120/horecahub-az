@@ -8,3 +8,15 @@ export const CITIES = [
   'Şamaxı', 'Qobustan', 'Abşeron', 'Xızı', 'Siyəzən', 'Xudat', 'Xaçmaz',
   'Oğuz', 'Qəbələ', 'Ağcabədi', 'Beyləqan', 'Neftçala', 'Hacıqabul',
 ]
+
+export const SUPPLIER_CATEGORIES = [
+  'Ət və quş əti',
+  'Tərəvəz və meyvə',
+  'Süd məhsulları',
+  'Qəhvə və çay',
+  'İçkilər (alkoqolsuz)',
+  'Təmizlik məhsulları',
+  'Sarf materiallar',
+  'Avadanlıq hissələri',
+  'Digər',
+]

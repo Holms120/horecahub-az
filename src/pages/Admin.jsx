@@ -6,7 +6,7 @@ import {
   Shield, ShieldOff, Send, X, ChevronLeft, Inbox,
   LogOut, CheckCircle2, Eye, Heart, TrendingUp, AlertCircle,
   Download, Search, Settings, BarChart2, Bell, Phone,
-  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2, Pencil, Store,
+  ChevronDown, ChevronUp, Check, XCircle, Tag, MessageCircle, Menu, Trash2, Pencil, Store, Loader2,
 } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -14,6 +14,8 @@ import {
 } from 'recharts'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import PhoneInput from '../components/PhoneInput'
+import { CITIES, SUPPLIER_CATEGORIES } from '../data/mockData'
 
 /* ─── helpers ───────────────────────────────────────────── */
 function timeStr(iso) {
@@ -134,6 +136,164 @@ function SendMsgModal({ receiverId, senderId, receiverName, onClose }) {
               </button>
             </div>
           </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* Admin edit of another user's profile fields. Writes go through
+   admin_update_profile (014) — profiles has no admin UPDATE policy, only
+   profiles_update_own, so a direct client update would match zero rows. */
+function EditUserModal({ user, onClose, onSaved }) {
+  const [loading, setLoading]     = useState(true)
+  const [saving, setSaving]       = useState(false)
+  const [error, setError]         = useState('')
+  const [fullName, setFullName]       = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [phone, setPhone]             = useState('')
+  const [phone2, setPhone2]           = useState('')
+  const [city, setCity]               = useState('')
+  const [description, setDescription] = useState('')
+  const [categories, setCategories]   = useState([])
+  const [logoUrl, setLogoUrl]         = useState('')
+
+  const isSupplier = user.account_type === 'supplier' || user.supplier_status === 'pending'
+
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      const { data, error: err } = await supabase
+        .from('profiles')
+        .select('full_name, company_name, phone, phone2, city, description, logo_url, supplier_categories')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (cancelled) return
+      if (err || !data) { setError('Profil yüklənmədi: ' + (err?.message || '')); setLoading(false); return }
+      setFullName(data.full_name || '')
+      setCompanyName(data.company_name || '')
+      setPhone(data.phone || '')
+      setPhone2(data.phone2 || '')
+      setCity(data.city || '')
+      setDescription(data.description || '')
+      setCategories(data.supplier_categories || [])
+      setLogoUrl(data.logo_url || '')
+      setLoading(false)
+    }
+    load()
+    return () => { cancelled = true }
+  }, [user.id])
+
+  function toggleCategory(cat) {
+    setCategories(cs => cs.includes(cat) ? cs.filter(c => c !== cat) : [...cs, cat])
+  }
+
+  async function handleSave() {
+    if (fullName.trim().length < 2) { setError('Ad ən azı 2 simvol olmalıdır'); return }
+    setSaving(true); setError('')
+    const { data, error: err } = await supabase.rpc('admin_update_profile', {
+      p_user_id: user.id,
+      p_full_name: fullName.trim(),
+      p_company_name: companyName.trim() || null,
+      p_phone: phone.trim(),
+      p_phone2: phone2.trim() || null,
+      p_city: city.trim(),
+      p_description: description.trim() || null,
+      p_supplier_categories: isSupplier ? categories : [],
+    })
+    if (err) { setError('Xəta: ' + err.message); setSaving(false); return }
+    onSaved(data)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 my-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-[#0A2342]">Profili redaktə et</h3>
+          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600"><X size={18} /></button>
+        </div>
+        {loading ? <Spinner /> : (
+          <div className="space-y-4">
+            {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">{error}</div>}
+
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl overflow-hidden border border-gray-200 flex-shrink-0">
+                {logoUrl
+                  ? <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+                  : (fullName || companyName || '?').charAt(0).toUpperCase()}
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Profil şəkli yalnız istifadəçinin özü tərəfindən "Profili redaktə et" bölməsindən dəyişdirilə bilər.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Ad Soyad</label>
+              <input value={fullName} onChange={e => setFullName(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" />
+            </div>
+
+            {isSupplier && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Şirkət adı</label>
+                <input value={companyName} onChange={e => setCompanyName(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">Telefon</label>
+                <PhoneInput value={phone} onChange={setPhone} />
+              </div>
+              {isSupplier && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Telefon 2</label>
+                  <PhoneInput value={phone2} onChange={setPhone2} />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Şəhər</label>
+              <select value={city} onChange={e => setCity(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-blue-500">
+                <option value="">—</option>
+                {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Haqqında</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-blue-500" />
+            </div>
+
+            {isSupplier && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-2">Kateqoriyalar</label>
+                <div className="grid grid-cols-2 gap-2 p-3 border border-gray-200 rounded-xl bg-gray-50 max-h-40 overflow-y-auto">
+                  {SUPPLIER_CATEGORIES.map(cat => (
+                    <label key={cat} className="flex items-center gap-2 cursor-pointer text-xs text-gray-700">
+                      <input type="checkbox" checked={categories.includes(cat)} onChange={() => toggleCategory(cat)}
+                        className="accent-blue-600 rounded w-3.5 h-3.5 flex-shrink-0" />
+                      {cat}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2 justify-end pt-2">
+              <button onClick={onClose} disabled={saving}
+                className="px-4 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50">Ləğv et</button>
+              <button onClick={handleSave} disabled={saving}
+                className="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2">
+                {saving && <Loader2 size={14} className="animate-spin" />}
+                Yadda saxla
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -881,6 +1041,7 @@ function UsersTab({ adminId }) {
   const [expanded, setExpanded]     = useState(null)
   const [userListings, setUserListings] = useState({})
   const [msgTarget, setMsgTarget]   = useState(null)
+  const [editTarget, setEditTarget] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -1059,6 +1220,10 @@ function UsersTab({ adminId }) {
                           }`}>
                           {u.is_blocked ? <><ShieldOff size={11} /> Açıq</> : <><Shield size={11} /> Blok</>}
                         </button>
+                        <button onClick={() => setEditTarget(u)}
+                          className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">
+                          <Pencil size={11} /> Redaktə
+                        </button>
                         <button onClick={() => setMsgTarget({ id: u.id, name: u.full_name || u.company_name || u.email })}
                           className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100">
                           <MessageSquare size={11} /> Mesaj
@@ -1103,6 +1268,18 @@ function UsersTab({ adminId }) {
       {msgTarget && (
         <SendMsgModal receiverId={msgTarget.id} senderId={adminId}
           receiverName={msgTarget.name} onClose={() => setMsgTarget(null)} />
+      )}
+      {editTarget && (
+        <EditUserModal
+          user={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSaved={updated => {
+            setUsers(us => us.map(u => u.id === updated.id
+              ? { ...u, full_name: updated.full_name, company_name: updated.company_name, phone: updated.phone, city: updated.city }
+              : u))
+            setEditTarget(null)
+          }}
+        />
       )}
     </div>
   )

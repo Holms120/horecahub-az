@@ -9,20 +9,9 @@ import { translateAuthError } from '../lib/authErrors'
 import PhoneInput from '../components/PhoneInput'
 import Logo from '../components/Logo'
 import { useTranslation } from 'react-i18next'
+import { SUPPLIER_CATEGORIES } from '../data/mockData'
 
 const strip = v => (v || '').replace(/<[^>]*>/g, '').trim()
-
-const SUPPLIER_CATEGORIES = [
-  'Ət və quş əti',
-  'Tərəvəz və meyvə',
-  'Süd məhsulları',
-  'Qəhvə və çay',
-  'İçkilər (alkoqolsuz)',
-  'Təmizlik məhsulları',
-  'Sarf materiallar',
-  'Avadanlıq hissələri',
-  'Digər',
-]
 
 const EMPTY = {
   email: '', password: '', confirmPassword: '',
