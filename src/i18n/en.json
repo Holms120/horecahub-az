@@ -343,7 +343,7 @@
     "errRateLimit": "Too many attempts. Please wait a few minutes.",
     "and": "and",
     "forgotPassword": "Forgot your password?",
-    "supplierModerationHint": "Supplier accounts are moderated: after you sign up, an admin reviews your application (usually within 24 hours).",
+    "supplierModerationHint": "Supplier accounts are moderated: after you sign up, an admin reviews your application (usually within 24 hours). After confirming your email, you'll be asked to add a profile photo on first login.",
     "supplierPendingNotice": "Your supplier application is under review. Until it is approved your account works as an individual one — we will notify you of the decision."
   },
   "profile": {

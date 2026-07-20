@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import SupportWidget from './components/SupportWidget'
 import ErrorBoundary from './components/ErrorBoundary'
+import SupplierPhotoGate from './components/SupplierPhotoGate'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -51,43 +52,45 @@ function Layout() {
   const isAuth = AUTH_ROUTES.includes(pathname)
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      {!isAuth && <Navbar />}
-      <main className="flex-1">
-        <ErrorBoundary>
-        <Suspense fallback={<PageSpinner />}>
-          <Routes>
-            <Route path="/"             element={<Home />} />
-            <Route path="/listings"     element={<Listings />} />
-            <Route path="/listings/:id" element={<ListingDetail />} />
-            <Route path="/sell"         element={<AddListing />} />
-            <Route path="/login"            element={<Login />} />
-            <Route path="/register"         element={<Register />} />
-            <Route path="/forgot-password"  element={<ForgotPassword />} />
-            <Route path="/reset-password"   element={<ResetPassword />} />
-            <Route path="/profile/:id"  element={<Profile />} />
-            <Route path="/messages"     element={<Messages />} />
-            <Route path="/edit-profile"      element={<EditProfile />} />
-            <Route path="/listings/:id/edit" element={<EditListing />} />
-            <Route path="/terms"        element={<TermsOfService />} />
-            <Route path="/privacy"      element={<PrivacyPolicy />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/about"        element={<About />} />
-            <Route path="/contact"      element={<Contact />} />
-            <Route path="/blog"         element={<Blog />} />
-            <Route path="/blog/:id"     element={<BlogPost />} />
-            <Route path="/suppliers"    element={<Suppliers />} />
-            <Route path="/careers"      element={<ComingSoon />} />
-            <Route path="/partners"     element={<ComingSoon />} />
-            <Route path="/faq"          element={<Navigate to="/how-it-works" replace />} />
-            <Route path="*"             element={<NotFound />} />
-          </Routes>
-        </Suspense>
-        </ErrorBoundary>
-      </main>
-      {!isAuth && <Footer />}
-      {!isAuth && <SupportWidget />}
-    </div>
+    <SupplierPhotoGate>
+      <div className="min-h-screen flex flex-col bg-white">
+        {!isAuth && <Navbar />}
+        <main className="flex-1">
+          <ErrorBoundary>
+          <Suspense fallback={<PageSpinner />}>
+            <Routes>
+              <Route path="/"             element={<Home />} />
+              <Route path="/listings"     element={<Listings />} />
+              <Route path="/listings/:id" element={<ListingDetail />} />
+              <Route path="/sell"         element={<AddListing />} />
+              <Route path="/login"            element={<Login />} />
+              <Route path="/register"         element={<Register />} />
+              <Route path="/forgot-password"  element={<ForgotPassword />} />
+              <Route path="/reset-password"   element={<ResetPassword />} />
+              <Route path="/profile/:id"  element={<Profile />} />
+              <Route path="/messages"     element={<Messages />} />
+              <Route path="/edit-profile"      element={<EditProfile />} />
+              <Route path="/listings/:id/edit" element={<EditListing />} />
+              <Route path="/terms"        element={<TermsOfService />} />
+              <Route path="/privacy"      element={<PrivacyPolicy />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/about"        element={<About />} />
+              <Route path="/contact"      element={<Contact />} />
+              <Route path="/blog"         element={<Blog />} />
+              <Route path="/blog/:id"     element={<BlogPost />} />
+              <Route path="/suppliers"    element={<Suppliers />} />
+              <Route path="/careers"      element={<ComingSoon />} />
+              <Route path="/partners"     element={<ComingSoon />} />
+              <Route path="/faq"          element={<Navigate to="/how-it-works" replace />} />
+              <Route path="*"             element={<NotFound />} />
+            </Routes>
+          </Suspense>
+          </ErrorBoundary>
+        </main>
+        {!isAuth && <Footer />}
+        {!isAuth && <SupportWidget />}
+      </div>
+    </SupplierPhotoGate>
   )
 }
 

@@ -343,7 +343,7 @@
     "errRateLimit": "Çox sayda cəhd edildi. Bir neçə dəqiqə gözləyin.",
     "and": "və",
     "forgotPassword": "Şifrəni unutmusunuz?",
-    "supplierModerationHint": "Təchizatçı hesabı moderasiyadan keçir: qeydiyyatdan sonra müraciətiniz admin tərəfindən yoxlanılacaq (adətən 24 saat ərzində).",
+    "supplierModerationHint": "Təchizatçı hesabı moderasiyadan keçir: qeydiyyatdan sonra müraciətiniz admin tərəfindən yoxlanılacaq (adətən 24 saat ərzində). E-poçtu təsdiqləyib ilk dəfə daxil olduqda profil şəkli əlavə etməyiniz tələb olunacaq.",
     "supplierPendingNotice": "Təchizatçı müraciətiniz yoxlanılır. Təsdiqlənənə qədər hesabınız fərdi hesab kimi işləyəcək — nəticə barədə sizə bildiriş göndəriləcək."
   },
   "profile": {
