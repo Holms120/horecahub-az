@@ -10,15 +10,28 @@ export function AuthProvider({ children }) {
     // Own full profile via a SECURITY DEFINER RPC — the base `profiles`
     // table no longer grants a blanket select('*') to authenticated
     // clients (the email column is column-revoked to stop PII harvesting).
-    const { data } = await supabase
+    const { data, error } = await supabase
       .rpc('get_my_profile')
       .maybeSingle()
+    // Swallowing this used to silently strip is_admin app-wide, so an admin
+    // would look like a normal user after one failed RPC. Keep the previous
+    // profile rather than clobbering it with null on a transient failure.
+    if (error) {
+      console.warn('get_my_profile failed:', error.message)
+      return
+    }
     setProfile(data)
   }
   useEffect(() => {
+    // loading must settle on EVERY path: pages gated on it (Messages, and any
+    // auth-guarded route) render a full-screen spinner until it flips, so an
+    // unhandled rejection here means the page never opens at all.
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
       await fetchProfile(session?.user?.id ?? null)
+    }).catch(e => {
+      console.warn('getSession failed:', e)
+    }).finally(() => {
       setLoading(false)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {

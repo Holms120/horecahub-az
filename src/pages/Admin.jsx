@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react'
+import { invalidateCategories } from '../hooks/useCategories'
 import { Link, Navigate } from 'react-router-dom'
 import {
   Users, MessageSquare, LayoutDashboard, List,
@@ -63,6 +64,13 @@ function exportCSV(rows, filename) {
   a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' }))
   a.download = filename
   document.body.appendChild(a); a.click(); document.body.removeChild(a)
+}
+
+// Deliberately not Array.prototype.at(): that needs Safari/iOS 15.4+, and the
+// build has no polyfills (esbuild transpiles syntax, not built-in methods), so
+// `.at(-1)` threw a TypeError and blanked the whole admin panel on iOS 14-15.3.
+function lastOf(arr) {
+  return Array.isArray(arr) && arr.length ? arr[arr.length - 1] : undefined
 }
 
 const PIE_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#0ea5e9']
@@ -818,8 +826,20 @@ function ListingsTab({ adminId }) {
                   disabled={catSaving || !editCat}
                   onClick={async () => {
                     setCatSaving(true)
-                    const { error } = await supabase.from('listings').update({ category: editCat, subcategory: editSub || null }).eq('id', viewModal.id)
-                    if (!error) {
+                    // .select() is what makes this verifiable: without it an
+                    // RLS-blocked UPDATE touches 0 rows and still returns
+                    // error === null, so the panel would report success and
+                    // repaint the new category while the DB kept the old one.
+                    const { data: rows, error } = await supabase
+                      .from('listings')
+                      .update({ category: editCat, subcategory: editSub || null })
+                      .eq('id', viewModal.id)
+                      .select('id')
+                    if (error) {
+                      alert('Kateqoriya saxlanmadı: ' + error.message)
+                    } else if (!rows || rows.length === 0) {
+                      alert('Kateqoriya saxlanmadı: dəyişiklik tətbiq olunmadı (icazə yoxdur).')
+                    } else {
                       const updated = { ...viewModal, category: editCat, subcategory: editSub || null }
                       setViewModal(updated)
                       setListings(ls => ls.map(l => l.id === viewModal.id ? { ...l, category: editCat, subcategory: editSub || null } : l))
@@ -883,8 +903,18 @@ function UsersTab({ adminId }) {
   }, [])
 
   async function toggleBlock(uid, current) {
-    const { error } = await supabase.from('profiles').update({ is_blocked: !current }).eq('id', uid)
-    if (!error) setUsers(us => us.map(u => u.id === uid ? { ...u, is_blocked: !current } : u))
+    // Goes through a definer RPC (migration 011): there is no admin UPDATE
+    // policy on profiles, so a direct update matched zero rows and returned
+    // success — the row turned "Blok" in the UI and reverted on next load.
+    const { data, error } = await supabase.rpc('set_user_blocked', {
+      p_user_id: uid,
+      p_blocked: !current,
+    })
+    if (error) {
+      alert('Əməliyyat alınmadı: ' + error.message)
+      return
+    }
+    setUsers(us => us.map(u => u.id === uid ? { ...u, is_blocked: data } : u))
   }
 
   async function handleDeleteUser(uid, name) {
@@ -1247,7 +1277,7 @@ function SupportTab({ adminId }) {
           if (m.receiver_id === adminId && !m.is_read) map[otherId].unread++
         }
         const list = Object.values(map).sort((a, b) =>
-          new Date(b.messages.at(-1).created_at) - new Date(a.messages.at(-1).created_at))
+          new Date(lastOf(b.messages)?.created_at) - new Date(lastOf(a.messages)?.created_at))
         setConvs(list)
         const ids = list.map(c => c.userId)
         if (ids.length) {
@@ -1322,8 +1352,8 @@ function SupportTab({ adminId }) {
                     <span className="ml-2 flex-shrink-0 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{c.unread}</span>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 truncate">{c.messages.at(-1)?.content}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5">{timeStr(c.messages.at(-1)?.created_at)}</p>
+                <p className="text-xs text-gray-500 truncate">{lastOf(c.messages)?.content}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">{timeStr(lastOf(c.messages)?.created_at)}</p>
               </button>
             ))}
           </div>
@@ -1662,13 +1692,18 @@ function CategoriesTab() {
 
   useEffect(() => { load() }, [])
 
+  // Every catalogue mutation must drop the shared useCategories cache, or the
+  // public surfaces (Home, FilterSidebar, ListingCard, AddListing…) keep
+  // rendering the pre-edit labels until the visitor hard-reloads.
   async function toggleCat(id, val) {
     await supabase.from('categories').update({ is_active: !val }).eq('id', id)
     setCats(prev => prev.map(x => x.id === id ? { ...x, is_active: !val } : x))
+    invalidateCategories()
   }
   async function toggleSub(id, val) {
     await supabase.from('subcategories').update({ is_active: !val }).eq('id', id)
     setSubs(prev => prev.map(x => x.id === id ? { ...x, is_active: !val } : x))
+    invalidateCategories()
   }
   async function deleteCat(id) {
     if (!window.confirm('Kateqoriyanı silmək istədiyinizə əminsiniz? Alt kateqoriyalar da silinəcək.')) return
@@ -1677,11 +1712,13 @@ function CategoriesTab() {
     setCats(prev => prev.filter(x => x.id !== id))
     setSubs(prev => prev.filter(x => x.category_id !== id))
     if (selectedCat === id) setSelectedCat(null)
+    invalidateCategories()
   }
   async function deleteSub(id) {
     if (!window.confirm('Alt kateqoriyanı silmək istədiyinizə əminsiniz?')) return
     await supabase.from('subcategories').delete().eq('id', id)
     setSubs(prev => prev.filter(x => x.id !== id))
+    invalidateCategories()
   }
 
   async function saveModal() {
@@ -1723,6 +1760,7 @@ function CategoriesTab() {
       alert('Saxlanılmadı: dəyişiklik bazaya yazılmadı (icazə problemi — RLS).')
     } else {
       await load()
+      invalidateCategories()
       setModal(null)
     }
     setSaving(false)
@@ -2067,16 +2105,29 @@ export default function Admin() {
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (cancelled) return
-      if (!session?.user) { setIsAdmin(false); return }
-      const uid = session.user.id
-      const { data, error } = await supabase
-        .from('profiles').select('is_admin').eq('id', uid).maybeSingle()
-      if (cancelled) return
-      if (error) return
-      if (data?.is_admin) { setAdminId(uid); setIsAdmin(true) }
-      else setIsAdmin(false)
+      // Every exit path must settle isAdmin. Leaving it null renders the
+      // spinner at the bottom of this component forever, with no way out —
+      // a transient network blip used to strand the whole panel.
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (cancelled) return
+        if (!session?.user) { setIsAdmin(false); return }
+        const uid = session.user.id
+        const { data, error } = await supabase
+          .from('profiles').select('is_admin').eq('id', uid).maybeSingle()
+        if (cancelled) return
+        if (error) {
+          console.warn('admin probe failed:', error.message)
+          setIsAdmin(false)
+          return
+        }
+        if (data?.is_admin) { setAdminId(uid); setIsAdmin(true) }
+        else setIsAdmin(false)
+      } catch (e) {
+        if (cancelled) return
+        console.warn('admin probe threw:', e)
+        setIsAdmin(false)
+      }
     })()
     return () => { cancelled = true }
   }, [])
@@ -2088,24 +2139,46 @@ export default function Admin() {
     ])
   }
 
+  // Counting supplier applications MUST go through the admin-only `admin_users`
+  // view, not `profiles`: 003 revoked `email` and 009's supplier_* columns were
+  // never granted, so `select('*') … .eq('supplier_status', …)` on the base table
+  // returns 401/42501 for every role (PostgREST needs SELECT on filtered columns
+  // too). That failure used to be swallowed, pinning this badge at 0 — which read
+  // as "supplier registrations never arrive" even though the tab itself was fine.
+  const refreshSupplierBadge = useCallback(() => {
+    supabase.from('admin_users')
+      .select('id', { count: 'exact', head: true })
+      .eq('supplier_status', 'pending')
+      .then(({ count, error }) => {
+        if (error) { console.warn('supplier badge:', error.message); return }
+        setSupplierBadge(count || 0)
+      })
+  }, [])
+
   useEffect(() => {
     if (!adminId) return
     supabase.from('messages')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('is_support', true).eq('receiver_id', adminId).eq('is_read', false)
-      .then(({ count }) => setSupportBadge(count || 0))
+      .then(({ count, error }) => {
+        if (error) { console.warn('support badge:', error.message); return }
+        setSupportBadge(count || 0)
+      })
     supabase.from('listings')
-      .select('*', { count: 'exact', head: true }).eq('status', 'pending')
-      .then(({ count }) => setPendingBadge(count || 0))
+      .select('id', { count: 'exact', head: true }).eq('status', 'pending')
+      .then(({ count, error }) => {
+        if (error) { console.warn('pending badge:', error.message); return }
+        setPendingBadge(count || 0)
+      })
     supabase.from('feedback')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('is_read', false)
-      .then(({ count }) => setFeedbackBadge(count || 0))
-    supabase.from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('supplier_status', 'pending')
-      .then(({ count }) => setSupplierBadge(count || 0))
-  }, [adminId])
+      .then(({ count, error }) => {
+        if (error) { console.warn('feedback badge:', error.message); return }
+        setFeedbackBadge(count || 0)
+      })
+    refreshSupplierBadge()
+  }, [adminId, refreshSupplierBadge])
 
   useEffect(() => {
     if (!adminId) return
@@ -2130,24 +2203,24 @@ export default function Admin() {
           addEvent('support', 'Yeni support mesajı alındı')
         }
       })
+      // Do NOT branch on payload.new.supplier_status here: realtime builds the
+      // payload with the subscriber's column privileges, and that column is not
+      // granted (see refreshSupplierBadge), so it may simply be absent. `old` is
+      // unreliable too — logical replication ships it only under REPLICA IDENTITY
+      // FULL. Re-count through the view instead; it is a cheap HEAD request.
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, payload => {
-        addEvent('user', `Yeni qeydiyyat: ${payload.new?.full_name || payload.new?.email || 'istifadəçi'}`)
-        if (payload.new?.supplier_status === 'pending') {
-          setSupplierBadge(n => n + 1)
-          addEvent('pending', `Yeni təchizatçı müraciəti: ${payload.new?.company_name || payload.new?.full_name || ''}`)
-        }
+        addEvent('user', `Yeni qeydiyyat: ${payload.new?.full_name || 'istifadəçi'}`)
+        refreshSupplierBadge()
       })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, payload => {
-        if (payload.new?.supplier_status === 'pending' && payload.old?.supplier_status !== 'pending') {
-          setSupplierBadge(n => n + 1)
-        }
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, () => {
+        refreshSupplierBadge()
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'feedback' }, () => {
         setFeedbackBadge(n => n + 1)
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [adminId])
+  }, [adminId, refreshSupplierBadge])
 
   if (isAdmin === null) return (
     <div className="min-h-screen flex items-center justify-center">

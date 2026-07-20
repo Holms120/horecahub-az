@@ -800,9 +800,9 @@ export default function AddListing() {
             )}
             <div className="divide-y divide-gray-100">
               {[
-                { label: t('addListing.reviewCategory'),    value: (() => { const c = categories.find(c => c.id === form.category); return c ? (t(c.key) || c.label) : '—' })() },
+                { label: t('addListing.reviewCategory'),    value: (() => { const c = categories.find(c => c.id === form.category); return c ? catalogLabel(c, 'cat') : '—' })() },
                 ...(subcategories[form.category]?.length > 0
-                  ? [{ label: t('addListing.reviewSubcategory'), value: (() => { const s = subcategories[form.category]?.find(s => s.id === form.subcategory); return s ? (t(s.key) || s.label) : '—' })() }]
+                  ? [{ label: t('addListing.reviewSubcategory'), value: (() => { const s = subcategories[form.category]?.find(s => s.id === form.subcategory); return s ? catalogLabel(s, 'subcat') : '—' })() }]
                   : []
                 ),
                 { label: t('addListing.reviewTitle2'),      value: strip(form.title) || '—' },
