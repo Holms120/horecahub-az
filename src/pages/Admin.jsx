@@ -370,12 +370,18 @@ function ModerationTab({ adminId, onApprove }) {
 
   async function handleApprove(listing) {
     setProcessing(listing.id)
-    const { error } = await supabase
+    // .select() makes the write verifiable: an RLS-filtered UPDATE touches 0
+    // rows and still returns error === null, which used to remove the card AND
+    // message the seller "your listing is live" while it stayed in moderation.
+    const { data: rows, error } = await supabase
       .from('listings')
       .update({ status: 'active' })
       .eq('id', listing.id)
+      .select('id')
 
-    if (!error) {
+    if (error || !rows || rows.length === 0) {
+      alert('Təsdiq alınmadı: ' + (error ? error.message : 'dəyişiklik tətbiq olunmadı (icazə yoxdur).'))
+    } else {
       setListings(ls => ls.filter(l => l.id !== listing.id))
       onApprove?.()
 
@@ -390,8 +396,6 @@ function ModerationTab({ adminId, onApprove }) {
           if (msgError) console.warn('Message insert failed:', msgError)
         })
       }
-    } else {
-      console.warn('Approve failed:', error)
     }
     setProcessing(null)
   }
@@ -404,12 +408,16 @@ function ModerationTab({ adminId, onApprove }) {
 
     setProcessing(modal.id)
 
-    const { error } = await supabase
+    const { data: rows, error } = await supabase
       .from('listings')
       .update({ status: 'rejected' })
       .eq('id', modal.id)
+      .select('id')
 
-    if (!error) {
+    if (error || !rows || rows.length === 0) {
+      alert('Rədd edilmədi: ' + (error ? error.message : 'dəyişiklik tətbiq olunmadı (icazə yoxdur).'))
+      setProcessing(null)
+    } else {
       setListings(ls => ls.filter(l => l.id !== modal.id))
       setRejectModal(null)
       setRejectReason('')
@@ -439,10 +447,6 @@ function ModerationTab({ adminId, onApprove }) {
             },
           })
         })
-    } else {
-      setProcessing(null)
-      setRejectModal(null)
-      setRejectReason('')
     }
   }
 
@@ -451,14 +455,16 @@ function ModerationTab({ adminId, onApprove }) {
     setProcessing(listing.id)
     // Soft-delete via the admin UPDATE policy (same as the Listings tab).
     // No message and no rejection email are sent to the seller.
-    const { error } = await supabase
+    const { data: rows, error } = await supabase
       .from('listings')
       .update({ status: 'deleted' })
       .eq('id', listing.id)
-    if (!error) {
+      .select('id')
+    if (!error && rows && rows.length > 0) {
       setListings(ls => ls.filter(l => l.id !== listing.id))
       onApprove?.()
     } else {
+      alert('Silinmədi: ' + (error ? error.message : 'dəyişiklik tətbiq olunmadı (icazə yoxdur).'))
       console.warn('Silent delete failed:', error)
     }
     setProcessing(null)

@@ -159,14 +159,23 @@ export default function EditProfile() {
   // move only rejected/none → pending; account_type stays admin-granted.
   async function handleReapply() {
     setReapplying(true)
-    const { error: err } = await supabase
+    // .select() so a trigger- or RLS-filtered write cannot read as success:
+    // the row comes back with whatever the DB actually stored.
+    const { data: rows, error: err } = await supabase
       .from('profiles')
       .update({ supplier_status: 'pending' })
       .eq('id', user.id)
+      .select('supplier_status, supplier_reject_reason')
     if (err) {
       setError(err.message)
+    } else if (!rows || rows.length === 0 || rows[0].supplier_status !== 'pending') {
+      setError(t('editProfile.supplierApplyFailed'))
     } else {
-      setProfile(prev => ({ ...prev, supplier_status: 'pending', supplier_reject_reason: null }))
+      setProfile(prev => ({
+        ...prev,
+        supplier_status: rows[0].supplier_status,
+        supplier_reject_reason: rows[0].supplier_reject_reason,
+      }))
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
     setReapplying(false)
@@ -342,6 +351,29 @@ export default function EditProfile() {
         </div>
 
         {/* Supplier application status */}
+        {/* 'none' needs its own entry point: the DB trigger allows the owner to
+            move none/rejected → pending, but the UI only ever offered the
+            rejected half. Without this an individual account can never become a
+            supplier, and anyone whose signup application was dropped is stuck. */}
+        {profile.account_type !== 'supplier' &&
+         (!profile.supplier_status || profile.supplier_status === 'none') && (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 flex gap-3">
+            <AlertCircle size={18} className="text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-blue-900">{t('editProfile.supplierApplyTitle')}</p>
+              <p className="text-sm text-blue-800 mt-1 leading-relaxed">{t('editProfile.supplierApplyDesc')}</p>
+              <button
+                type="button"
+                onClick={handleReapply}
+                disabled={reapplying}
+                className="mt-3 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors inline-flex items-center gap-2"
+              >
+                {reapplying && <Loader2 size={14} className="animate-spin" />}
+                {t('editProfile.supplierApply')}
+              </button>
+            </div>
+          </div>
+        )}
         {profile.supplier_status === 'pending' && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex gap-3">
             <Clock size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
