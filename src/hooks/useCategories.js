@@ -34,6 +34,15 @@ function fetchAll() {
   return inflight
 }
 
+// The cache lives at module scope and outlives every component, so an admin
+// editing a label/category would keep seeing the stale copy (and so would every
+// catalogue surface) until a full page reload. Admin mutations call this to
+// refetch and push the new rows to all mounted subscribers.
+export function invalidateCategories() {
+  cache = null
+  return fetchAll()
+}
+
 export function useCategories() {
   const [state, setState] = useState(cache)
 

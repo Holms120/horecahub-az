@@ -3,6 +3,7 @@ import { Send } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useTranslation } from 'react-i18next'
 import RelativeTime from './RelativeTime'
+import { storageGet, storageSet, storageRemove } from '../lib/safeStorage'
 
 const FAQ_IDS = [1, 2, 3, 4, 5, 6]
 
@@ -26,7 +27,7 @@ export default function SupportChat({ conv, user, messages }) {
   // Clear closed flag on mount (next visit starts fresh)
   useEffect(() => {
     const key = `horecahub_support_closed_${user.id}`
-    if (localStorage.getItem(key)) localStorage.removeItem(key)
+    if (storageGet(key)) storageRemove(key)
   }, [user.id])
 
   // Auto-scroll when new messages arrive in 'open' state
@@ -40,7 +41,7 @@ export default function SupportChat({ conv, user, messages }) {
   }
 
   function handleEndChat() {
-    localStorage.setItem(`horecahub_support_closed_${user.id}`, '1')
+    storageSet(`horecahub_support_closed_${user.id}`, '1')
     setChatState('closed')
   }
 

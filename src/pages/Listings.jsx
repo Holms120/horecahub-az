@@ -134,7 +134,10 @@ export default function Listings() {
     } else {
       let normalized = (data || []).map(normalizeListing)
       if (filters.verifiedOnly) {
-        normalized = normalized.filter(l => l.seller.accountType === 'supplier')
+        // normalizeListing exposes `isVerified` (derived from account_type),
+        // not `accountType` — comparing the latter was undefined === 'supplier'
+        // for every row, so this filter emptied the whole catalogue.
+        normalized = normalized.filter(l => l.seller.isVerified)
       }
       setListings(normalized)
       setTotalCount(count || 0)

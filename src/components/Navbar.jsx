@@ -6,6 +6,7 @@ import Logo from './Logo'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index.js'
+import { storageSet } from '../lib/safeStorage'
 
 const EMAIL_LIKE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -194,7 +195,7 @@ export default function Navbar() {
                 {['az', 'ru', 'en'].map(lang => (
                   <button
                     key={lang}
-                    onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
+                    onClick={() => { i18n.changeLanguage(lang); storageSet('lang', lang) }}
                     className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
                   >
                     {lang.toUpperCase()}
@@ -325,7 +326,7 @@ export default function Navbar() {
             {['az', 'ru', 'en'].map(lang => (
               <button
                 key={lang}
-                onClick={() => { i18n.changeLanguage(lang); localStorage.setItem('lang', lang) }}
+                onClick={() => { i18n.changeLanguage(lang); storageSet('lang', lang) }}
                 className={`px-2 py-1 rounded transition-colors ${i18n.language === lang ? 'text-blue-600 font-bold' : 'text-gray-400 hover:text-navy'}`}
               >
                 {lang.toUpperCase()}
