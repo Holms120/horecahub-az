@@ -5,7 +5,7 @@ import * as Sentry from '@sentry/react'
 // holding a stale index.html that points at a chunk hash the new build no
 // longer serves. Re-loading the page pulls the fresh index + chunks.
 const CHUNK_ERROR_RE =
-  /Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed|Loading chunk \d+ failed|ChunkLoadError/i
+  /Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed|Loading chunk \d+ failed|ChunkLoadError|is not a valid JavaScript MIME type/i
 
 function isChunkError(error) {
   const msg = (error && (error.message || error.name)) || String(error || '')
